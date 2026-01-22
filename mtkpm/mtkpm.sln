@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36811.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mtkpm", "mtkpm.csproj", "{AB172122-CEBE-44D3-8110-B24DCD712EDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mtkpm.Domain", "..\mtkpm.Domain\mtkpm.Domain.csproj", "{03D8CFC9-9B35-4392-96F1-ABF279927C2E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB172122-CEBE-44D3-8110-B24DCD712EDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB172122-CEBE-44D3-8110-B24DCD712EDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB172122-CEBE-44D3-8110-B24DCD712EDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB172122-CEBE-44D3-8110-B24DCD712EDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03D8CFC9-9B35-4392-96F1-ABF279927C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03D8CFC9-9B35-4392-96F1-ABF279927C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03D8CFC9-9B35-4392-96F1-ABF279927C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03D8CFC9-9B35-4392-96F1-ABF279927C2E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C130AC14-F725-42F1-8467-FD243F396546}
+	EndGlobalSection
+EndGlobal
