@@ -8,5 +8,7 @@ namespace mtkpm.Domain.Entities.Identity_Auth
 {
     internal class AccessToken
     {
+        public string Token { get; set; }
+        public DateTime ExpiresAt { get; set; }
     }
 }

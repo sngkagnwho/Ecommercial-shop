@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace mtkpm.Domain.Entities.Base
 {
-    public abstract class SoftDeleteEntity : BaseEntity, ISoftDelete
+    public abstract class SoftDeleteEntity : BaseEntity
     {
         public bool IsDeleted { get; set; } = false;
         public int? DeletedBy { get; set; }

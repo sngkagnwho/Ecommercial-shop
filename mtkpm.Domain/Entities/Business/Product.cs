@@ -14,20 +14,32 @@ namespace mtkpm.Domain.Entities.Business
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string? ImageUrl { get; set; }
+        public bool IsAvailable => StockQuantity > 0 && IsDeleted;
+
         protected Product()
         {
 
         }
-        public Product(string name, string description,decimal price, int stockquality,string imageurl)
+        
+        public Product(string name, string description, decimal price, int stockquality, string imageurl)
         {
-           Name = name;
-           Description = description;
-           Price = price;
-           StockQuantity = stockquality;
+            Name = name;
+            Description = description;
+            Price = price;
+            StockQuantity = stockquality;
             ImageUrl = imageurl;
-
+            
         }
-    }
 
-    
+        public void UpdateStockQuantity(int quantity)
+        {
+            if(quantity < 0)
+            {
+                throw new ArgumentException("Stock quantity cannot be negative.");
+            }
+            StockQuantity = quantity;   
+        }
+
+       
+    }
 }

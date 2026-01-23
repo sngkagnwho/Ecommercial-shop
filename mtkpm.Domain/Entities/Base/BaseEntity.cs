@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace mtkpm.Domain.Entities.Base
 {
-    public abstract class BaseEntity : IBaseEntity
+    public abstract class BaseEntity
     {
         public virtual int Id { get; set; }
         public virtual DateTime  CreateAt { get; set; }= DateTime.UtcNow;
