@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using mtkpm.Domain.Entities.Business;
+
 namespace mtkpm.Domain.Entities.Identity_Auth
 {
     public class User : IdentityUser<int>
@@ -19,27 +20,44 @@ namespace mtkpm.Domain.Entities.Identity_Auth
         public bool IsDeleted { get; set; }
 
         public DateTime? LastLoginAt { get; private set; }
+        
+        // Navigation Properties - Business
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public virtual ICollection<FavouriteProduct> FavouriteProducts { get; set; } = new List<FavouriteProduct>();
+        
+        // Navigation Properties - Auth
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        
         public virtual void SetCreated(int? createBy)
         {
             CreateAt = DateTime.UtcNow;
             CreatedBy = createBy;
         }
+        
         public virtual void SetUpdated(int? updateBy)
         {
             UpdateAt = DateTime.UtcNow;
             UpdatedBy = updateBy;
         }
+        
         public virtual void SetDeleted(int? deleteBy)
         {
             IsDeleted = true;
             DeleteAt = DateTime.UtcNow;
             DeleteBy = deleteBy;
         }
+        
         public virtual void UndoDelete()
         {
             IsDeleted = false;
             DeleteBy = null;
             DeleteAt = null;
+        }
+        
+        public void UpdateLastLogin()
+        {
+            LastLoginAt = DateTime.UtcNow;
         }
     }
 }

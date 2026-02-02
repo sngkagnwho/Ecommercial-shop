@@ -10,24 +10,23 @@ namespace mtkpm.Domain.Entities.Business
 {
     public class FavouriteProduct: SoftDeleteEntity
     {
-        public int UserId { get; set; }
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public DateTime CreateAt { get; set; }
-        public User? User { get; set; }
-        public decimal UnitPrice { get; set; }
-        public Product? Product { get; set; }
-        public decimal TotalPrice => UnitPrice*Quantity;
-        public FavouriteProduct()
+        public int UserId { get; private set; }
+        public int ProductId { get; private set; }
+        public DateTime AddedAt { get; private set; }
+        
+        public virtual User? User { get; set; }
+        public virtual Product? Product { get; set; }
+        
+        protected FavouriteProduct()
         {
             
         }
+        
         public FavouriteProduct(int userId, int productId)
         {
             UserId = userId;
             ProductId = productId;
-            CreateAt = DateTime.UtcNow;
+            AddedAt = DateTime.UtcNow;
         }
-
     }
 }

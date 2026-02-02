@@ -22,18 +22,17 @@ namespace mtkpm.Domain.Entities.Business
         public Address(string street, string city, string district, string ward,
                       string postalCode, string country, string phoneNumber, string receiverName)
         {
-            Street = street ?? throw new ArgumentNullException(nameof(street));
-            City = city ?? throw new ArgumentNullException(nameof(city));
+            Street = street;
+            City = city;
             District = district;
             Ward = ward;
             PostalCode = postalCode;
-            Country = country ?? "Vietnam";
-            PhoneNumber = phoneNumber ?? throw new ArgumentNullException(nameof(phoneNumber));
-            ReceiverName = receiverName ?? throw new ArgumentNullException(nameof(receiverName));
+            Country = country;
+            PhoneNumber = phoneNumber;
+            ReceiverName = receiverName;
         }
 
-        // EF Core constructor
-        private Address() { }
+     
 
        
     }

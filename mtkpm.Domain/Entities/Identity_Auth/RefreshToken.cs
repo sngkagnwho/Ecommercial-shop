@@ -9,23 +9,47 @@ namespace mtkpm.Domain.Entities.Identity_Auth
 {
     public class RefreshToken : BaseEntity
     {
-        public int UserId { get; set; }
+        public int UserId { get; private set; }
         public virtual User? User { get; set; }
+        
         public string Token { get; private set; }
         public DateTime ExpiresAt { get; private set; }
-        public DateTime? Revoked { get; private set; }
-        public string? DeviceInfo { get; set; }
-        public string? IpAddress { get; set; }
+        public DateTime? RevokedAt { get; private set; }
+        public string? RevokedByIp { get; private set; }
+        public string? RevokedReason { get; private set; }
+        
+        // Token Rotation - để detect token reuse attack
+        public string? ReplacedByToken { get; private set; }
+        
+        public string? DeviceInfo { get; private set; }
+        public string? IpAddress { get; private set; }
+        
         public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
-        public bool IsActive => Revoked == null && !IsExpired;
-        public RefreshToken(int userId, string token, DateTime expiresAt, string deviceInfo, string ipAddress)
+        public bool IsRevoked => RevokedAt.HasValue;
+        public bool IsActive => !IsRevoked && !IsExpired;
+        
+        protected RefreshToken() { }
+        
+        public RefreshToken(int userId, string token, DateTime expiresAt, string? deviceInfo, string? ipAddress)
         {
             UserId = userId;
-            Token = token;
+            Token = token ?? throw new ArgumentNullException(nameof(token));
             ExpiresAt = expiresAt;
             DeviceInfo = deviceInfo;
             IpAddress = ipAddress;
         }
-        public void Revoke() => Revoked = DateTime.UtcNow;
+        
+        public void Revoke(string? ipAddress, string? reason = null)
+        {
+            RevokedAt = DateTime.UtcNow;
+            RevokedByIp = ipAddress;
+            RevokedReason = reason;
+        }
+        
+        public void ReplaceWith(string newToken)
+        {
+            ReplacedByToken = newToken;
+            Revoke(IpAddress, "Replaced by new token");
+        }
     }
 }

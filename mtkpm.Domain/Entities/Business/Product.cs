@@ -14,21 +14,25 @@ namespace mtkpm.Domain.Entities.Business
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string? ImageUrl { get; set; }
-        public bool IsAvailable => StockQuantity > 0 && IsDeleted;
+        
+        public int CategoryId { get; set; }
+        public virtual Category? Category { get; set; }
+        
+        public bool IsAvailable => StockQuantity > 0 && !IsDeleted;
 
         protected Product()
         {
 
         }
         
-        public Product(string name, string description, decimal price, int stockquality, string imageurl)
+        public Product(string name, string description, decimal price, int stockQuantity, int categoryId, string? imageUrl = null)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description;
-            Price = price;
-            StockQuantity = stockquality;
-            ImageUrl = imageurl;
-            
+            Price = price >= 0 ? price : throw new ArgumentException("Price cannot be negative");
+            StockQuantity = stockQuantity >= 0 ? stockQuantity : throw new ArgumentException("Stock quantity cannot be negative");
+            CategoryId = categoryId;
+            ImageUrl = imageUrl;
         }
 
         public void UpdateStockQuantity(int quantity)
@@ -39,7 +43,33 @@ namespace mtkpm.Domain.Entities.Business
             }
             StockQuantity = quantity;   
         }
-
-       
+        
+        public void UpdatePrice(decimal newPrice)
+        {
+            if (newPrice < 0)
+            {
+                throw new ArgumentException("Price cannot be negative.");
+            }
+            Price = newPrice;
+        }
+        
+        public void DecreaseStock(int quantity)
+        {
+            if (quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than 0");
+            
+            if (StockQuantity < quantity)
+                throw new InvalidOperationException("Not enough stock available");
+            
+            StockQuantity -= quantity;
+        }
+        
+        public void IncreaseStock(int quantity)
+        {
+            if (quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than 0");
+            
+            StockQuantity += quantity;
+        }
     }
 }

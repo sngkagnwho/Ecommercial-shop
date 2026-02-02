@@ -9,20 +9,21 @@ namespace mtkpm.Domain.Entities.Base
     public abstract class BaseEntity
     {
         public virtual int Id { get; set; }
-        public virtual DateTime  CreateAt { get; set; }= DateTime.UtcNow;
+        public virtual DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public virtual DateTime? UpdateAt { get; set; }
         public virtual int? CreatedBy { get; set; }
         public virtual int? UpdatedBy { get; set; }
-        public virtual void SetCreated(int? CreateBy)
+        
+        public virtual void SetCreated(int? createdBy)
         {
             CreateAt = DateTime.UtcNow;
-            CreatedBy = CreateBy;
+            CreatedBy = createdBy;
         }
-        public virtual void SetUpdated(int? UpdateBy)
+        
+        public virtual void SetUpdated(int? updatedBy)
         {
             UpdateAt = DateTime.UtcNow;
-            UpdatedBy = UpdateBy;
+            UpdatedBy = updatedBy;
         }
-
     }
 }
