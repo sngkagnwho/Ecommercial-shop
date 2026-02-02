@@ -1,0 +1,16 @@
+D:\MTKPM_WEB\mtkpm.Application\bin\Debug\net8.0\mtkpm.Application.deps.json
+D:\MTKPM_WEB\mtkpm.Application\bin\Debug\net8.0\mtkpm.Application.dll
+D:\MTKPM_WEB\mtkpm.Application\bin\Debug\net8.0\mtkpm.Application.pdb
+D:\MTKPM_WEB\mtkpm.Application\bin\Debug\net8.0\mtkpm.Domain.dll
+D:\MTKPM_WEB\mtkpm.Application\bin\Debug\net8.0\mtkpm.Domain.pdb
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.csproj.AssemblyReference.cache
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.AssemblyInfoInputs.cache
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.AssemblyInfo.cs
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.csproj.CoreCompileInputs.cache
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.sourcelink.json
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Ap.060AA972.Up2Date
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.dll
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\refint\mtkpm.Application.dll
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\mtkpm.Application.pdb
+D:\MTKPM_WEB\mtkpm.Application\obj\Debug\net8.0\ref\mtkpm.Application.dll
