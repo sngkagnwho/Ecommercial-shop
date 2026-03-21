@@ -18,7 +18,7 @@ namespace mtkpm.Application.Common.DTOs.Order
         public decimal TotalAmount { get; set; }
         public OrderStatus Status { get; set; }
         public string StatusDisplay { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentMethodType PaymentMethod { get; set; }
         public string PaymentMethodDisplay { get; set; }
         public bool IsPaid { get; set; }
         public DateTime? PaidAt { get; set; }

@@ -6,13 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Repositories;
+using mtkpm.Application.Common.Interfaces.Services;
 using mtkpm.Domain.Entities.Identity_Auth;
+using mtkpm.Domain.Enums.Business;
 using mtkpm.Infrastructure.Configuration;
 using mtkpm.Infrastructure.Data.Contexts;
 using mtkpm.Infrastructure.Data.Repositories;
 using mtkpm.Infrastructure.Data.UnitOfWork;
 using mtkpm.Infrastructure.Services;
+using mtkpm.Infrastructure.Services.Payments;
+using mtkpm.Infrastructure.Services.Pricing;
+using mtkpm.Infrastructure.Services.Discounts;
+using mtkpm.Infrastructure.Services.Notifications;
 using mtkpm.Infrastructure.Services.SeedData;
+using System.Security.Claims;
 using System.Text;
 
 namespace mtkpm.Infrastructure
@@ -101,7 +108,9 @@ namespace mtkpm.Infrastructure
                     ValidIssuer = jwtSettings.Issuer,
                     ValidAudience = jwtSettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role,
+                    NameClaimType = ClaimTypes.Name
                 };
 
                 options.Events = new JwtBearerEvents
@@ -140,6 +149,25 @@ namespace mtkpm.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<DataSeeder>();
+            
+            // Add Payment Services - Factory Pattern
+            services.AddScoped<IPaymentFactory, PaymentFactory>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            
+            // Add Pricing Services - Strategy Pattern
+            services.AddScoped<IPricingService, PricingService>();
+            
+            // Add Discount Services - Decorator Pattern
+            services.AddScoped<IDiscountService, DiscountService>();
+            
+            // Add Notification Services - Observer Pattern
+            services.AddSingleton<IEventPublisher, EventPublisher>();
+            services.AddScoped<EmailNotificationService>();
+            services.AddScoped<SMSNotificationService>();
+            services.AddScoped<PushNotificationService>();
+            
+            // Register subscriber
+            services.AddHostedService<NotificationSubscriber>();
             
             services.AddSingleton<ILoggerService>(provider => LoggerService.Instance);
             

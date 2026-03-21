@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("mtkpm.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c713c5a8fa0a90d194b924997d53f418ae84919")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d2fd0255254b9b6dad5567c19e7c607c0818cb6")]
 [assembly: System.Reflection.AssemblyProductAttribute("mtkpm.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("mtkpm.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -31,7 +31,7 @@ namespace mtkpm.Domain.Entities.Business
         public OrderStatus Status { get; private set; }
         
         // Payment
-        public PaymentMethod PaymentMethod { get; private set; }
+        public PaymentMethodType PaymentMethod { get; private set; }
         public bool IsPaid { get; private set; }
         public DateTime? PaidAt { get; private set; }
         
@@ -52,7 +52,7 @@ namespace mtkpm.Domain.Entities.Business
             decimal subTotal,
             decimal shippingFee,
             decimal discount,
-            PaymentMethod paymentMethod,
+            PaymentMethodType paymentMethod,
             string? note = null)
         {
             UserId = userId;
