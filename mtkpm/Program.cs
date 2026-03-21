@@ -95,6 +95,9 @@ namespace mtkpm
             // Use Exception Handling Middleware
             app.UseExceptionHandlingMiddleware();
 
+            // Use Request/Response Logging Middleware
+            app.UseMiddleware<mtkpm.Middleware.RequestResponseLoggingMiddleware>();
+
             // Initialize Database with seed data
             using (var scope = app.Services.CreateScope())
             {

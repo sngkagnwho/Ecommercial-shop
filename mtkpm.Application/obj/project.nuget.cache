@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LGo9J/yj6DA=",
+  "dgSpecHash": "BgUMjgwNuls=",
   "success": true,
-  "projectFilePath": "D:\\MTKPM_WEB\\mtkpm.Application\\mtkpm.Application.csproj",
+  "projectFilePath": "D:\\MTKPM_WEB\\backend\\mtkpm.Application\\mtkpm.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Adminn\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\Adminn\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

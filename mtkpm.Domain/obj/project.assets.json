@@ -817,11 +817,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\MTKPM_WEB\\mtkpm.Domain\\mtkpm.Domain.csproj",
+      "projectUniqueName": "D:\\MTKPM_WEB\\backend\\mtkpm.Domain\\mtkpm.Domain.csproj",
       "projectName": "mtkpm.Domain",
-      "projectPath": "D:\\MTKPM_WEB\\mtkpm.Domain\\mtkpm.Domain.csproj",
+      "projectPath": "D:\\MTKPM_WEB\\backend\\mtkpm.Domain\\mtkpm.Domain.csproj",
       "packagesPath": "C:\\Users\\Adminn\\.nuget\\packages\\",
-      "outputPath": "D:\\MTKPM_WEB\\mtkpm.Domain\\obj\\",
+      "outputPath": "D:\\MTKPM_WEB\\backend\\mtkpm.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

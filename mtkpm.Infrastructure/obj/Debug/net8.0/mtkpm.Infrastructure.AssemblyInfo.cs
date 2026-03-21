@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("mtkpm.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+298bbc7f1f06d141998150b30a8932ea32759c61")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c713c5a8fa0a90d194b924997d53f418ae84919")]
 [assembly: System.Reflection.AssemblyProductAttribute("mtkpm.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("mtkpm.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,5 @@
 using MediatR;
+using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Repositories;
 
 namespace mtkpm.Application.Features.Products.Commands.DeleteProduct
@@ -6,10 +7,12 @@ namespace mtkpm.Application.Features.Products.Commands.DeleteProduct
     public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILoggerService _logger;
 
-        public DeleteProductCommandHandler(IUnitOfWork unitOfWork)
+        public DeleteProductCommandHandler(IUnitOfWork unitOfWork, ILoggerService logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public async Task<bool> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
@@ -22,6 +25,7 @@ namespace mtkpm.Application.Features.Products.Commands.DeleteProduct
 
             _unitOfWork.Products.Remove(product);
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogWarning($"Xóa s?n ph?m: ProductId={product.Id}, Tên={product.Name}", "ProductService");
 
             return true;
         }

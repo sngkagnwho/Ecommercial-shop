@@ -141,6 +141,8 @@ namespace mtkpm.Infrastructure
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<DataSeeder>();
             
+            services.AddSingleton<ILoggerService>(provider => LoggerService.Instance);
+            
             services.AddHttpContextAccessor();
 
             return services;
