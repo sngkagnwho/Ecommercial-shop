@@ -6,7 +6,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Bundle Discount Decorator - Gi?m giá khi mua combo
+    /// Bundle Discount Decorator - Discount when buying combo
     /// </summary>
     public class BundleDiscountDecorator : DiscountDecorator
     {
@@ -14,11 +14,11 @@ namespace mtkpm.Infrastructure.Services.Discounts
         private readonly decimal _discountPercent;
 
         /// <summary>
-        /// T?o bundle discount
+        /// Create bundle discount
         /// </summary>
-        /// <param name="innerDiscount">Discount bên trong ?? wrap</param>
-        /// <param name="requiredItemCount">S? s?n ph?m t?i thi?u ?? áp d?ng</param>
-        /// <param name="discountPercent">Ph?n tr?m gi?m</param>
+        /// <param name="innerDiscount">Inner discount to wrap</param>
+        /// <param name="requiredItemCount">Minimum number of items to apply</param>
+        /// <param name="discountPercent">Discount percentage</param>
         public BundleDiscountDecorator(IDiscount innerDiscount, int requiredItemCount, decimal discountPercent)
             : base(innerDiscount)
         {

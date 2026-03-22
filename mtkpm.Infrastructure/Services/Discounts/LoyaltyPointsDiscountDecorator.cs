@@ -6,19 +6,19 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Loyalty Points Discount Decorator - Gi?m theo ?i?m thành viên
+    /// Loyalty Points Discount Decorator - Discount by member points
     /// </summary>
     public class LoyaltyPointsDiscountDecorator : DiscountDecorator
     {
         private readonly int _loyaltyPoints;
-        private readonly decimal _pointsValue; // M?i ?i?m b?ng bao nhiêu ti?n
+        private readonly decimal _pointsValue; // Each point equals how much money
 
         /// <summary>
-        /// T?o loyalty points discount
+        /// Create loyalty points discount
         /// </summary>
-        /// <param name="innerDiscount">Discount bên trong ?? wrap</param>
-        /// <param name="loyaltyPoints">S? ?i?m thành viên</param>
-        /// <param name="pointsValue">Giá tr? m?i ?i?m (m?c ??nh 1000 ? = 1 ?i?m)</param>
+        /// <param name="innerDiscount">Inner discount to wrap</param>
+        /// <param name="loyaltyPoints">Member loyalty points</param>
+        /// <param name="pointsValue">Value per point (default 1000)</param>
         public LoyaltyPointsDiscountDecorator(IDiscount innerDiscount, int loyaltyPoints, decimal pointsValue = 1000)
             : base(innerDiscount)
         {

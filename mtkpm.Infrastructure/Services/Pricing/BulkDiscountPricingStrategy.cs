@@ -6,18 +6,18 @@ using mtkpm.Domain.Entities.Business;
 namespace mtkpm.Infrastructure.Services.Pricing
 {
     /// <summary>
-    /// Bulk Discount Pricing Strategy - Gi?m giá khi mua nhi?u
+    /// Bulk Discount Pricing Strategy - Discount when buying many
     /// </summary>
     public class BulkDiscountPricingStrategy : IPricingStrategy
     {
         public string StrategyName => "Bulk Discount Pricing";
-        public string Description => "Gi?m giá d?a vào s? l??ng mua";
+        public string Description => "Discount based on quantity purchased";
 
         private readonly decimal _threshold;
         private readonly decimal _discountPercent;
 
         /// <summary>
-        /// Mua t? X s?n ph?m tr? lên s? ???c gi?m Y%
+        /// Buy from X products and above will get Y% discount
         /// </summary>
         public BulkDiscountPricingStrategy(int threshold = 10, decimal discountPercent = 10m)
         {
@@ -32,7 +32,7 @@ namespace mtkpm.Infrastructure.Services.Pricing
 
             var basePrice = product.Price * quantity;
 
-            // N?u mua >= threshold s?n ph?m, áp d?ng discount
+            // If buy >= threshold products, apply discount
             if (quantity >= _threshold)
             {
                 var discountAmount = basePrice * (_discountPercent / 100);

@@ -6,7 +6,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Fixed Amount Discount Decorator - Gi?m s? ti?n c? ??nh
+    /// Fixed Amount Discount Decorator - Discount fixed amount
     /// </summary>
     public class FixedAmountDiscountDecorator : DiscountDecorator
     {
@@ -14,11 +14,11 @@ namespace mtkpm.Infrastructure.Services.Discounts
         private readonly decimal _minOrderAmount;
 
         /// <summary>
-        /// T?o fixed amount discount
+        /// Create fixed amount discount
         /// </summary>
-        /// <param name="innerDiscount">Discount bên trong ?? wrap</param>
-        /// <param name="discountAmount">S? ti?n gi?m c? ??nh</param>
-        /// <param name="minOrderAmount">Giá t?i thi?u ??n hàng</param>
+        /// <param name="innerDiscount">Inner discount to wrap</param>
+        /// <param name="discountAmount">Fixed discount amount</param>
+        /// <param name="minOrderAmount">Minimum order amount</param>
         public FixedAmountDiscountDecorator(IDiscount innerDiscount, decimal discountAmount, decimal minOrderAmount)
             : base(innerDiscount)
         {

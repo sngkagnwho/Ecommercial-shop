@@ -50,11 +50,11 @@ namespace mtkpm.Infrastructure.Services.Discounts
         {
             _logger.LogInfo("Building default discounts", "DiscountService");
 
-            // B?t ??u v?i BaseDiscount
-            // Sau ?ó wrap v?i các decorators
+            // Start with BaseDiscount
+            // Then wrap with decorators
             IDiscount discount = new BaseDiscount();
 
-            // Ví d?: T? ??ng áp d?ng free shipping cho ??n > 500k
+            // Example: Auto apply free shipping for orders > 500k
             discount = new FreeShippingDiscountDecorator(discount, shippingCost: 50000, minItemCount: 0);
 
             return discount;
@@ -67,10 +67,10 @@ namespace mtkpm.Infrastructure.Services.Discounts
 
             _logger.LogInfo($"Building discount chain with {discounts.Length} discounts", "DiscountService");
 
-            // B?t ??u t? discount ??u tiên
+            // Start from first discount
             IDiscount result = discounts[0];
 
-            // Wrap l?n l??t v?i các discount khác
+            // Wrap sequentially with other discounts
             for (int i = 1; i < discounts.Length; i++)
             {
                 if (discounts[i] is DiscountDecorator decorator)

@@ -17,7 +17,7 @@ namespace mtkpm.Infrastructure.Services.Pricing
         {
             _logger = logger;
             
-            // ??ng ký t?t c? strategies
+            // Register all strategies
             _strategies = new Dictionary<string, IPricingStrategy>
             {
                 { "regular", new RegularPricingStrategy() },
@@ -56,7 +56,7 @@ namespace mtkpm.Infrastructure.Services.Pricing
             decimal bestPrice = product.Price * quantity;
             string bestStrategy = "Regular";
 
-            // Th? t?t c? strategies và ch?n giá t?t nh?t (nh? nh?t) cho customer
+            // Try all strategies and select the best price (lowest) for customer
             foreach (var strategy in _strategies.Values)
             {
                 var price = strategy.CalculatePrice(product, quantity, context);

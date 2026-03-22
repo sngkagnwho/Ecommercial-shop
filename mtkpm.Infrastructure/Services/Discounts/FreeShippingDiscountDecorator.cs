@@ -6,7 +6,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Free Shipping Discount Decorator - Mi?n phí v?n chuy?n
+    /// Free Shipping Discount Decorator - Free shipping
     /// </summary>
     public class FreeShippingDiscountDecorator : DiscountDecorator
     {
@@ -14,11 +14,11 @@ namespace mtkpm.Infrastructure.Services.Discounts
         private readonly int _minItemCount;
 
         /// <summary>
-        /// T?o free shipping discount
+        /// Create free shipping discount
         /// </summary>
-        /// <param name="innerDiscount">Discount bên trong ?? wrap</param>
-        /// <param name="shippingCost">Chi phí v?n chuy?n chu?n</param>
-        /// <param name="minItemCount">S? s?n ph?m t?i thi?u (m?c ??nh 0)</param>
+        /// <param name="innerDiscount">Inner discount to wrap</param>
+        /// <param name="shippingCost">Standard shipping cost</param>
+        /// <param name="minItemCount">Minimum number of items (default 0)</param>
         public FreeShippingDiscountDecorator(IDiscount innerDiscount, decimal shippingCost, int minItemCount = 0)
             : base(innerDiscount)
         {

@@ -6,21 +6,21 @@ using mtkpm.Domain.Entities.Business;
 namespace mtkpm.Infrastructure.Services.Pricing
 {
     /// <summary>
-    /// Seasonal Pricing Strategy - Giá theo mùa/d?p (Black Friday, T?t, etc)
+    /// Seasonal Pricing Strategy - Price by season/occasion (Black Friday, Tet, etc)
     /// </summary>
     public class SeasonalPricingStrategy : IPricingStrategy
     {
         public string StrategyName => "Seasonal Pricing";
-        public string Description => "Giá bán theo mùa/d?p l?";
+        public string Description => "Price by season/special occasions";
 
         private readonly Dictionary<(int Month, int Day), decimal> _seasonalDiscounts;
 
         public SeasonalPricingStrategy()
         {
-            // Thi?t l?p các d?p sale trong n?m
+            // Setup seasonal sales throughout the year
             _seasonalDiscounts = new Dictionary<(int Month, int Day), decimal>
             {
-                // T?t Nguyên ?án (1/1 Âm l?ch ? kho?ng 2/10)
+                // Tet Lunar New Year (approx Feb)
                 { (2, 1), 0.15m },  // 15% discount
                 
                 // Black Friday (11/27)
@@ -49,14 +49,14 @@ namespace mtkpm.Infrastructure.Services.Pricing
             var currentDate = context.CurrentDate;
             var seasonKey = (currentDate.Month, currentDate.Day);
 
-            // Ki?m tra xem hôm nay có sale không
+            // Check if today has a sale
             if (_seasonalDiscounts.TryGetValue(seasonKey, out var discountPercent))
             {
                 var discountAmount = basePrice * discountPercent;
                 return basePrice - discountAmount;
             }
 
-            // N?u không có sale, tr? v? giá th??ng
+            // If no sale, return regular price
             return basePrice;
         }
     }

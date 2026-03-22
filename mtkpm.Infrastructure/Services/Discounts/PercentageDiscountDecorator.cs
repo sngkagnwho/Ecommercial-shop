@@ -6,7 +6,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Percentage Discount Decorator - Gi?m theo ph?n tr?m
+    /// Percentage Discount Decorator - Discount by percentage
     /// </summary>
     public class PercentageDiscountDecorator : DiscountDecorator
     {
@@ -14,11 +14,11 @@ namespace mtkpm.Infrastructure.Services.Discounts
         private readonly decimal _minAmount;
 
         /// <summary>
-        /// T?o percentage discount
+        /// Create percentage discount
         /// </summary>
-        /// <param name="innerDiscount">Discount bên trong ?? wrap</param>
-        /// <param name="discountPercent">Ph?n tr?m gi?m (0-100)</param>
-        /// <param name="minAmount">Giá t?i thi?u ?? áp d?ng (m?c ??nh 0)</param>
+        /// <param name="innerDiscount">Inner discount to wrap</param>
+        /// <param name="discountPercent">Discount percentage (0-100)</param>
+        /// <param name="minAmount">Minimum amount to apply (default 0)</param>
         public PercentageDiscountDecorator(IDiscount innerDiscount, decimal discountPercent, decimal minAmount = 0)
             : base(innerDiscount)
         {

@@ -6,8 +6,8 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
-    /// Discount Decorator - Base class cho t?t c? decorators
-    /// Cho phép stacking discounts (áp d?ng nhi?u discount l?n l??t)
+    /// Discount Decorator - Base class for all decorators
+    /// Allows stacking discounts (applying multiple discounts sequentially)
     /// </summary>
     public abstract class DiscountDecorator : IDiscount
     {
@@ -22,18 +22,18 @@ namespace mtkpm.Infrastructure.Services.Discounts
         public abstract string Description { get; }
 
         /// <summary>
-        /// Áp d?ng decorator này r?i g?i decorator trong cùng
-        /// ?i?u này cho phép stacking (ví d?: 10% discount + Free shipping)
+        /// Apply this decorator then call the inner decorator
+        /// This allows stacking (e.g.: 10% discount + Free shipping)
         /// </summary>
         public virtual decimal ApplyDiscount(CartDto cart)
         {
             if (cart == null)
                 throw new ArgumentNullException(nameof(cart));
 
-            // Áp d?ng discount bên trong tr??c
+            // Apply inner discount first
             var priceAfterInnerDiscount = _innerDiscount.ApplyDiscount(cart);
             
-            // T?o cart t?m th?i v?i giá ?ã ???c discount t? bên trong
+            // Create a temporary cart with the discounted price from the inner discount
             var tempCart = new CartDto
             {
                 UserId = cart.UserId,
@@ -42,13 +42,13 @@ namespace mtkpm.Infrastructure.Services.Discounts
                 TotalAmount = priceAfterInnerDiscount
             };
 
-            // Áp d?ng discount hi?n t?i
+            // Apply the current discount
             return ApplyCurrentDiscount(tempCart);
         }
 
         /// <summary>
-        /// Áp d?ng discount c?a decorator hi?n t?i
-        /// Subclass override method này
+        /// Apply the discount of the current decorator
+        /// Subclass override this method
         /// </summary>
         protected abstract decimal ApplyCurrentDiscount(CartDto cart);
 

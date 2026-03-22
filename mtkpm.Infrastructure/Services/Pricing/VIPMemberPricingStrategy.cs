@@ -6,13 +6,13 @@ using mtkpm.Domain.Entities.Business;
 namespace mtkpm.Infrastructure.Services.Pricing
 {
     /// <summary>
-    /// VIP Member Pricing Strategy - Giá cho thành viên VIP
-    /// Phân c?p: Bronze, Silver, Gold, Platinum
+    /// VIP Member Pricing Strategy - Special price for VIP members
+    /// Tier: Bronze, Silver, Gold, Platinum
     /// </summary>
     public class VIPMemberPricingStrategy : IPricingStrategy
     {
         public string StrategyName => "VIP Member Pricing";
-        public string Description => "Giá ??c bi?t cho thành viên VIP";
+        public string Description => "Special pricing for VIP members";
 
         private readonly Dictionary<string, decimal> _tierDiscounts = new()
         {
@@ -29,7 +29,7 @@ namespace mtkpm.Infrastructure.Services.Pricing
 
             var basePrice = product.Price * quantity;
 
-            // N?u là VIP member, áp d?ng discount theo tier
+            // If VIP member, apply discount by tier
             if (!string.IsNullOrEmpty(context.UserTier) && 
                 _tierDiscounts.TryGetValue(context.UserTier, out var discountPercent))
             {
@@ -37,7 +37,7 @@ namespace mtkpm.Infrastructure.Services.Pricing
                 return basePrice - discountAmount;
             }
 
-            // N?u không ph?i VIP, tr? v? giá th??ng
+            // If not VIP, return regular price
             return basePrice;
         }
     }
