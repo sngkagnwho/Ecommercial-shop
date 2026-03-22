@@ -1,5 +1,7 @@
 using mtkpm.Application.Common.DTOs.Cart;
+using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
+using mtkpm.Domain.Events;
 
 namespace mtkpm.Infrastructure.Services.Discounts
 {

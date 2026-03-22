@@ -14,7 +14,7 @@ namespace mtkpm.Application.Common.DTOs.Order
         public string? BillingAddress { get; set; }
 
         [Required(ErrorMessage = "Ph??ng th?c thanh toán là b?t bu?c")]
-        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentMethodType PaymentMethod { get; set; }
 
         [StringLength(500, ErrorMessage = "Ghi chú không ???c v??t quá 500 ký t?")]
         public string? Note { get; set; }

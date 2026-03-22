@@ -1,6 +1,7 @@
 using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
 using mtkpm.Domain.Entities.Business;
+using mtkpm.Domain.Events;
 
 namespace mtkpm.Infrastructure.Services.Pricing
 {

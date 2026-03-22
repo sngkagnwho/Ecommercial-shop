@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
 using mtkpm.Application.Features.Products.Commands.CalculatePrice;
-using mtkpm.Infrastructure.Services;
+using mtkpm.Application.Common.Interfaces.Services;
 
 namespace mtkpm.Controllers
 {

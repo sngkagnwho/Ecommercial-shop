@@ -1,5 +1,6 @@
 using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
+using mtkpm.Domain.Events;
 using mtkpm.Domain.Enums.Business;
 
 namespace mtkpm.Infrastructure.Services.Payments
