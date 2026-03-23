@@ -1,26 +1,26 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.Auth
 {
     public class RegisterDto
     {
-        [Required(ErrorMessage = "T�n ng??i d�ng l� b?t bu?c")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "T�n ng??i d�ng ph?i t? 3 ??n 100 k� t?")]
+        [Required(ErrorMessage = "Tên người dùng là bắt buộc")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Tên người dùng phải từ 3 đến 100 ký tự")]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Email l� b?t bu?c")]
-        [EmailAddress(ErrorMessage = "Email kh�ng h?p l?")]
+        [Required(ErrorMessage = "Email là bắt buộc")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "M?t kh?u l� b?t bu?c")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "M?t kh?u ph?i t? 6 ??n 100 k� t?")]
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải từ 6 đến 100 ký tự")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "X�c nh?n m?t kh?u l� b?t bu?c")]
-        [Compare("Password", ErrorMessage = "M?t kh?u x�c nh?n kh�ng kh?p")]
+        [Required(ErrorMessage = "Xác nhận mật khẩu là bắt buộc")]
+        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         public string ConfirmPassword { get; set; }
 
-        [Phone(ErrorMessage = "S? ?i?n tho?i kh�ng h?p l?")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         public string? PhoneNumber { get; set; }
     }
 }

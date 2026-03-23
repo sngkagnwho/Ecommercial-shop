@@ -56,7 +56,7 @@ namespace mtkpm.Controllers
 
             if (result == null)
             {
-                return NotFound(ApiResponse<OrderDto>.FailureResponse("Không tìm thấy đơn hàng"));
+                return NotFound(ApiResponse<OrderDto>.FailureResponse("Đơn hàng không tìm thấy"));
             }
 
             var userId = _currentUserService.UserId!.Value;
@@ -81,7 +81,7 @@ namespace mtkpm.Controllers
 
             if (result == null)
             {
-                return NotFound(ApiResponse<OrderDto>.FailureResponse("Không tìm thấy đơn hàng"));
+                return NotFound(ApiResponse<OrderDto>.FailureResponse("Đơn hàng không tìm thấy"));
             }
 
             var userId = _currentUserService.UserId!.Value;

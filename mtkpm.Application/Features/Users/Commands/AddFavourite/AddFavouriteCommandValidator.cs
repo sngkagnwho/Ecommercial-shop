@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace mtkpm.Application.Features.Users.Commands.AddFavourite
 {
@@ -7,10 +7,10 @@ namespace mtkpm.Application.Features.Users.Commands.AddFavourite
         public AddFavouriteCommandValidator()
         {
             RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("User ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("User ID không hợp lệ");
 
             RuleFor(x => x.ProductId)
-                .GreaterThan(0).WithMessage("Product ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("Product ID không hợp lệ");
         }
     }
 }

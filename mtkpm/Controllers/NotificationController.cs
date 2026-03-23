@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
 using mtkpm.Application.Common.Interfaces.Services;
@@ -20,8 +20,8 @@ namespace mtkpm.Controllers
         }
 
         /// <summary>
-        /// L?y danh s�ch observers ?ang ??ng k�
-        /// Observer Pattern - Hi?n th? t?t c? subscribers
+        /// Lấy danh sách các observer đang đăng ký
+        /// Observer Pattern - Hiện thị tất cả subscribers
         /// </summary>
         [HttpGet("subscribers")]
         [ProducesResponseType(typeof(SubscribersResponse), StatusCodes.Status200OK)]
@@ -34,15 +34,15 @@ namespace mtkpm.Controllers
             {
                 TotalSubscribers = count,
                 Subscribers = names,
-                Message = $"{count} notification observers are listening for events"
+                Message = $"{count} observer đang lắng nghe các sự kiện"
             };
 
             return Ok(ApiResponse<SubscribersResponse>.SuccessResponse(response));
         }
 
         /// <summary>
-        /// G?i test notification cho order created event
-        /// Observer Pattern - Demo: t?t c? observers s? nh?n event
+        /// Gửi test notification cho sự kiện tạo đơn hàng
+        /// Observer Pattern - Demo: tất cả observers sẽ nhận event
         /// </summary>
         [HttpPost("test/order-created")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -59,12 +59,12 @@ namespace mtkpm.Controllers
             await _eventPublisher.PublishAsync(@event);
 
             return Ok(ApiResponse<object>.SuccessResponse(
-                new { message = "Order created event published to all observers" }
+                new { message = "Sự kiện tạo đơn hàng đã được công bố tới tất cả observers" }
             ));
         }
 
         /// <summary>
-        /// G?i test notification cho payment completed event
+        /// Gửi test notification cho sự kiện thanh toán hoàn thành
         /// </summary>
         [HttpPost("test/payment-completed")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -81,12 +81,12 @@ namespace mtkpm.Controllers
             await _eventPublisher.PublishAsync(@event);
 
             return Ok(ApiResponse<object>.SuccessResponse(
-                new { message = "Payment completed event published to all observers" }
+                new { message = "Sự kiện thanh toán hoàn thành đã được công bố tới tất cả observers" }
             ));
         }
 
         /// <summary>
-        /// G?i test notification cho order shipped event
+        /// Gửi test notification cho sự kiện đơn hàng được gửi đi
         /// </summary>
         [HttpPost("test/order-shipped")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -102,12 +102,12 @@ namespace mtkpm.Controllers
             await _eventPublisher.PublishAsync(@event);
 
             return Ok(ApiResponse<object>.SuccessResponse(
-                new { message = "Order shipped event published to all observers" }
+                new { message = "Sự kiện đơn hàng được gửi đi đã được công bố tới tất cả observers" }
             ));
         }
 
         /// <summary>
-        /// G?i test notification cho payment failed event
+        /// Gửi test notification cho sự kiện thanh toán thất bại
         /// </summary>
         [HttpPost("test/payment-failed")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -123,12 +123,12 @@ namespace mtkpm.Controllers
             await _eventPublisher.PublishAsync(@event);
 
             return Ok(ApiResponse<object>.SuccessResponse(
-                new { message = "Payment failed event published to all observers" }
+                new { message = "Sự kiện thanh toán thất bại đã được công bố tới tất cả observers" }
             ));
         }
 
         /// <summary>
-        /// G?i test notification cho order cancelled event
+        /// Gửi test notification cho sự kiện đơn hàng bị hủy
         /// </summary>
         [HttpPost("test/order-cancelled")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -144,60 +144,60 @@ namespace mtkpm.Controllers
             await _eventPublisher.PublishAsync(@event);
 
             return Ok(ApiResponse<object>.SuccessResponse(
-                new { message = "Order cancelled event published to all observers" }
+                new { message = "Sự kiện đơn hàng bị hủy đã được công bố tới tất cả observers" }
             ));
         }
 
         /// <summary>
-        /// H??ng d?n Observer Pattern
+        /// Hướng dẫn sử dụng Observer Pattern
         /// </summary>
         [HttpGet("guide")]
         [AllowAnonymous]
         public IActionResult GetObserverPatternGuide()
         {
             var guide = @"
-Observer Pattern - Notification System
+Observer Pattern - Hệ thống Thông báo
 
-**M?c Ti�u:**
-Th�ng b�o ??n multiple observers khi c� events x?y ra, kh�ng c?n coupling.
+**Mục đích:**
+Thông báo tới nhiều observers khi có sự kiện xảy ra mà không cần coupling.
 
-**C?u Tr�c:**
-- Subject (EventPublisher): Qu?n l� observers, ph�t events
-- Observer (INotificationObserver): Interface m� observers implement
+**Cấu Trúc:**
+- Subject (EventPublisher): Quản lý observers, phát events
+- Observer (INotificationObserver): Interface mà observers implement
 - ConcreteObservers: EmailNotificationService, SMSNotificationService, PushNotificationService
 
-**Events:**
-- OrderCreatedEvent: ??n h�ng ???c t?o
-- OrderConfirmedEvent: ??n h�ng ???c x�c nh?n
-- OrderShippedEvent: ??n h�ng ???c g?i ?i
-- OrderDeliveredEvent: ??n h�ng ???c giao
-- OrderCancelledEvent: ??n h�ng b? h?y
-- PaymentCompletedEvent: Thanh to�n th�nh c�ng
-- PaymentFailedEvent: Thanh to�n th?t b?i
-- PaymentRefundedEvent: Ho�n ti?n
+**Các Sự Kiện:**
+- OrderCreatedEvent: Đơn hàng được tạo
+- OrderConfirmedEvent: Đơn hàng được xác nhận
+- OrderShippedEvent: Đơn hàng được gửi đi
+- OrderDeliveredEvent: Đơn hàng được giao
+- OrderCancelledEvent: Đơn hàng bị hủy
+- PaymentCompletedEvent: Thanh toán hoàn thành
+- PaymentFailedEvent: Thanh toán thất bại
+- PaymentRefundedEvent: Hoàn tiền
 
-**V� D? S? D?ng:**
+**Ví Dụ Sử Dụng:**
 
-1. L?y danh s�ch observers:
+1. Lấy danh sách observers:
    GET /api/notification/subscribers
 
-2. Test order created event:
+2. Test sự kiện tạo đơn hàng:
    POST /api/notification/test/order-created
 
-3. Test payment completed:
+3. Test thanh toán hoàn thành:
    POST /api/notification/test/payment-completed
 
-**L?i �ch Observer Pattern:**
-? Loose Coupling - Subject kh�ng bi?t chi ti?t observers
-? Dynamic Subscription - Th�m/x�a observers l�c runtime
-? Broadcast Communication - M?t event g?i t?i nhi?u observers
-? Separation of Concerns - M?i observer c� tr�ch nhi?m ri�ng
-? Easy to Extend - Th�m observer m?i m� kh�ng s?a code c?
+**Lợi Ích Observer Pattern:**
+- Loose Coupling: Subject không biết chi tiết observers
+- Dynamic Subscription: Thêm/xóa observers lúc runtime
+- Broadcast Communication: Một sự kiện gửi tới nhiều observers
+- Separation of Concerns: Mỗi observer có trách nhiệm riêng
+- Easy to Extend: Thêm observer mới mà không sửa code cũ
 
-**Real-World Usage:**
-- Khi order ???c t?o, t?t c? observers (Email, SMS, Push) ??ng th?i nh?n notification
-- Khi thanh to�n th?t b?i, customer ???c th�ng b�o qua email + SMS + push
-- D? m? r?ng: th�m Slack notification, Discord notification, etc.
+**Sử Dụng Thực Tế:**
+- Khi đơn hàng được tạo, tất cả observers (Email, SMS, Push) cùng lúc nhận thông báo
+- Khi thanh toán thất bại, khách hàng được thông báo qua email + SMS + push
+- Dễ mở rộng: thêm Slack notification, Discord notification, v.v.
 ";
 
             return Ok(new { guide });

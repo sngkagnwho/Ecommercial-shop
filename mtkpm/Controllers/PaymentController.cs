@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
@@ -26,8 +26,8 @@ namespace mtkpm.Controllers
         }
 
         /// <summary>
-        /// X? l� thanh to�n ??n h�ng
-        /// S? d?ng Factory Pattern - Payment methods ???c t?o ??ng d?a theo type
+        /// Xử lý thanh toán đơn hàng
+        /// Sử dụng Factory Pattern - Các phương thức thanh toán được tạo đúng dựa trên loại
         /// </summary>
         [HttpPost("process")]
         [ProducesResponseType(typeof(ProcessPaymentResponse), StatusCodes.Status200OK)]
@@ -49,7 +49,7 @@ namespace mtkpm.Controllers
                 return BadRequest(ApiResponse<ProcessPaymentResponse>.FailureResponse(result.Message));
             }
 
-            return Ok(ApiResponse<ProcessPaymentResponse>.SuccessResponse(result, "Payment processed successfully"));
+            return Ok(ApiResponse<ProcessPaymentResponse>.SuccessResponse(result, "Thanh toán đã được xử lý thành công"));
         }
     }
 

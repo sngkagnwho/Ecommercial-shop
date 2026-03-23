@@ -18,17 +18,17 @@ namespace mtkpm.Application.Features.Orders.Commands.CancelOrder
             var order = await _unitOfWork.Orders.GetWithDetailsAsync(request.OrderId, cancellationToken);
             if (order == null)
             {
-                throw new KeyNotFoundException($"Order with ID {request.OrderId} not found");
+                throw new KeyNotFoundException($"??n hàng có ID {request.OrderId} không t?n t?i");
             }
 
             if (order.UserId != request.UserId)
             {
-                throw new UnauthorizedAccessException("You are not authorized to cancel this order");
+                throw new UnauthorizedAccessException("B?n không có quy?n h?y ??n hàng này");
             }
 
             if (order.Status == OrderStatus.Shipping || order.Status == OrderStatus.Delivered || order.Status == OrderStatus.Completed)
             {
-                throw new InvalidOperationException($"Cannot cancel order with status: {order.Status}");
+                throw new InvalidOperationException($"Không th? h?y ??n hàng có tr?ng thái: {order.Status}");
             }
 
             foreach (var item in order.OrderItems)

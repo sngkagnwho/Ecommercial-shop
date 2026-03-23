@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("mtkpm.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a8ea09ed5f33b2243e7280dadd4e429aa13f2f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2b52bbd37efbbd9fa4b99e51f851464f81525f6")]
 [assembly: System.Reflection.AssemblyProductAttribute("mtkpm.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("mtkpm.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

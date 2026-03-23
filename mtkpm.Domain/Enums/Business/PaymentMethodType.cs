@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Domain.Enums.Business
 {
@@ -8,22 +8,22 @@ namespace mtkpm.Domain.Enums.Business
     /// </summary>
     public enum PaymentMethodType
     {
-        [Display(Name = "Th? t�n d?ng")]
+        [Display(Name = "Thẻ tín dụng")]
         CreditCard = 1,
 
-        [Display(Name = "Th? ghi n?")]
+        [Display(Name = "Thẻ ghi nợ")]
         DebitCard = 2,
 
-        [Display(Name = "Chuy?n kho?n ng�n h�ng")]
+        [Display(Name = "Chuyển khoản ngân hàng")]
         BankTransfer = 3,
 
         [Display(Name = "PayPal")]
         PayPal = 4,
 
-        [Display(Name = "Thanh to�n khi nh?n h�ng")]
+        [Display(Name = "Thanh toán khi nhận hàng")]
         COD = 5,
 
-        [Display(Name = "V� ?i?n t? di ??ng")]
+        [Display(Name = "Ví điện tử")]
         MobileWallet = 6
     }
 }

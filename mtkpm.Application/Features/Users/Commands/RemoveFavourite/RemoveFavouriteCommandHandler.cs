@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using mtkpm.Application.Common.Interfaces.Repositories;
 
 namespace mtkpm.Application.Features.Users.Commands.RemoveFavourite
@@ -17,7 +17,7 @@ namespace mtkpm.Application.Features.Users.Commands.RemoveFavourite
             var favourite = await _unitOfWork.FavouriteProducts.GetByUserAndProductAsync(request.UserId, request.ProductId, cancellationToken);
             if (favourite == null)
             {
-                throw new KeyNotFoundException("Favourite product not found");
+                throw new KeyNotFoundException("Sản phẩm yêu thích không tìm thấy");
             }
 
             _unitOfWork.FavouriteProducts.Remove(favourite);

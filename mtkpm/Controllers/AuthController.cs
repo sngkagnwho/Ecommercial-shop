@@ -135,7 +135,7 @@ namespace mtkpm.Controllers
 
             await _mediator.Send(command);
 
-            return Ok(new { message = "Đăng xuất thành công" });
+            return Ok(new { message = "Đăng xuất thành công." });
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace mtkpm.Controllers
 
             var result = await _mediator.Send(command);
 
-            return Ok(new { message = "Đổi mật khẩu thành công" });
+            return Ok(new { message = "Đã cập nhật mật khẩu thành công" });
         }
 
         private string? GetIpAddress()

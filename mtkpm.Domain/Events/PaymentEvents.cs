@@ -1,7 +1,7 @@
-namespace mtkpm.Domain.Events
+Ôªønamespace mtkpm.Domain.Events
 {
     /// <summary>
-    /// Event khi thanh to·n th‡nh cÙng
+    /// Event khi thanh to√°n th√†nh c√¥ng
     /// </summary>
     public class PaymentCompletedEvent : DomainEvent
     {
@@ -23,7 +23,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi thanh to·n th?t b?i
+    /// Event khi thanh to√°n th·∫•t b·∫°i
     /// </summary>
     public class PaymentFailedEvent : DomainEvent
     {
@@ -43,7 +43,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi ho‡n ti?n
+    /// Event khi ho√†n ti·ªÅn
     /// </summary>
     public class PaymentRefundedEvent : DomainEvent
     {

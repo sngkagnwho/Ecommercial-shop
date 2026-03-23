@@ -1,29 +1,29 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.Product
 {
     public class CreateProductDto
     {
-        [Required(ErrorMessage = "T�n s?n ph?m l� b?t bu?c")]
-        [StringLength(200, ErrorMessage = "T�n s?n ph?m kh�ng ???c v??t qu� 200 k� t?")]
+        [Required(ErrorMessage = "Tên sản phẩm là bắt buộc")]
+        [StringLength(200, ErrorMessage = "Tên sản phẩm không được vượt quá 200 ký tự")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "M� t? s?n ph?m l� b?t bu?c")]
-        [StringLength(1000, ErrorMessage = "M� t? kh�ng ???c v??t qu� 1000 k� t?")]
+        [Required(ErrorMessage = "Mô tả sản phẩm là bắt buộc")]
+        [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự")]
         public string Description { get; set; }
 
-        [Required(ErrorMessage = "Gi� s?n ph?m l� b?t bu?c")]
-        [Range(0, double.MaxValue, ErrorMessage = "Gi� ph?i l?n h?n ho?c b?ng 0")]
+        [Required(ErrorMessage = "Giá sản phẩm là bắt buộc")]
+        [Range(0, double.MaxValue, ErrorMessage = "Giá phải lớn hơn hoặc bằng 0")]
         public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "S? l??ng t?n kho l� b?t bu?c")]
-        [Range(0, int.MaxValue, ErrorMessage = "S? l??ng t?n kho ph?i l?n h?n ho?c b?ng 0")]
+        [Required(ErrorMessage = "Số lượng tồn kho là bắt buộc")]
+        [Range(0, int.MaxValue, ErrorMessage = "Số lượng tồn kho phải lớn hơn hoặc bằng 0")]
         public int StockQuantity { get; set; }
 
-        [Url(ErrorMessage = "URL h�nh ?nh kh�ng h?p l?")]
+        [Url(ErrorMessage = "URL hình ảnh không hợp lệ")]
         public string? ImageUrl { get; set; }
 
-        [Required(ErrorMessage = "Danh m?c l� b?t bu?c")]
+        [Required(ErrorMessage = "Danh mục là bắt buộc")]
         public int CategoryId { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace mtkpm.Controllers
 
             if (result == null)
             {
-                return NotFound(ApiResponse<CategoryDto>.FailureResponse("Không tìm thấy danh mục"));
+                return NotFound(ApiResponse<CategoryDto>.FailureResponse("Danh mục không tìm thấy"));
             }
 
             return Ok(ApiResponse<CategoryDto>.SuccessResponse(result));

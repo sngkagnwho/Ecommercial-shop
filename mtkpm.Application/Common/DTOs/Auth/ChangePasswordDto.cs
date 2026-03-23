@@ -1,18 +1,18 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.Auth
 {
     public class ChangePasswordDto
     {
-        [Required(ErrorMessage = "M?t kh?u hi?n t?i l� b?t bu?c")]
+        [Required(ErrorMessage = "Mật khẩu hiện tại là bắt buộc")]
         public string CurrentPassword { get; set; }
 
-        [Required(ErrorMessage = "M?t kh?u m?i l� b?t bu?c")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "M?t kh?u ph?i t? 6 ??n 100 k� t?")]
+        [Required(ErrorMessage = "Mật khẩu mới là bắt buộc")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải từ 6 đến 100 ký tự")]
         public string NewPassword { get; set; }
 
-        [Required(ErrorMessage = "X�c nh?n m?t kh?u m?i l� b?t bu?c")]
-        [Compare("NewPassword", ErrorMessage = "M?t kh?u x�c nh?n kh�ng kh?p")]
+        [Required(ErrorMessage = "Xác nhận mật khẩu mới là bắt buộc")]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         public string ConfirmNewPassword { get; set; }
     }
 }

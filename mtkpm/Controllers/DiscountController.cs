@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
@@ -23,18 +23,18 @@ namespace mtkpm.Controllers
         }
 
         /// <summary>
-        /// T�nh gi� gi? h�ng sau khi �p d?ng discounts
-        /// S? d?ng Decorator Pattern ?? stack multiple discounts
+        /// Tính giá giỏ hàng sau khi áp dụng chiết khấu
+        /// Sử dụng Decorator Pattern để stack multiple discounts
         /// </summary>
         /// <remarks>
-        /// Discount codes examples:
-        /// - "percentage_10" = 10% discount
-        /// - "fixed_100000" = gi?m 100,000 ?
-        /// - "free_shipping" = mi?n ph� v?n chuy?n
-        /// - "loyalty_points_50" = s? d?ng 50 ?i?m th�nh vi�n
-        /// - "bundle_3_15" = mua 3+ s?n ph?m ???c -15%
+        /// Mã chiết khấu ví dụ:
+        /// - "percentage_10" = giảm 10%
+        /// - "fixed_100000" = giảm 100.000 đ
+        /// - "free_shipping" = miễn phí vận chuyển
+        /// - "loyalty_points_50" = sử dụng 50 điểm thành viên
+        /// - "bundle_3_15" = mua 3+ sản phẩm được -15%
         /// 
-        /// V� d? body:
+        /// Ví dụ body:
         /// {
         ///   "discountCodes": ["percentage_10", "free_shipping"]
         /// }
@@ -53,11 +53,11 @@ namespace mtkpm.Controllers
             };
 
             var result = await _mediator.Send(command);
-            return Ok(ApiResponse<CalculateCartDiscountResponse>.SuccessResponse(result, "Discount calculated successfully"));
+            return Ok(ApiResponse<CalculateCartDiscountResponse>.SuccessResponse(result, "Tính chiết khấu thành công"));
         }
 
         /// <summary>
-        /// L?y danh s�ch discount codes c� s?n
+        /// Lấy danh sách các mã chiết khấu có sẵn
         /// </summary>
         [HttpGet("available")]
         [AllowAnonymous]
@@ -69,43 +69,43 @@ namespace mtkpm.Controllers
                 new DiscountCodeInfo
                 {
                     Code = "percentage_10",
-                    Name = "10% Discount",
-                    Description = "Gi?m 10% t?ng gi? h�ng",
+                    Name = "Giảm 10%",
+                    Description = "Giảm 10% trên giá hàng",
                     Example = "percentage_10"
                 },
                 new DiscountCodeInfo
                 {
                     Code = "percentage_20",
-                    Name = "20% Discount",
-                    Description = "Gi?m 20% t?ng gi? h�ng",
+                    Name = "Giảm 20%",
+                    Description = "Giảm 20% trên giá hàng",
                     Example = "percentage_20"
                 },
                 new DiscountCodeInfo
                 {
                     Code = "fixed_100000",
-                    Name = "100K Fixed Discount",
-                    Description = "Gi?m 100,000 ? c? ??nh",
+                    Name = "Giảm 100K",
+                    Description = "Giảm 100.000 đ cố định",
                     Example = "fixed_100000"
                 },
                 new DiscountCodeInfo
                 {
                     Code = "free_shipping",
-                    Name = "Free Shipping",
-                    Description = "Mi?n ph� v?n chuy?n (ti?t ki?m 50,000 ?)",
+                    Name = "Miễn phí vận chuyển",
+                    Description = "Miễn phí vận chuyển (tiết kiệm 50.000 đ)",
                     Example = "free_shipping"
                 },
                 new DiscountCodeInfo
                 {
                     Code = "loyalty_points_50",
-                    Name = "50 Loyalty Points",
-                    Description = "S? d?ng 50 ?i?m th�nh vi�n (50,000 ?)",
+                    Name = "50 điểm thành viên",
+                    Description = "Sử dụng 50 điểm thành viên (50.000 đ)",
                     Example = "loyalty_points_50"
                 },
                 new DiscountCodeInfo
                 {
                     Code = "bundle_3_15",
-                    Name = "Bundle Discount (3+ items -15%)",
-                    Description = "Mua 3+ s?n ph?m ???c gi?m 15%",
+                    Name = "Chiết khấu combo (3+ sản phẩm -15%)",
+                    Description = "Mua 3+ sản phẩm được giảm 15%",
                     Example = "bundle_3_15"
                 }
             };
@@ -114,54 +114,54 @@ namespace mtkpm.Controllers
         }
 
         /// <summary>
-        /// L?y h??ng d?n s? d?ng Decorator Pattern
+        /// Hướng dẫn sử dụng Decorator Pattern
         /// </summary>
         [HttpGet("guide")]
         [AllowAnonymous]
         public IActionResult GetDecoratorPatternGuide()
         {
             var guide = @"
-Decorator Pattern - Discount System
+Decorator Pattern - Hệ thống Chiết khấu
 
-**M?c Ti�u:**
-�p d?ng nhi?u discount l?n l??t (stacking) m� kh�ng c?n s?a code.
+**Mục đích:**
+Áp dụng nhiều chiết khấu lần lượt (stacking) mà không cần sửa code.
 
-**C?u Tr�c:**
-- BaseDiscount: Component c? b?n (kh�ng discount)
-- DiscountDecorator: Base class cho t?t c? decorators
-- PercentageDiscountDecorator: Gi?m theo %
-- FixedAmountDiscountDecorator: Gi?m s? ti?n c? ??nh
-- FreeShippingDiscountDecorator: Mi?n ph� ship
-- LoyaltyPointsDiscountDecorator: S? d?ng ?i?m
-- BundleDiscountDecorator: Mua combo ???c gi?m
+**Cấu Trúc:**
+- BaseDiscount: Component cơ bản (không có chiết khấu)
+- DiscountDecorator: Base class cho tất cả decorators
+- PercentageDiscountDecorator: Chiết khấu theo phần trăm
+- FixedAmountDiscountDecorator: Chiết khấu số tiền cố định
+- FreeShippingDiscountDecorator: Miễn phí vận chuyển
+- LoyaltyPointsDiscountDecorator: Sử dụng điểm
+- BundleDiscountDecorator: Chiết khấu combo
 
-**V� D? S? D?ng:**
+**Ví Dụ Sử Dụng:**
 
-1. �p d?ng 1 discount:
+1. Áp dụng một chiết khấu:
    POST /api/discount/calculate
    {
      ""discountCodes"": [""percentage_10""]
    }
 
-2. Stack multiple discounts:
+2. Stack nhiều chiết khấu:
    POST /api/discount/calculate
    {
      ""discountCodes"": [""percentage_10"", ""free_shipping""]
    }
    
-   K?t qu?: Gi?m 10% + Mi?n ph� ship = Ti?t ki?m c?ng d?n
+   Kết quả: Giảm 10% + Miễn phí ship = Tiết kiệm cùng lúc
 
-3. S? d?ng ?i?m + Discount:
+3. Sử dụng điểm + Chiết khấu:
    POST /api/discount/calculate
    {
      ""discountCodes"": [""percentage_20"", ""loyalty_points_100""]
    }
 
-**L?i �ch Decorator Pattern:**
-? Flexible - C� th? combine b?t k? discounts n�o
-? Open/Closed - D? th�m discount m?i
-? No Class Explosion - Kh�ng c?n t?o qu� nhi?u class
-? Runtime Composition - Quy?t ??nh discount l�c runtime
+**Lợi Ích Decorator Pattern:**
+- Linh hoạt: Có thể kết hợp bất kỳ chiết khấu nào
+- Open/Closed: Dễ thêm chiết khấu mới
+- Không bùng nổ class: Không cần tạo nhiều class
+- Runtime Composition: Quyết định chiết khấu lúc runtime
 ";
 
             return Ok(new { guide });

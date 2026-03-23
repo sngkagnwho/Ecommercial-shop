@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
@@ -21,12 +21,12 @@ namespace mtkpm.Controllers
         }
 
         /// <summary>
-        /// T�nh gi� s?n ph?m d�ng Strategy Pattern
-        /// C� th? ch? ??nh strategy ho?c ?? h? th?ng t? ch?n gi� t?t nh?t
+        /// Tính giá sản phẩm sử dụng Strategy Pattern
+        /// Có thể chỉ định strategy hoặc để hệ thống tự chọn giá tốt nhất
         /// </summary>
         /// <remarks>
-        /// Strategy options: "regular", "bulk", "seasonal", "vip"
-        /// N?u kh�ng ch? ??nh, s? t? ??ng ch?n gi� t?t nh?t
+        /// Các tùy chọn strategy: "regular", "bulk", "seasonal", "vip"
+        /// Nếu không chỉ định, sẽ tự động chọn giá tốt nhất
         /// </remarks>
         [HttpPost("calculate")]
         [ProducesResponseType(typeof(CalculatePriceResponse), StatusCodes.Status200OK)]
@@ -35,11 +35,11 @@ namespace mtkpm.Controllers
         public async Task<IActionResult> CalculatePrice([FromBody] CalculatePriceCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(ApiResponse<CalculatePriceResponse>.SuccessResponse(result, "Calculated pricing successfully"));
+            return Ok(ApiResponse<CalculatePriceResponse>.SuccessResponse(result, "Tính giá thành công"));
         }
 
         /// <summary>
-        /// L?y danh s�ch t?t c? pricing strategies c� s?n
+        /// Lấy danh sách tất cả các chiến lược định giá có sẵn
         /// </summary>
         [HttpGet("strategies")]
         [ProducesResponseType(typeof(List<PricingStrategyInfo>), StatusCodes.Status200OK)]
@@ -50,26 +50,26 @@ namespace mtkpm.Controllers
                 new PricingStrategyInfo 
                 { 
                     Name = "regular", 
-                    DisplayName = "Regular Pricing",
-                    Description = "Gi� b�n th??ng kh�ng c� chi?t kh?u"
+                    DisplayName = "Giá thường",
+                    Description = "Giá bán thường không có chiết khấu"
                 },
                 new PricingStrategyInfo 
                 { 
                     Name = "bulk", 
-                    DisplayName = "Bulk Discount",
-                    Description = "Gi?m gi� khi mua 10+ s?n ph?m (10% discount)"
+                    DisplayName = "Chiết khấu số lượng",
+                    Description = "Giảm giá khi mua 10+ sản phẩm (giảm 10%)"
                 },
                 new PricingStrategyInfo 
                 { 
                     Name = "seasonal", 
-                    DisplayName = "Seasonal Pricing",
-                    Description = "Gi� ??c bi?t theo m�a/d?p l? (Black Friday, T?t, etc)"
+                    DisplayName = "Giá mùa vụ",
+                    Description = "Giá đặc biệt theo mùa/dịp lễ (Black Friday, Tết, v.v.)"
                 },
                 new PricingStrategyInfo 
                 { 
                     Name = "vip", 
-                    DisplayName = "VIP Member Pricing",
-                    Description = "Gi� ??c bi?t cho th�nh vi�n VIP (Bronze 5%, Silver 10%, Gold 15%, Platinum 25%)"
+                    DisplayName = "Giá thành viên VIP",
+                    Description = "Giá đặc biệt cho thành viên VIP (Bronze 5%, Silver 10%, Gold 15%, Platinum 25%)"
                 }
             };
 

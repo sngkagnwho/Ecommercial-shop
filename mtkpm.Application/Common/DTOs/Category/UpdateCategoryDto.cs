@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.Category
 {
     public class UpdateCategoryDto
     {
-        [Required(ErrorMessage = "T�n danh m?c l� b?t bu?c")]
-        [StringLength(100, ErrorMessage = "T�n danh m?c kh�ng ???c v??t qu� 100 k� t?")]
+        [Required(ErrorMessage = "Tên danh mục là bắt buộc")]
+        [StringLength(100, ErrorMessage = "Tên danh mục không được vượt quá 100 ký tự")]
         public string Name { get; set; }
 
-        [StringLength(500, ErrorMessage = "M� t? kh�ng ???c v??t qu� 500 k� t?")]
+        [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự")]
         public string Description { get; set; }
     }
 }

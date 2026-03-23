@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace mtkpm.Application.Features.Auth.Commands.Register
 {
@@ -7,22 +7,22 @@ namespace mtkpm.Application.Features.Auth.Commands.Register
         public RegisterCommandValidator()
         {
             RuleFor(x => x.UserName)
-                .NotEmpty().WithMessage("T�n ng??i d�ng l� b?t bu?c")
-                .Length(3, 100).WithMessage("T�n ng??i d�ng ph?i t? 3 ??n 100 k� t?");
+                .NotEmpty().WithMessage("Tên người dùng là bắt buộc")
+                .Length(3, 100).WithMessage("Tên người dùng phải từ 3 đến 100 ký tự");
 
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email l� b?t bu?c")
-                .EmailAddress().WithMessage("Email kh�ng h?p l?");
+                .NotEmpty().WithMessage("Email là bắt buộc")
+                .EmailAddress().WithMessage("Email không hợp lệ");
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("M?t kh?u l� b?t bu?c")
-                .MinimumLength(6).WithMessage("M?t kh?u ph?i c� �t nh?t 6 k� t?");
+                .NotEmpty().WithMessage("Mật khẩu là bắt buộc")
+                .MinimumLength(6).WithMessage("Mật khẩu phải có ít nhất 6 ký tự");
 
             RuleFor(x => x.ConfirmPassword)
-                .Equal(x => x.Password).WithMessage("M?t kh?u x�c nh?n kh�ng kh?p");
+                .Equal(x => x.Password).WithMessage("Mật khẩu xác nhận không khớp");
 
             RuleFor(x => x.PhoneNumber)
-                .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage("S? ?i?n tho?i kh�ng h?p l?")
+                .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage("Số điện thoại không hợp lệ")
                 .When(x => !string.IsNullOrEmpty(x.PhoneNumber));
         }
     }

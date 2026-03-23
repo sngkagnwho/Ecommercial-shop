@@ -1,16 +1,16 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.User
 {
     public class UpdateUserDto
     {
-        [StringLength(100, ErrorMessage = "T�n ng??i d�ng kh�ng ???c v??t qu� 100 k� t?")]
+        [StringLength(100, ErrorMessage = "Tên người dùng không được vượt quá 100 ký tự")]
         public string? UserName { get; set; }
 
-        [EmailAddress(ErrorMessage = "Email kh�ng h?p l?")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string? Email { get; set; }
 
-        [Phone(ErrorMessage = "S? ?i?n tho?i kh�ng h?p l?")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         public string? PhoneNumber { get; set; }
     }
 }

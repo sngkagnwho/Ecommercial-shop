@@ -1,9 +1,9 @@
-using mtkpm.Domain.Enums.Business;
+﻿using mtkpm.Domain.Enums.Business;
 
 namespace mtkpm.Domain.Events
 {
     /// <summary>
-    /// Event khi ??n h�ng ???c t?o
+    /// Event khi đơn hàng được tạo
     /// </summary>
     public class OrderCreatedEvent : DomainEvent
     {
@@ -25,7 +25,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi ??n h�ng ???c x�c nh?n v� s?p g?i
+    /// Event khi đơn hàng được xác nhận và sắp gửi
     /// </summary>
     public class OrderConfirmedEvent : DomainEvent
     {
@@ -43,7 +43,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi ??n h�ng ???c g?i ?i
+    /// Event khi đơn hàng được gửi đi
     /// </summary>
     public class OrderShippedEvent : DomainEvent
     {
@@ -63,7 +63,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi ??n h�ng ???c giao th�nh c�ng
+    /// Event khi đơn hàng được giao thành công
     /// </summary>
     public class OrderDeliveredEvent : DomainEvent
     {
@@ -83,7 +83,7 @@ namespace mtkpm.Domain.Events
     }
 
     /// <summary>
-    /// Event khi ??n h�ng b? h?y
+    /// Event khi đơn hàng bị hủy
     /// </summary>
     public class OrderCancelledEvent : DomainEvent
     {

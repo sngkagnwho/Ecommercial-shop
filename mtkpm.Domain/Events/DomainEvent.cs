@@ -1,8 +1,8 @@
-namespace mtkpm.Domain.Events
+﻿namespace mtkpm.Domain.Events
 {
     /// <summary>
-    /// Base class cho t?t c? domain events
-    /// Observer Pattern - Event ?? notify subscribers
+    /// Base class cho tất cả domain events
+    /// Observer Pattern - Event để notify subscribers
     /// </summary>
     public abstract class DomainEvent
     {

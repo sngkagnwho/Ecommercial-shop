@@ -22,12 +22,12 @@ namespace mtkpm.Application.Features.Cart.Commands.AddToCart
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                throw new KeyNotFoundException($"Product with ID {request.ProductId} not found");
+                throw new KeyNotFoundException($"S?n ph?m có ID {request.ProductId} không t?n t?i");
             }
 
             if (product.StockQuantity < request.Quantity)
             {
-                throw new InvalidOperationException($"Not enough stock. Available: {product.StockQuantity}");
+                throw new InvalidOperationException($"Không ?? hàng. Hàng có s?n: {product.StockQuantity}");
             }
 
             var existingCartItem = await _unitOfWork.CartItems.GetByUserAndProductAsync(request.UserId, request.ProductId, cancellationToken);

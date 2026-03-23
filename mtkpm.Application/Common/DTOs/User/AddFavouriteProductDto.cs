@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mtkpm.Application.Common.DTOs.User
 {
     public class AddFavouriteProductDto
     {
-        [Required(ErrorMessage = "ID s?n ph?m l� b?t bu?c")]
+        [Required(ErrorMessage = "ID sản phẩm là bắt buộc")]
         public int ProductId { get; set; }
     }
 }
