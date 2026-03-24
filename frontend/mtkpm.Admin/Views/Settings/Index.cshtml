@@ -1,0 +1,339 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "System Settings";
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-cogs"></i> System Settings</h1>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Settings Menu -->
+    <div class="col-md-3">
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-general-tab" data-bs-toggle="pill" data-bs-target="#v-pills-general" 
+                    type="button" role="tab">
+                <i class="fas fa-cog"></i> General Settings
+            </button>
+            <button class="nav-link" id="v-pills-email-tab" data-bs-toggle="pill" data-bs-target="#v-pills-email" 
+                    type="button" role="tab">
+                <i class="fas fa-envelope"></i> Email Configuration
+            </button>
+            <button class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" data-bs-target="#v-pills-security" 
+                    type="button" role="tab">
+                <i class="fas fa-shield-alt"></i> Security
+            </button>
+            <button class="nav-link" id="v-pills-payment-tab" data-bs-toggle="pill" data-bs-target="#v-pills-payment" 
+                    type="button" role="tab">
+                <i class="fas fa-credit-card"></i> Payment Methods
+            </button>
+            <button class="nav-link" id="v-pills-storage-tab" data-bs-toggle="pill" data-bs-target="#v-pills-storage" 
+                    type="button" role="tab">
+                <i class="fas fa-database"></i> Storage
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="col-md-9">
+        <div class="tab-content" id="v-pills-tabContent">
+            <!-- General Settings -->
+            <div class="tab-pane fade show active" id="v-pills-general" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-cog"></i> General Settings</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Settings/SaveGeneral">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <label for="siteName" class="form-label">Site Name</label>
+                                <input type="text" class="form-control" id="siteName" name="SiteName" 
+                                       value="@ViewBag.SiteName" placeholder="MTKPM E-Commerce">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="siteDescription" class="form-label">Site Description</label>
+                                <textarea class="form-control" id="siteDescription" name="SiteDescription" 
+                                          rows="3" placeholder="Your site description">@ViewBag.SiteDescription</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="currency" class="form-label">Default Currency</label>
+                                <select class="form-select" id="currency" name="Currency">
+                                    <option value="USD" selected="@(ViewBag.Currency == "USD")">US Dollar (USD)</option>
+                                    <option value="EUR" selected="@(ViewBag.Currency == "EUR")">Euro (EUR)</option>
+                                    <option value="GBP" selected="@(ViewBag.Currency == "GBP")">British Pound (GBP)</option>
+                                    <option value="VND" selected="@(ViewBag.Currency == "VND")">Vietnamese Dong (VND)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="timezone" class="form-label">Timezone</label>
+                                <select class="form-select" id="timezone" name="Timezone">
+                                    <option value="UTC" selected="@(ViewBag.Timezone == "UTC")">UTC</option>
+                                    <option value="America/New_York" selected="@(ViewBag.Timezone == "America/New_York")">Eastern Time</option>
+                                    <option value="Asia/Ho_Chi_Minh" selected="@(ViewBag.Timezone == "Asia/Ho_Chi_Minh")">Indochina Time</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="maintenanceMode" name="MaintenanceMode"
+                                           checked="@(ViewBag.MaintenanceMode == true)">
+                                    <label class="form-check-label" for="maintenanceMode">
+                                        Enable Maintenance Mode
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Configuration -->
+            <div class="tab-pane fade" id="v-pills-email" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-envelope"></i> Email Configuration</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Settings/SaveEmail">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <label for="smtpServer" class="form-label">SMTP Server</label>
+                                <input type="text" class="form-control" id="smtpServer" name="SmtpServer" 
+                                       value="@ViewBag.SmtpServer" placeholder="smtp.gmail.com">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="smtpPort" class="form-label">SMTP Port</label>
+                                <input type="number" class="form-control" id="smtpPort" name="SmtpPort" 
+                                       value="@ViewBag.SmtpPort" placeholder="587">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="emailFrom" class="form-label">From Email Address</label>
+                                <input type="email" class="form-control" id="emailFrom" name="EmailFrom" 
+                                       value="@ViewBag.EmailFrom" placeholder="noreply@mtkpm.com">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="smtpUsername" class="form-label">SMTP Username</label>
+                                <input type="text" class="form-control" id="smtpUsername" name="SmtpUsername" 
+                                       value="@ViewBag.SmtpUsername" placeholder="Your email">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="smtpPassword" class="form-label">SMTP Password</label>
+                                <input type="password" class="form-control" id="smtpPassword" name="SmtpPassword" 
+                                       placeholder="Your password">
+                                <small class="text-muted">Leave blank to keep current password</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="smtpUseSSL" name="SmtpUseSSL"
+                                           checked="@(ViewBag.SmtpUseSSL == true)">
+                                    <label class="form-check-label" for="smtpUseSSL">
+                                        Use SSL/TLS
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="tab-pane fade" id="v-pills-security" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Security Settings</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Settings/SaveSecurity">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
+                                <input type="number" class="form-control" id="sessionTimeout" name="SessionTimeout" 
+                                       value="@ViewBag.SessionTimeout" placeholder="30">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="maxLoginAttempts" class="form-label">Max Login Attempts</label>
+                                <input type="number" class="form-control" id="maxLoginAttempts" name="MaxLoginAttempts" 
+                                       value="@ViewBag.MaxLoginAttempts" placeholder="5">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="lockoutDuration" class="form-label">Account Lockout Duration (minutes)</label>
+                                <input type="number" class="form-control" id="lockoutDuration" name="LockoutDuration" 
+                                       value="@ViewBag.LockoutDuration" placeholder="30">
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="twoFactorAuth" name="TwoFactorAuth"
+                                           checked="@(ViewBag.TwoFactorAuth == true)">
+                                    <label class="form-check-label" for="twoFactorAuth">
+                                        Enable Two-Factor Authentication
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="forceHttps" name="ForceHttps"
+                                           checked="@(ViewBag.ForceHttps == true)">
+                                    <label class="form-check-label" for="forceHttps">
+                                        Force HTTPS
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="tab-pane fade" id="v-pills-payment" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-credit-card"></i> Payment Methods</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Settings/SavePayment">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <h6>Available Payment Methods</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="creditCard" name="EnableCreditCard"
+                                           checked="@(ViewBag.EnableCreditCard == true)">
+                                    <label class="form-check-label" for="creditCard">
+                                        <i class="fas fa-credit-card"></i> Credit/Debit Card
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="paypal" name="EnablePayPal"
+                                           checked="@(ViewBag.EnablePayPal == true)">
+                                    <label class="form-check-label" for="paypal">
+                                        <i class="fab fa-paypal"></i> PayPal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="bankTransfer" name="EnableBankTransfer"
+                                           checked="@(ViewBag.EnableBankTransfer == true)">
+                                    <label class="form-check-label" for="bankTransfer">
+                                        <i class="fas fa-university"></i> Bank Transfer
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label for="stripeKey" class="form-label">Stripe API Key</label>
+                                <input type="password" class="form-control" id="stripeKey" name="StripeKey" 
+                                       placeholder="Your Stripe API Key">
+                                <small class="text-muted">Required for credit card payments</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="paypalClientId" class="form-label">PayPal Client ID</label>
+                                <input type="text" class="form-control" id="paypalClientId" name="PayPalClientId" 
+                                       placeholder="Your PayPal Client ID">
+                                <small class="text-muted">Required for PayPal payments</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Storage Settings -->
+            <div class="tab-pane fade" id="v-pills-storage" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-database"></i> Storage Configuration</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Settings/SaveStorage">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <h6>Storage Provider</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="localStorage" name="StorageProvider" 
+                                           value="Local" checked="@(ViewBag.StorageProvider == "Local")">
+                                    <label class="form-check-label" for="localStorage">
+                                        Local Storage
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="awsS3" name="StorageProvider" 
+                                           value="S3" checked="@(ViewBag.StorageProvider == "S3")">
+                                    <label class="form-check-label" for="awsS3">
+                                        AWS S3
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="azure" name="StorageProvider" 
+                                           value="Azure" checked="@(ViewBag.StorageProvider == "Azure")">
+                                    <label class="form-check-label" for="azure">
+                                        Azure Blob Storage
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label for="maxFileSize" class="form-label">Max File Size (MB)</label>
+                                <input type="number" class="form-control" id="maxFileSize" name="MaxFileSize" 
+                                       value="@ViewBag.MaxFileSize" placeholder="5">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="allowedExtensions" class="form-label">Allowed File Extensions</label>
+                                <input type="text" class="form-control" id="allowedExtensions" name="AllowedExtensions" 
+                                       value="@ViewBag.AllowedExtensions" placeholder="jpg,png,gif,pdf">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

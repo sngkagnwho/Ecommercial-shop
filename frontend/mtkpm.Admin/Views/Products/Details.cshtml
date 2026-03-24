@@ -1,0 +1,209 @@
+@model mtkpm.Admin.Models.Product.ProductViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1>@Model.Name</h1>
+        <p class="text-muted">Product ID: <span class="badge bg-secondary">@Model.Id</span></p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Products/Edit/@Model.Id" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="/Products" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Product Information -->
+    <div class="col-lg-8">
+        <!-- Basic Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Basic Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Product Name</h6>
+                        <p class="mb-0">@Model.Name</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Category</h6>
+                        <p class="mb-0">
+                            <a href="/Categories" class="text-decoration-none">
+                                @Model.CategoryName
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Price</h6>
+                        <p class="mb-0 h5 text-success">${@Model.Price.ToString("F2")}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Stock Quantity</h6>
+                        <p class="mb-0">
+                            @if (Model.StockQuantity > 10)
+                            {
+                                <span class="badge bg-success bg-lg">@Model.StockQuantity in stock</span>
+                            }
+                            else if (Model.StockQuantity > 0)
+                            {
+                                <span class="badge bg-warning bg-lg">@Model.StockQuantity in stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger bg-lg">Out of Stock</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-file-alt"></i> Description</h6>
+            </div>
+            <div class="card-body">
+                <p>@Model.Description</p>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-flag"></i> Status</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Availability</h6>
+                        @if (Model.IsAvailable)
+                        {
+                            <span class="badge bg-success badge-lg">
+                                <i class="fas fa-check-circle"></i> Available
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger badge-lg">
+                                <i class="fas fa-times-circle"></i> Unavailable
+                            </span>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Created Date</h6>
+                        <p class="mb-0">@Model.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Product Image -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-image"></i> Product Image</h6>
+            </div>
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 300px;">
+                }
+                else
+                {
+                    <div style="height: 200px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 6px;">
+                        <div class="text-center">
+                            <i class="fas fa-image" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-2 mb-0">No image available</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3 class="text-primary">0</h3>
+                        <small class="text-muted">Orders</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-success">0</h3>
+                        <small class="text-muted">Reviews</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-info">0</h3>
+                        <small class="text-muted">Views</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-cogs"></i> Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/Products/Edit/@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Product
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                        <i class="fas fa-trash"></i> Delete Product
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Delete Product</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong>@Model.Name</strong>? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="/Products/Delete/@Model.Id" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+    </script>
+}

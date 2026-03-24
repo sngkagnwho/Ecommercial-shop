@@ -1,0 +1,81 @@
+@model mtkpm.Admin.Models.Payment.PaymentViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Payment Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-credit-card"></i> Payment Details</h1>
+        <p class="text-muted">Transaction #@Model.TransactionId</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Payment Information</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Transaction ID:</dt>
+                    <dd class="col-sm-8"><strong>@Model.TransactionId</strong></dd>
+
+                    <dt class="col-sm-4">Order Number:</dt>
+                    <dd class="col-sm-8"><a href="/Orders/Details/@Model.OrderId">#@Model.OrderNumber</a></dd>
+
+                    <dt class="col-sm-4">Amount:</dt>
+                    <dd class="col-sm-8"><strong class="text-success">${@Model.Amount.ToString("F2")}</strong></dd>
+
+                    <dt class="col-sm-4">Payment Method:</dt>
+                    <dd class="col-sm-8"><span class="badge bg-secondary">@Model.PaymentMethod</span></dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        @switch (Model.Status)
+                        {
+                            case "Completed":
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case "Pending":
+                                <span class="badge bg-warning">Pending</span>
+                                break;
+                            case "Failed":
+                                <span class="badge bg-danger">Failed</span>
+                                break;
+                            case "Refunded":
+                                <span class="badge bg-info">Refunded</span>
+                                break;
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Date:</dt>
+                    <dd class="col-sm-8">@Model.OrderNumber</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (Model.Status == "Completed")
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/Payments/Refund/@Model.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-undo"></i> Process Refund
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<a href="/Payments" class="btn btn-secondary mt-3">
+    <i class="fas fa-arrow-left"></i> Back to Payments
+</a>

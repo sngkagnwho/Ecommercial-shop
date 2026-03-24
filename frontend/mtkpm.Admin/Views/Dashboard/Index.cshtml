@@ -1,0 +1,265 @@
+@model mtkpm.Admin.Models.Dashboard.DashboardViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        <p class="text-muted">Welcome back! Here's your business overview.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="metric-card primary">
+            <h6><i class="fas fa-shopping-cart"></i> Total Orders</h6>
+            <h3>@Model.TotalOrders</h3>
+            <small class="text-muted">All time</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="metric-card success">
+            <h6><i class="fas fa-dollar-sign"></i> Total Revenue</h6>
+            <h3>${@Model.TotalRevenue.ToString("F2")}</h3>
+            <small class="text-muted">All time</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="metric-card info">
+            <h6><i class="fas fa-boxes"></i> Total Products</h6>
+            <h3>@Model.TotalProducts</h3>
+            <small class="text-muted">Active products</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="metric-card warning">
+            <h6><i class="fas fa-users"></i> Total Users</h6>
+            <h3>@Model.TotalUsers</h3>
+            <small class="text-muted">Registered users</small>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Recent Orders -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-history"></i> Recent Orders</h6>
+                    <a href="/Orders" class="btn btn-sm btn-primary">View All</a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentOrders != null && Model.RecentOrders.Count > 0)
+                        {
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="/Orders/Details/@order.Id" class="text-decoration-none">
+                                            <strong>#@order.OrderNumber</strong>
+                                        </a>
+                                    </td>
+                                    <td>@order.UserEmail</td>
+                                    <td><strong class="text-success">${@order.TotalAmount.ToString("F2")}</strong></td>
+                                    <td>
+                                        @switch (order.Status)
+                                        {
+                                            case "Pending":
+                                                <span class="badge bg-secondary">Pending</span>
+                                                break;
+                                            case "Processing":
+                                                <span class="badge bg-warning">Processing</span>
+                                                break;
+                                            case "Shipped":
+                                                <span class="badge bg-info">Shipped</span>
+                                                break;
+                                            case "Delivered":
+                                                <span class="badge bg-success">Delivered</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@order.OrderDate.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">
+                                    <i class="fas fa-inbox"></i> No orders yet
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Products -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Low Stock Products</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.LowStockProducts != null && Model.LowStockProducts.Count > 0)
+                        {
+                            @foreach (var product in Model.LowStockProducts)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="/Products/Edit/@product.Id" class="text-decoration-none">
+                                            @product.Name
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if (product.StockQuantity > 5)
+                                        {
+                                            <span class="badge bg-warning">@product.StockQuantity</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@product.StockQuantity</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center py-3 text-muted">
+                                    <i class="fas fa-check-circle"></i> All products in stock
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Statistics -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Sales Overview (Last 7 Days)</h6>
+            </div>
+            <div class="card-body" style="height: 300px;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Distribution -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-pie-chart"></i> Order Status Distribution</h6>
+            </div>
+            <div class="card-body" style="height: 300px;">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sales Chart
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: [1200, 1900, 800, 2400, 1600, 2200, 1800],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#3498db',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        const ctxStatus = document.getElementById('orderStatusChart').getContext('2d');
+        const statusChart = new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Processing', 'Shipped', 'Delivered'],
+                datasets: [{
+                    data: [12, 19, 8, 45],
+                    backgroundColor: ['#6c757d', '#ffc107', '#17a2b8', '#28a745'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}
