@@ -30,14 +30,14 @@ namespace mtkpm.Infrastructure.Services.Discounts
         }
 
         public override string DiscountName => "Free Shipping";
-        public override string Description => $"Mi?n ph� v?n chuy?n (ti?t ki?m {_shippingCost:C}) cho {_minItemCount}+ s?n ph?m";
+        public override string Description => $"Miễn phí vận chuyển (tiết kiệm {_shippingCost:C}) cho {_minItemCount}+ sản phẩm";
 
         protected override decimal ApplyCurrentDiscount(CartDto cart)
         {
             if (!IsApplicable(cart))
                 return cart.TotalAmount;
 
-            // Gi?m chi ph� v?n chuy?n
+            // Gi?m chi ph� v?n chuy?n
             return cart.TotalAmount - _shippingCost;
         }
 

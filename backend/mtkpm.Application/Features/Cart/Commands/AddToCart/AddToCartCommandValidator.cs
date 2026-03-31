@@ -7,13 +7,13 @@ namespace mtkpm.Application.Features.Cart.Commands.AddToCart
         public AddToCartCommandValidator()
         {
             RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("User ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("User ID không hợp lệ");
 
             RuleFor(x => x.ProductId)
-                .GreaterThan(0).WithMessage("Product ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("Product ID không hợp lệ");
 
             RuleFor(x => x.Quantity)
-                .GreaterThan(0).WithMessage("S? l??ng ph?i l?n h?n 0");
+                .GreaterThan(0).WithMessage("Số lượng phải lớn hơn 0");
         }
     }
 }

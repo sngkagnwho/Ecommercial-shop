@@ -60,7 +60,7 @@ namespace mtkpm
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Nh?p 'Bearer' [space] v� token c?a b?n\n\nV� d?: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    Description = "Nhập 'Bearer' [space] và token của bạn\n\nVí dụ: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement

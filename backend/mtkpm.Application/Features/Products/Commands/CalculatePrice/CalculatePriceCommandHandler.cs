@@ -32,7 +32,7 @@ namespace mtkpm.Application.Features.Products.Commands.CalculatePrice
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId, cancellationToken);
             if (product == null)
             {
-                throw new KeyNotFoundException($"S?n ph?m c� ID {request.ProductId} kh�ng t?n t?i");
+                throw new KeyNotFoundException($"Sản phẩm có ID {request.ProductId} không tồn tại");
             }
 
             var baseTotalPrice = product.Price * request.Quantity;
@@ -61,7 +61,7 @@ namespace mtkpm.Application.Features.Products.Commands.CalculatePrice
                 
                 if (strategy == null)
                 {
-                    throw new ArgumentException($"Chi?n l??c ??nh gi� '{request.PricingStrategy}' kh�ng t�m th?y. C�c t�y ch?n h?p l?: 'regular', 'bulk', 'seasonal', 'vip'");
+                    throw new ArgumentException($"Chiến lược định giá '{request.PricingStrategy}' không tìm thấy. Các tùy chọn hợp lệ: 'regular', 'bulk', 'seasonal', 'vip'");
                 }
 
                 finalPrice = _pricingService.CalculatePrice(product, request.Quantity, strategy, context);

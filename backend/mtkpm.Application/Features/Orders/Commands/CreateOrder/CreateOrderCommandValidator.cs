@@ -7,34 +7,34 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
         public CreateOrderCommandValidator()
         {
             RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("User ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("User ID không hợp lệ");
 
             RuleFor(x => x.ShippingAddress)
-                .NotEmpty().WithMessage("??a ch? giao h�ng l� b?t bu?c")
-                .MaximumLength(500).WithMessage("??a ch? giao h�ng kh�ng ???c v??t qu� 500 k� t?");
+                .NotEmpty().WithMessage("Địa chỉ giao hàng là bắt buộc")
+                .MaximumLength(500).WithMessage("Địa chỉ giao hàng không được vượt quá 500 ký tự");
 
             RuleFor(x => x.BillingAddress)
-                .MaximumLength(500).WithMessage("??a ch? thanh to�n kh�ng ???c v??t qu� 500 k� t?")
+                .MaximumLength(500).WithMessage("Địa chỉ thanh toản không được vượt quá 500 ký tự")
                 .When(x => !string.IsNullOrEmpty(x.BillingAddress));
 
             RuleFor(x => x.PaymentMethod)
-                .IsInEnum().WithMessage("Ph??ng th?c thanh to�n kh�ng h?p l?");
+                .IsInEnum().WithMessage("Phương thức thanh toản không hợp lệ");
 
             RuleFor(x => x.Note)
-                .MaximumLength(500).WithMessage("Ghi ch� kh�ng ???c v??t qu� 500 k� t?")
+                .MaximumLength(500).WithMessage("Ghi chú không được vượt quá 500 ký tự")
                 .When(x => !string.IsNullOrEmpty(x.Note));
 
             RuleFor(x => x.OrderItems)
-                .NotEmpty().WithMessage("??n h�ng ph?i c� �t nh?t 1 s?n ph?m")
-                .Must(items => items.Count > 0).WithMessage("??n h�ng ph?i c� �t nh?t 1 s?n ph?m");
+                .NotEmpty().WithMessage("Đơn hàng phải có ít nhất 1 sản phẩm")
+                .Must(items => items.Count > 0).WithMessage("Đơn hàng phải có ít nhất 1 sản phẩm");
 
             RuleForEach(x => x.OrderItems).ChildRules(item =>
             {
                 item.RuleFor(x => x.ProductId)
-                    .GreaterThan(0).WithMessage("ID s?n ph?m kh�ng h?p l?");
+                    .GreaterThan(0).WithMessage("ID sản phẩm không hợp lệ");
 
                 item.RuleFor(x => x.Quantity)
-                    .GreaterThan(0).WithMessage("S? l??ng ph?i l?n h?n 0");
+                    .GreaterThan(0).WithMessage("Số lượng phải lớn hơn 0");
             });
         }
     }

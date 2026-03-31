@@ -7,10 +7,10 @@ namespace mtkpm.Application.Features.Products.Commands.UpdateStock
         public UpdateStockCommandValidator()
         {
             RuleFor(x => x.ProductId)
-                .GreaterThan(0).WithMessage("ID s?n ph?m kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("ID sản phẩm không hợp lệ");
 
             RuleFor(x => x.Quantity)
-                .GreaterThanOrEqualTo(0).WithMessage("S? l??ng t?n kho ph?i l?n h?n ho?c b?ng 0");
+                .GreaterThan(0).WithMessage("Số lượng tồn kho phải lớn hơn hoặc bằng 0");
         }
     }
 }

@@ -33,7 +33,7 @@ namespace mtkpm.Infrastructure.Services.Discounts
         }
 
         public override string DiscountName => $"Bundle Discount ({_requiredItemCount}+ items)";
-        public override string Description => $"Mua {_requiredItemCount}+ s?n ph?m ???c gi?m {_discountPercent}%";
+        public override string Description => $"Mua {_requiredItemCount}+ sản phẩm được giảm {_discountPercent}%";
 
         protected override decimal ApplyCurrentDiscount(CartDto cart)
         {

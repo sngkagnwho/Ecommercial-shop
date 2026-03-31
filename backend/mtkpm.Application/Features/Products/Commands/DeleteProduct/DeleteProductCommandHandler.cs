@@ -25,7 +25,7 @@ namespace mtkpm.Application.Features.Products.Commands.DeleteProduct
 
             _unitOfWork.Products.Remove(product);
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogWarning($"X�a s?n ph?m: ProductId={product.Id}, T�n={product.Name}", "ProductService");
+            _logger.LogWarning($"Xóa sản phẩm: ProductId={product.Id}, Tên={product.Name}", "ProductService");
 
             return true;
         }

@@ -35,14 +35,14 @@ namespace mtkpm.Infrastructure.Services
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                return AuthResponse.FailureResult($"Email '{request.Email}' ?� ???c ??ng k�", 
+                return AuthResponse.FailureResult($"Email '{request.Email}' đã được đăng ký", 
                     new List<string> { "Email already registered" });
             }
 
             var existingUsername = await _userManager.FindByNameAsync(request.UserName);
             if (existingUsername != null)
             {
-                return AuthResponse.FailureResult($"T�n ng??i d�ng '{request.UserName}' ?� ???c s? d?ng",
+                return AuthResponse.FailureResult($"Tên người dùng '{request.UserName}' đã được sử dụng",
                     new List<string> { "Username already taken" });
             }
 
@@ -59,7 +59,7 @@ namespace mtkpm.Infrastructure.Services
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description).ToList();
-                return AuthResponse.FailureResult("??ng k� th?t b?i", errors);
+                return AuthResponse.FailureResult("Đăng ký thất bại", errors);
             }
 
             await _userManager.AddToRoleAsync(user, "User");
@@ -93,7 +93,7 @@ namespace mtkpm.Infrastructure.Services
                 refreshToken, 
                 DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
                 userInfo,
-                "??ng k� th�nh c�ng"
+                "Đăng ký thành công"
             );
         }
 
@@ -112,13 +112,13 @@ namespace mtkpm.Infrastructure.Services
 
             if (user == null)
             {
-                return AuthResponse.FailureResult("Th�ng tin ??ng nh?p kh�ng ch�nh x�c",
+                return AuthResponse.FailureResult("Thông tin đăng nhập không chính xác",
                     new List<string> { "Invalid credentials" });
             }
 
             if (user.IsDeleted)
             {
-                return AuthResponse.FailureResult("T�i kho?n ?� b? x�a",
+                return AuthResponse.FailureResult("Tài khoản đã bị xóa",
                     new List<string> { "Account has been deleted" });
             }
 
@@ -126,13 +126,13 @@ namespace mtkpm.Infrastructure.Services
 
             if (result.IsLockedOut)
             {
-                return AuthResponse.FailureResult("T�i kho?n ?� b? kh�a",
+                return AuthResponse.FailureResult("Tài khoản đã bị khóa",
                     new List<string> { "Account is locked out" });
             }
 
             if (!result.Succeeded)
             {
-                return AuthResponse.FailureResult("Th�ng tin ??ng nh?p kh�ng ch�nh x�c",
+                return AuthResponse.FailureResult("Thông tin đăng nhập không chính xác",
                     new List<string> { "Invalid credentials" });
             }
 
@@ -168,7 +168,7 @@ namespace mtkpm.Infrastructure.Services
                 refreshToken,
                 DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
                 userInfo,
-                "??ng nh?p th�nh c�ng"
+                "Đăng nhập thành công"
             );
         }
 
@@ -177,14 +177,14 @@ namespace mtkpm.Infrastructure.Services
             var userId = _jwtService.GetUserIdFromExpiredToken(request.AccessToken);
             if (userId == null)
             {
-                return AuthResponse.FailureResult("Token kh�ng h?p l?",
+                return AuthResponse.FailureResult("Token không hợp lệ",
                     new List<string> { "Invalid token" });
             }
 
             var user = await _userManager.FindByIdAsync(userId.ToString()!);
             if (user == null || user.IsDeleted)
             {
-                return AuthResponse.FailureResult("Ng??i d�ng kh�ng t?n t?i",
+                return AuthResponse.FailureResult("Người dùng không tồn tại",
                     new List<string> { "User not found" });
             }
 
@@ -192,7 +192,7 @@ namespace mtkpm.Infrastructure.Services
             
             if (storedRefreshToken == null || !storedRefreshToken.IsActive || storedRefreshToken.UserId != userId)
             {
-                return AuthResponse.FailureResult("Refresh token kh�ng h?p l?",
+                return AuthResponse.FailureResult("Refresh token không hợp lệ",
                     new List<string> { "Invalid refresh token" });
             }
 
@@ -227,7 +227,7 @@ namespace mtkpm.Infrastructure.Services
                 newRefreshToken,
                 DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
                 userInfo,
-                "L�m m?i token th�nh c�ng"
+                "Làm mới token thành công"
             );
         }
 

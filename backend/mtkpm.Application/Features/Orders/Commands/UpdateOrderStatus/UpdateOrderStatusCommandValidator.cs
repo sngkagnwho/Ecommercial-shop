@@ -7,10 +7,10 @@ namespace mtkpm.Application.Features.Orders.Commands.UpdateOrderStatus
         public UpdateOrderStatusCommandValidator()
         {
             RuleFor(x => x.OrderId)
-                .GreaterThan(0).WithMessage("ID ??n h�ng kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("ID đơn hàng không hợp lệ");
 
             RuleFor(x => x.Status)
-                .IsInEnum().WithMessage("Tr?ng th�i ??n h�ng kh�ng h?p l?");
+                .IsInEnum().WithMessage("Trạng thái đơn hàng không hợp lệ");
         }
     }
 }

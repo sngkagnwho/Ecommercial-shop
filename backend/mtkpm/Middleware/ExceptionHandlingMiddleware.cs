@@ -67,7 +67,7 @@ namespace mtkpm.Middleware
                 _ => new
                 {
                     statusCode = (int)HttpStatusCode.InternalServerError,
-                    response = ApiResponse<object>.FailureResponse("?� x?y ra l?i kh�ng mong mu?n")
+                    response = ApiResponse<object>.FailureResponse("Đã xảy ra lỗi không mong muốn")
                 }
             };
 

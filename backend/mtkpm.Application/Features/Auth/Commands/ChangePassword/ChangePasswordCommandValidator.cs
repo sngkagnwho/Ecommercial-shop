@@ -7,18 +7,18 @@ namespace mtkpm.Application.Features.Auth.Commands.ChangePassword
         public ChangePasswordCommandValidator()
         {
             RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("User ID kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("User ID không hợp lệ");
 
             RuleFor(x => x.CurrentPassword)
-                .NotEmpty().WithMessage("M?t kh?u hi?n t?i l� b?t bu?c");
+                .NotEmpty().WithMessage("Mật khẩu hiện tại là bắt buộc");
 
             RuleFor(x => x.NewPassword)
-                .NotEmpty().WithMessage("M?t kh?u m?i l� b?t bu?c")
-                .MinimumLength(6).WithMessage("M?t kh?u m?i ph?i c� �t nh?t 6 k� t?")
-                .NotEqual(x => x.CurrentPassword).WithMessage("M?t kh?u m?i ph?i kh�c m?t kh?u hi?n t?i");
+                .NotEmpty().WithMessage("Mật khẩu mới là bắt buộc")
+                .MinimumLength(6).WithMessage("Mật khẩu mới phải có ít nhất 6 ký tự")
+                .NotEqual(x => x.CurrentPassword).WithMessage("Mật khẩu mới phải khác mật khẩu hiện tại");
 
             RuleFor(x => x.ConfirmNewPassword)
-                .Equal(x => x.NewPassword).WithMessage("M?t kh?u x�c nh?n kh�ng kh?p");
+                .Equal(x => x.NewPassword).WithMessage("Mật khẩu xác nhận không khớp");
         }
     }
 }

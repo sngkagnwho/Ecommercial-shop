@@ -7,25 +7,25 @@ namespace mtkpm.Application.Features.Products.Commands.CreateProduct
         public CreateProductCommandValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("T�n s?n ph?m l� b?t bu?c")
-                .MaximumLength(200).WithMessage("T�n s?n ph?m kh�ng ???c v??t qu� 200 k� t?");
+                .NotEmpty().WithMessage("Tên sản phẩm là bắt buộc")
+                .MaximumLength(200).WithMessage("Tên sản phẩm không được vượt quá 200 ký tự");
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("M� t? s?n ph?m l� b?t bu?c")
-                .MaximumLength(1000).WithMessage("M� t? kh�ng ???c v??t qu� 1000 k� t?");
+                .NotEmpty().WithMessage("Mô tả sản phẩm là bắt buộc")
+                .MaximumLength(1000).WithMessage("Mô tả không được vượt quá 1000 ký tự");
 
             RuleFor(x => x.Price)
-                .GreaterThanOrEqualTo(0).WithMessage("Gi� ph?i l?n h?n ho?c b?ng 0");
+                .GreaterThanOrEqualTo(0).WithMessage("Giá phải lớn hơn hoặc bằng 0");
 
             RuleFor(x => x.StockQuantity)
-                .GreaterThanOrEqualTo(0).WithMessage("S? l??ng t?n kho ph?i l?n h?n ho?c b?ng 0");
+                .GreaterThanOrEqualTo(0).WithMessage("Số lượng tồn kho phải lớn hơn hoặc bằng 0");
 
             RuleFor(x => x.CategoryId)
-                .GreaterThan(0).WithMessage("Danh m?c l� b?t bu?c");
+                .GreaterThan(0).WithMessage("Danh mục là bắt buộc");
 
             RuleFor(x => x.ImageUrl)
                 .Must(BeAValidUrl).When(x => !string.IsNullOrEmpty(x.ImageUrl))
-                .WithMessage("URL h�nh ?nh kh�ng h?p l?");
+                .WithMessage("URL hình ảnh không hợp lệ");
         }
 
         private bool BeAValidUrl(string? url)

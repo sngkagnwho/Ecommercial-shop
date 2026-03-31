@@ -17,13 +17,13 @@ namespace mtkpm.Application.Features.Categories.Commands.DeleteCategory
             var category = await _unitOfWork.Categories.GetByIdAsync(request.Id);
             if (category == null)
             {
-                throw new KeyNotFoundException($"Danh m?c c� ID {request.Id} kh�ng t?n t?i");
+                throw new KeyNotFoundException($"Danh mục có ID {request.Id} không tồn tại");
             }
 
             var productsInCategory = await _unitOfWork.Products.GetByCategoryIdAsync(request.Id, cancellationToken);
             if (productsInCategory.Any())
             {
-                throw new InvalidOperationException("Kh�ng th? x�a danh m?c c� s?n ph?m. Vui l�ng x�a ho?c di chuy?n s?n ph?m tr??c.");
+                throw new InvalidOperationException("Không thể xóa danh mục có sản phẩm. Vui lòng xóa hoặc di chuyển sản phẩm trước.");
             }
 
             _unitOfWork.Categories.Remove(category);

@@ -1,11 +1,11 @@
-using mtkpm.Application.Common.Interfaces;
+ï»¿using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
 using mtkpm.Domain.Events;
 
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// Event Publisher (Subject) - Qu?n lý observers và phát events
+    /// Event Publisher (Subject) - Qu?n lï¿½ observers vï¿½ phï¿½t events
     /// Observer Pattern - Subject implementation
     /// </summary>
     public class EventPublisher : IEventPublisher
@@ -26,7 +26,7 @@ namespace mtkpm.Infrastructure.Services.Notifications
             if (!_observers.Contains(observer))
             {
                 _observers.Add(observer);
-                _logger.LogInfo($"? Observer '{observer.ObserverName}' subscribed. Total subscribers: {_observers.Count}", "EventPublisher");
+                _logger.LogInfo($"âœ“ Observer '{observer.ObserverName}' subscribed. Total subscribers: {_observers.Count}", "EventPublisher");
             }
         }
 
@@ -37,7 +37,7 @@ namespace mtkpm.Infrastructure.Services.Notifications
 
             if (_observers.Remove(observer))
             {
-                _logger.LogInfo($"? Observer '{observer.ObserverName}' unsubscribed. Total subscribers: {_observers.Count}", "EventPublisher");
+                _logger.LogInfo($"âœ“ Observer '{observer.ObserverName}' unsubscribed. Total subscribers: {_observers.Count}", "EventPublisher");
             }
         }
 
@@ -46,7 +46,7 @@ namespace mtkpm.Infrastructure.Services.Notifications
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            _logger.LogInfo($"?? Publishing event: {@event.GetType().Name}. Subscribers: {_observers.Count}", "EventPublisher");
+            _logger.LogInfo($"âœ” Publishing event: {@event.GetType().Name}. Subscribers: {_observers.Count}", "EventPublisher");
 
             var tasks = new List<Task>();
 
@@ -78,7 +78,7 @@ namespace mtkpm.Infrastructure.Services.Notifications
             // Notify all observers in parallel
             await Task.WhenAll(tasks);
 
-            _logger.LogInfo($"? Event {@event.GetType().Name} published to {_observers.Count} observers", "EventPublisher");
+            _logger.LogInfo($"âœ“ Event {@event.GetType().Name} published to {_observers.Count} observers", "EventPublisher");
         }
 
         public int GetSubscriberCount()
@@ -92,3 +92,4 @@ namespace mtkpm.Infrastructure.Services.Notifications
         }
     }
 }
+

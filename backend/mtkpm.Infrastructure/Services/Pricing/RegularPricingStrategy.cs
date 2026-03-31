@@ -6,19 +6,19 @@ using mtkpm.Domain.Entities.Business;
 namespace mtkpm.Infrastructure.Services.Pricing
 {
     /// <summary>
-    /// Regular Pricing Strategy - Gi� th??ng kh�ng c� gi?m gi�
+    /// Regular Pricing Strategy - Giá thường không có giảm giá
     /// </summary>
     public class RegularPricingStrategy : IPricingStrategy
     {
         public string StrategyName => "Regular Pricing";
-        public string Description => "Gi� b�n th??ng kh�ng c� chi?t kh?u";
+        public string Description => "Giá bán thường không có chiết khấu";
 
         public decimal CalculatePrice(Product product, int quantity, PricingContext context)
         {
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
-            // Gi� th??ng = gi� s?n ph?m * s? l??ng
+            // Giá thường = giá sản phẩm * số lượng
             return product.Price * quantity;
         }
     }

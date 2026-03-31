@@ -30,7 +30,7 @@ namespace mtkpm.Infrastructure.Services.Discounts
         }
 
         public override string DiscountName => $"{_discountAmount:C} Off";
-        public override string Description => $"Gi?m {_discountAmount:C} cho ??n h�ng t? {_minOrderAmount:C}";
+        public override string Description => $"Giảm {_discountAmount:C} cho đơn hàng từ {_minOrderAmount:C}";
 
         protected override decimal ApplyCurrentDiscount(CartDto cart)
         {

@@ -77,11 +77,11 @@ namespace mtkpm.Infrastructure.Services.SeedData
 
             var categories = new[]
             {
-                new Category("?i?n tho?i", "?i?n tho?i th�ng minh c�c lo?i"),
-                new Category("Laptop", "M�y t�nh x�ch tay"),
-                new Category("Tablet", "M�y t�nh b?ng"),
-                new Category("Ph? ki?n", "Ph? ki?n ?i?n t?"),
-                new Category("�m thanh", "Tai nghe, loa, �m thanh")
+                new Category("Điện thoại", "Điện thoại thông minh các loại"),
+                new Category("Laptop", "Máy tính xách tay"),
+                new Category("Tablet", "Máy tính bảng"),
+                new Category("Phụ kiện", "Phụ kiện điện tử"),
+                new Category("Âm thanh", "Tai nghe, loa, âm thanh")
             };
 
             await _context.Categories.AddRangeAsync(categories);
@@ -95,7 +95,7 @@ namespace mtkpm.Infrastructure.Services.SeedData
                 return;
             }
 
-            var phoneCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "?i?n tho?i");
+            var phoneCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Điện thoại");
             var laptopCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Laptop");
 
             if (phoneCategory != null)

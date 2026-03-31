@@ -4,10 +4,10 @@ namespace mtkpm.Application.Common.DTOs.Auth
 {
     public class LoginDto
     {
-        [Required(ErrorMessage = "Email ho?c t�n ng??i d�ng l� b?t bu?c")]
+        [Required(ErrorMessage = "Email hoặc tên người dùng là bắt buộc")]
         public string UserNameOrEmail { get; set; }
 
-        [Required(ErrorMessage = "M?t kh?u l� b?t bu?c")]
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }

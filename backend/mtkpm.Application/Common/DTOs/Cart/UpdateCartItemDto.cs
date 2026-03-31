@@ -4,8 +4,8 @@ namespace mtkpm.Application.Common.DTOs.Cart
 {
     public class UpdateCartItemDto
     {
-        [Required(ErrorMessage = "S? l??ng l� b?t bu?c")]
-        [Range(1, int.MaxValue, ErrorMessage = "S? l??ng ph?i l?n h?n 0")]
+        [Required(ErrorMessage = "Số lượng là bắt buộc")]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
         public int Quantity { get; set; }
     }
 }

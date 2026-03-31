@@ -24,7 +24,7 @@ namespace mtkpm.Application.Features.Products.Commands.UpdateStock
             }
 
             product.UpdateStockQuantity(request.Quantity);
-            _logger.LogInfo($"C?p nh?t s? l??ng t?n kho: ProductId={product.Id}, S? l??ng m?i={request.Quantity}", "ProductService");
+            _logger.LogInfo($"Cập nhật số lượng tồn kho: ProductId={product.Id}, Số lượng mới={request.Quantity}", "ProductService");
             
             _unitOfWork.Products.Update(product);
             await _unitOfWork.SaveChangesAsync();

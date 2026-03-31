@@ -7,15 +7,15 @@ namespace mtkpm.Application.Features.Categories.Commands.UpdateCategory
         public UpdateCategoryCommandValidator()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("ID danh m?c kh�ng h?p l?");
+                .GreaterThan(0).WithMessage("ID danh mục không hợp lệ");
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("T�n danh m?c l� b?t bu?c")
-                .MaximumLength(100).WithMessage("T�n danh m?c kh�ng ???c v??t qu� 100 k� t?");
+                .NotEmpty().WithMessage("Tên danh mục là bắt buộc")
+                .MaximumLength(100).WithMessage("Tên danh mục không được vượt quá 100 ký tự");
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("M� t? danh m?c l� b?t bu?c")
-                .MaximumLength(500).WithMessage("M� t? kh�ng ???c v??t qu� 500 k� t?");
+                .NotEmpty().WithMessage("Mô tả danh mục là bắt buộc")
+                .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự");
         }
     }
 }

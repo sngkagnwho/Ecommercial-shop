@@ -7,10 +7,10 @@ namespace mtkpm.Application.Features.Auth.Commands.RefreshToken
         public RefreshTokenCommandValidator()
         {
             RuleFor(x => x.AccessToken)
-                .NotEmpty().WithMessage("Access token l� b?t bu?c");
+                .NotEmpty().WithMessage("Access token là bắt buộc");
 
             RuleFor(x => x.RefreshToken)
-                .NotEmpty().WithMessage("Refresh token l� b?t bu?c");
+                .NotEmpty().WithMessage("Refresh token là bắt buộc");
         }
     }
 }

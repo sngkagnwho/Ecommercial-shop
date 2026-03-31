@@ -7,10 +7,10 @@ namespace mtkpm.Application.Features.Auth.Commands.Login
         public LoginCommandValidator()
         {
             RuleFor(x => x.UserNameOrEmail)
-                .NotEmpty().WithMessage("Email ho?c t�n ng??i d�ng l� b?t bu?c");
+                .NotEmpty().WithMessage("Email hoặc tên người dùng là bắt buộc");
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("M?t kh?u l� b?t bu?c");
+                .NotEmpty().WithMessage("Mật khẩu là bắt buộc");
         }
     }
 }

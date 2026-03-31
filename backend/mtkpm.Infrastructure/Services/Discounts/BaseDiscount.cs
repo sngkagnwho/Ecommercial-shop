@@ -7,30 +7,30 @@ namespace mtkpm.Infrastructure.Services.Discounts
 {
     /// <summary>
     /// Base Discount - Component cho Decorator Pattern
-    /// ?ây là discount c? b?n không có chi?t kh?u
+    /// ?ï¿½y lï¿½ discount c? b?n khï¿½ng cï¿½ chi?t kh?u
     /// </summary>
     public class BaseDiscount : IDiscount
     {
         public virtual string DiscountName => "No Discount";
-        public virtual string Description => "Giá bán th??ng không có chi?t kh?u";
+        public virtual string Description => "GiÃ¡ bÃ¡n thÆ°á»ng khÃ´ng cÃ³ chiáº¿t kháº¥u";
 
         public virtual decimal ApplyDiscount(CartDto cart)
         {
             if (cart == null)
                 throw new ArgumentNullException(nameof(cart));
 
-            // Không áp d?ng discount nào
+            // Khï¿½ng ï¿½p d?ng discount nï¿½o
             return cart.TotalAmount;
         }
 
         public virtual bool IsApplicable(CartDto cart)
         {
-            return true; // Luôn có th? áp d?ng
+            return true; // Luï¿½n cï¿½ th? ï¿½p d?ng
         }
 
         public virtual decimal GetDiscountAmount(CartDto cart)
         {
-            return 0; // Không có chi?t kh?u
+            return 0; // Khï¿½ng cï¿½ chi?t kh?u
         }
     }
 }

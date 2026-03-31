@@ -30,7 +30,7 @@ namespace mtkpm.Infrastructure.Services.Discounts
         }
 
         public override string DiscountName => $"{_loyaltyPoints} Points";
-        public override string Description => $"S? d?ng {_loyaltyPoints} ?i?m thành viên (ti?t ki?m {GetTotalPointsValue():C})";
+        public override string Description => $"Sá»­ dá»¥ng {_loyaltyPoints} Ä‘iá»ƒm thÃ nh viÃªn (tiáº¿t kiá»‡m {GetTotalPointsValue():C})";
 
         protected override decimal ApplyCurrentDiscount(CartDto cart)
         {
@@ -44,7 +44,7 @@ namespace mtkpm.Infrastructure.Services.Discounts
 
         public override bool IsApplicable(CartDto cart)
         {
-            // Luôn có th? s? d?ng ?i?m (n?u có)
+            // Luï¿½n cï¿½ th? s? d?ng ?i?m (n?u cï¿½)
             return _loyaltyPoints > 0;
         }
 

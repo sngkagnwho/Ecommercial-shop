@@ -39,7 +39,7 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
 
             await _unitOfWork.Orders.AddAsync(order);
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInfo($"T?o ??n h�ng m?i: OrderId={order.Id}, UserId={request.UserId}", "OrderService");
+            _logger.LogInfo($"Tạo đơn hàng mới: OrderId={order.Id}, UserId={request.UserId}", "OrderService");
 
             foreach (var item in request.OrderItems)
             {
@@ -64,13 +64,13 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
 
                 order.AddOrderItem(orderItem);
                 product.DecreaseStock(item.Quantity);
-                _logger.LogInfo($"Tr? kho s?n ph?m Id={product.Id}, S? l??ng={item.Quantity}", "ProductService");
+                _logger.LogInfo($"Trừ kho sản phẩm Id={product.Id}, Số lượng={item.Quantity}", "ProductService");
                 _unitOfWork.Products.Update(product);
             }
 
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInfo($"Ho�n t?t ??n h�ng: OrderId={order.Id}, T?ng ti?n={order.TotalAmount}", "OrderService");
+            _logger.LogInfo($"Hoàn tất đơn hàng: OrderId={order.Id}, Tổng tiền={order.TotalAmount}", "OrderService");
 
             var orderDto = await _unitOfWork.Orders.GetWithDetailsAsync(order.Id, cancellationToken);
             return _mapper.Map<OrderDto>(orderDto);

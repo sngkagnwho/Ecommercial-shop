@@ -1,4 +1,4 @@
-using mtkpm.Application.Common.Interfaces;
+﻿using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
 using mtkpm.Domain.Events;
 using Microsoft.Extensions.Hosting;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// Notification Subscriber - T? ??ng ??ng k� observers khi app start
+    /// Notification Subscriber - T✓ ✔ng ✔ng k� observers khi app start
     /// </summary>
     public class NotificationSubscriber : IHostedService
     {
@@ -27,9 +27,9 @@ namespace mtkpm.Infrastructure.Services.Notifications
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInfo("?? Starting Notification Subscriber", "NotificationSubscriber");
+            _logger.LogInfo("✔ Starting Notification Subscriber", "NotificationSubscriber");
 
-            // Auto-register t?t c? observers
+            // Auto-register t?t c✓ observers
             using (var scope = _serviceProvider.CreateScope())
             {
                 var emailService = scope.ServiceProvider.GetRequiredService<EmailNotificationService>();
@@ -41,15 +41,16 @@ namespace mtkpm.Infrastructure.Services.Notifications
                 _eventPublisher.Subscribe(pushService);
             }
 
-            _logger.LogInfo($"?? Registered observers: {string.Join(", ", _eventPublisher.GetSubscriberNames())}", "NotificationSubscriber");
+            _logger.LogInfo($"✔ Registered observers: {string.Join(", ", _eventPublisher.GetSubscriberNames())}", "NotificationSubscriber");
 
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInfo("?? Stopping Notification Subscriber", "NotificationSubscriber");
+            _logger.LogInfo("✔ Stopping Notification Subscriber", "NotificationSubscriber");
             return Task.CompletedTask;
         }
     }
 }
+
