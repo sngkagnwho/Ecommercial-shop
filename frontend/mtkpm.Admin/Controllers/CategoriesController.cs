@@ -70,6 +70,24 @@ namespace mtkpm.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+                var category = await _categoryService.GetCategoryByIdAsync(id);
+                if (category == null)
+                    return NotFound();
+
+                return View(category);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error loading category details: {ex.Message}");
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             try

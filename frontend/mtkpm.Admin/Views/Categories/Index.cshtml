@@ -52,9 +52,12 @@
                     </div>
                     <div class="card-footer bg-light">
                         <div class="btn-group w-100" role="group">
-                            <button type="button" class="btn btn-sm btn-warning" onclick="editCategory(@category.Id)">
+                            <a href="/Categories/Details/@category.Id" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="/Categories/Edit/@category.Id" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i> Edit
-                            </button>
+                            </a>
                             <button type="button" class="btn btn-sm btn-danger" onclick="deleteCategory(@category.Id)">
                                 <i class="fas fa-trash"></i> Delete
                             </button>

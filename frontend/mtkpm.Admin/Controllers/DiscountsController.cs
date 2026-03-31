@@ -67,6 +67,24 @@ namespace mtkpm.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+                var discount = await _discountService.GetDiscountByIdAsync(id);
+                if (discount == null)
+                    return NotFound();
+
+                return View(discount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error loading discount details: {ex.Message}");
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             try

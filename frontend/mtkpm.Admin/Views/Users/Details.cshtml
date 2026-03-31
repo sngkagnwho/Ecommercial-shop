@@ -1,0 +1,188 @@
+@model mtkpm.Admin.Models.User.UserDetailViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "User Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-user"></i> User Details</h1>
+        <p class="text-muted">View user profile and activity</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">User Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">User ID</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        @Model.Id
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Username</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        @Model.Username
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Email</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        <a href="mailto:@Model.Email">@Model.Email</a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Phone Number</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                        {
+                            <a href="tel:@Model.PhoneNumber">@Model.PhoneNumber</a>
+                        }
+                        else
+                        {
+                            <span class="text-secondary">Not provided</span>
+                        }
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Email Confirmed</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        @if (Model.EmailConfirmed)
+                        {
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning"><i class="fas fa-times"></i> No</span>
+                        }
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Status</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger"><i class="fas fa-times"></i> Inactive</span>
+                        }
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Created At</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Last Login</h6>
+                    </div>
+                    <div class="col-sm-9 text-muted">
+                        @if (Model.LastLoginAt.HasValue)
+                        {
+                            @Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm")
+                        }
+                        else
+                        {
+                            <span class="text-secondary">Never logged in</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Orders != null && Model.Orders.Count > 0)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">User Orders (<span class="badge bg-primary">@Model.Orders.Count</span>)</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Orders)
+                            {
+                                <tr>
+                                    <td><a href="/Orders/Details/@order.Id">@order.OrderNumber</a></td>
+                                    <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                    <td><strong>$@order.TotalAmount.ToString("F2")</strong></td>
+                                    <td>
+                                        @if (order.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (order.Status == "Cancelled")
+                                        {
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        }
+                                        else if (order.Status == "Shipping")
+                                        {
+                                            <span class="badge bg-info">Shipping</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">@order.Status</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <div class="d-grid gap-2 d-sm-flex mt-3">
+            <a href="/Users/Edit/@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="/Users" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <form method="post" action="/Users/Delete/@Model.Id" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
