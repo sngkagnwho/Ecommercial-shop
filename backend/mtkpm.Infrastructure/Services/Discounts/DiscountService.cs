@@ -1,6 +1,7 @@
 using mtkpm.Application.Common.DTOs.Cart;
 using mtkpm.Application.Common.Interfaces;
 using mtkpm.Application.Common.Interfaces.Services;
+using mtkpm.Domain.Entities.Business;
 using mtkpm.Domain.Events;
 
 namespace mtkpm.Infrastructure.Services.Discounts
@@ -85,6 +86,123 @@ namespace mtkpm.Infrastructure.Services.Discounts
             }
 
             return result;
+        }
+
+        public IDiscount BuildDiscountFromCodes(IEnumerable<string> discountCodes)
+        {
+            if (discountCodes == null)
+            {
+                return new BaseDiscount();
+            }
+
+            IDiscount chain = new BaseDiscount();
+
+            foreach (var rawCode in discountCodes)
+            {
+                if (string.IsNullOrWhiteSpace(rawCode))
+                {
+                    continue;
+                }
+
+                var code = rawCode.Trim().ToLowerInvariant();
+
+                if (code.StartsWith("percentage_"))
+                {
+                    if (decimal.TryParse(code.Replace("percentage_", string.Empty), out var percent))
+                    {
+                        chain = new PercentageDiscountDecorator(chain, percent);
+                    }
+
+                    continue;
+                }
+
+                if (code.StartsWith("fixed_"))
+                {
+                    if (decimal.TryParse(code.Replace("fixed_", string.Empty), out var amount))
+                    {
+                        chain = new FixedAmountDiscountDecorator(chain, amount, 0);
+                    }
+
+                    continue;
+                }
+
+                if (code == "free_shipping")
+                {
+                    chain = new FreeShippingDiscountDecorator(chain, shippingCost: 50000, minItemCount: 0);
+                    continue;
+                }
+
+                if (code.StartsWith("loyalty_points_"))
+                {
+                    if (int.TryParse(code.Replace("loyalty_points_", string.Empty), out var points))
+                    {
+                        chain = new LoyaltyPointsDiscountDecorator(chain, points, pointsValue: 1000);
+                    }
+
+                    continue;
+                }
+
+                if (code.StartsWith("bundle_"))
+                {
+                    var parts = code.Split('_');
+                    if (parts.Length == 3
+                        && int.TryParse(parts[1], out var requiredCount)
+                        && decimal.TryParse(parts[2], out var bundlePercent))
+                    {
+                        chain = new BundleDiscountDecorator(chain, requiredCount, bundlePercent);
+                    }
+                }
+            }
+
+            return chain;
+        }
+
+        public IDiscount BuildDiscountFromDiscountEntities(IEnumerable<Discount> discounts)
+        {
+            if (discounts == null)
+            {
+                return new BaseDiscount();
+            }
+
+            IDiscount chain = new BaseDiscount();
+
+            foreach (var discount in discounts)
+            {
+                if (discount == null || !discount.CanBeUsed)
+                {
+                    continue;
+                }
+
+                var discountType = discount.DiscountType?.Trim().ToLowerInvariant();
+
+                switch (discountType)
+                {
+                    case "percentage":
+                        chain = new PercentageDiscountDecorator(
+                            chain,
+                            discount.DiscountValue,
+                            discount.MinimumOrderAmount ?? 0);
+                        break;
+
+                    case "fixedamount":
+                    case "fixed":
+                        chain = new FixedAmountDiscountDecorator(
+                            chain,
+                            discount.DiscountValue,
+                            discount.MinimumOrderAmount ?? 0);
+                        break;
+
+                    case "freeshipping":
+                    case "free_shipping":
+                        chain = new FreeShippingDiscountDecorator(
+                            chain,
+                            shippingCost: discount.DiscountValue > 0 ? discount.DiscountValue : 50000,
+                            minItemCount: 0);
+                        break;
+                }
+            }
+
+            return chain;
         }
     }
 }

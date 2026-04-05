@@ -1,0 +1,115 @@
+@model mtkpm.Admin.Features.Orders.Models.OrderViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Update Order Status";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-edit"></i> Update Order Status</h1>
+        <p class="text-muted">Order #@Model.OrderNumber</p>
+    </div>
+    <div>
+        <a href="/Orders/Details/@Model.Id" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Order
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body p-5">
+                <!-- Current Status Display -->
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <strong>Current Status:</strong>
+                            <div style="margin-top: 0.5rem;">
+                                @{
+                                    var currentStatusClass = Model.Status switch
+                                    {
+                                        1 => "warning",      // Pending
+                                        2 => "info",         // Confirmed
+                                        3 => "primary",      // Processing
+                                        4 => "secondary",    // Shipping
+                                        5 => "success",      // Delivered
+                                        6 => "success",      // Completed
+                                        7 => "danger",       // Cancelled
+                                        8 => "warning",      // Returned
+                                        9 => "danger",       // Failed
+                                        _ => "secondary"
+                                    };
+                                }
+                                <span class="badge bg-@currentStatusClass fs-6">@Model.StatusDisplay</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Status Form -->
+                <form method="post" action="/Orders/UpdateStatus/@Model.Id">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label for="status" class="form-label"><strong>Select New Status</strong></label>
+                        <select name="status" id="status" class="form-select form-select-lg" required>
+                            <option value="">-- Select Status --</option>
+                            <option value="1">Pending</option>
+                            <option value="2">Confirmed</option>
+                            <option value="3">Processing</option>
+                            <option value="4">Shipping</option>
+                            <option value="5">Delivered</option>
+                            <option value="6">Completed</option>
+                            <option value="7">Cancelled</option>
+                            <option value="8">Returned</option>
+                            <option value="9">Failed</option>
+                        </select>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="card mb-4 bg-light">
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <strong>Order Date:</strong> @Model.OrderDate.ToString("MMMM dd, yyyy HH:mm")
+                            </p>
+                            <p class="mb-2">
+                                <strong>Customer:</strong> @Model.UserName
+                            </p>
+                            <p class="mb-0">
+                                <strong>Total Amount:</strong> <span class="text-success">${@Model.TotalAmount.ToString("F2")}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                        <a href="/Orders/Details/@Model.Id" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

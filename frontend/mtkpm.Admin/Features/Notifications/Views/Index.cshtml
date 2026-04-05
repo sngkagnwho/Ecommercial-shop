@@ -1,0 +1,336 @@
+@{
+    ViewData["Title"] = "Notification Console";
+    var stats = (mtkpm.Admin.Models.Notification.NotificationStatisticsViewModel?)ViewBag.Statistics ?? new mtkpm.Admin.Models.Notification.NotificationStatisticsViewModel();
+    var methods = (List<mtkpm.Admin.Models.Notification.NotificationMethodViewModel>?)ViewBag.Methods ?? new List<mtkpm.Admin.Models.Notification.NotificationMethodViewModel>();
+    var subscribers = (List<mtkpm.Admin.Models.Notification.NotificationSubscriberViewModel>?)ViewBag.Subscribers ?? new List<mtkpm.Admin.Models.Notification.NotificationSubscriberViewModel>();
+    var testEvent = (string?)TempData["TestEvent"];
+    var errorMsg = (string?)TempData["ErrorMessage"];
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-bell"></i> Notification Console</h1>
+        <p class="text-muted">Manage notification methods, test events, and monitor delivery</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/AdminNotifications/Guide" class="btn btn-info">
+            <i class="fas fa-book"></i> Documentation
+        </a>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (!string.IsNullOrEmpty(testEvent))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> <strong>Test Event:</strong> @testEvent
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMsg))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> @errorMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-envelope fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Total Methods</h5>
+                <p class="card-text h3">@stats.TotalMethods</p>
+                <small class="text-muted">@stats.ActiveMethods active</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-users fs-1 text-success mb-3"></i>
+                <h5 class="card-title">Total Subscribers</h5>
+                <p class="card-text h3">@stats.TotalSubscribers</p>
+                <small class="text-muted">Active subscriptions</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-paper-plane fs-1 text-info mb-3"></i>
+                <h5 class="card-title">Sent Today</h5>
+                <p class="card-text h3">@stats.NotificationsSentToday</p>
+                <small class="text-muted">@stats.NotificationsFailedToday failed</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-pie fs-1 text-warning mb-3"></i>
+                <h5 class="card-title">Success Rate</h5>
+                <p class="card-text h3">@stats.TodaySuccessRate.ToString("F1")%</p>
+                <small class="text-muted">Today's average</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Methods -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cog"></i> Notification Methods</h5>
+    </div>
+    <div class="card-body">
+        @if (methods.Any())
+        {
+            <div class="row">
+                @foreach (var method in methods)
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">
+                                        @if (!string.IsNullOrEmpty(method.Icon))
+                                        {
+                                            <span>@method.Icon</span>
+                                        }
+                                        @method.Name
+                                    </h6>
+                                    <small class="text-muted">@method.Description</small>
+                                </div>
+                                <span class="badge @(method.IsActive ? "bg-success" : "bg-danger")">
+                                    @(method.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="small mb-2">
+                                <strong>@method.SubscriberCount</strong> subscribers
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> No notification methods available
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Test Events -->
+<div class="card mb-4">
+    <div class="card-header bg-primary bg-opacity-10">
+        <h5 class="mb-0"><i class="fas fa-flask"></i> Test Events</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Send test notifications for each event type to all active subscribers:</p>
+        <form method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-md-2">
+                <button type="submit" formaction="/AdminNotifications/TestOrderCreatedEvent" class="btn btn-outline-primary w-100" title="Send test OrderCreated event">
+                    <i class="fas fa-shopping-cart"></i> Order Created
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" formaction="/AdminNotifications/TestPaymentCompletedEvent" class="btn btn-outline-success w-100" title="Send test PaymentCompleted event">
+                    <i class="fas fa-credit-card"></i> Payment OK
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" formaction="/AdminNotifications/TestOrderShippedEvent" class="btn btn-outline-info w-100" title="Send test OrderShipped event">
+                    <i class="fas fa-truck"></i> Order Shipped
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" formaction="/AdminNotifications/TestPaymentFailedEvent" class="btn btn-outline-danger w-100" title="Send test PaymentFailed event">
+                    <i class="fas fa-times-circle"></i> Payment Failed
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" formaction="/AdminNotifications/TestOrderCancelledEvent" class="btn btn-outline-secondary w-100" title="Send test OrderCancelled event">
+                    <i class="fas fa-ban"></i> Order Cancelled
+                </button>
+            </div>
+            <div class="col-md-12 mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-circle-info"></i> Test events will be sent to all active notification methods and their subscribers.
+                </small>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Event Statistics -->
+@if (stats.EventStatistics.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Event Statistics</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Event Type</th>
+                            <th class="text-end">Total Sent</th>
+                            <th class="text-end">Failed</th>
+                            <th class="text-end">Success Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stat in stats.EventStatistics)
+                        {
+                            <tr>
+                                <td>@stat.EventName</td>
+                                <td class="text-end">@stat.TotalSent</td>
+                                <td class="text-end">
+                                    @if (stat.Failed > 0)
+                                    {
+                                        <span class="badge bg-danger">@stat.Failed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">0</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar @(stat.SuccessRate >= 95 ? "bg-success" : stat.SuccessRate >= 80 ? "bg-warning" : "bg-danger")" 
+                                             role="progressbar" style="width: @stat.SuccessRate.ToString("F1")%;" aria-valuenow="@stat.SuccessRate" aria-valuemin="0" aria-valuemax="100">
+                                            @stat.SuccessRate.ToString("F1")%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Subscribers -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Active Subscribers (@subscribers.Count)</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Method</th>
+                    <th>Recipient</th>
+                    <th class="text-end">Status</th>
+                    <th class="text-end">Sent</th>
+                    <th class="text-end">Failed</th>
+                    <th class="text-end">Success Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (subscribers.Any())
+                {
+                    @foreach (var subscriber in subscribers.Take(20))
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary">@subscriber.NotificationMethod</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(subscriber.Email))
+                                {
+                                    <span>@subscriber.Email</span>
+                                }
+                                else if (!string.IsNullOrEmpty(subscriber.PhoneNumber))
+                                {
+                                    <span>@subscriber.PhoneNumber</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <span class="badge @(subscriber.IsActive ? "bg-success" : "bg-danger")">
+                                    @(subscriber.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-end">@subscriber.TotalNotificationsSent</td>
+                            <td class="text-end">
+                                @if (subscriber.FailedNotifications > 0)
+                                {
+                                    <span class="badge bg-danger">@subscriber.FailedNotifications</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">0</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="progress" style="width: 80px; display: inline-block; height: 20px;">
+                                    <div class="progress-bar @(subscriber.SuccessRate >= 95 ? "bg-success" : subscriber.SuccessRate >= 80 ? "bg-warning" : "bg-danger")" 
+                                         role="progressbar" style="width: @subscriber.SuccessRate.ToString("F1")%;" 
+                                         aria-valuenow="@subscriber.SuccessRate" aria-valuemin="0" aria-valuemax="100" title="@subscriber.SuccessRate.ToString("F1")%">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox"></i> No subscribers yet
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (subscribers.Count > 20)
+    {
+        <div class="card-footer text-center text-muted small">
+            Showing 20 of @subscribers.Count subscribers - <a href="#">View all</a>
+        </div>
+    }
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .progress-bar {
+        font-size: 0.75rem;
+        line-height: 20px;
+    }
+</style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+</style>

@@ -1,0 +1,236 @@
+@model mtkpm.Admin.Models.Payment.UpdatePaymentMethodViewModel
+
+@{
+    ViewData["Title"] = "Edit Payment Method";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-edit"></i> Edit Payment Method</h1>
+        <p class="text-muted">Update payment method configuration</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Payments" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-form"></i> Payment Method Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="Code" value="@Model.Code" />
+
+                    <!-- Code Display (Read-only) -->
+                    <div class="mb-3 p-3 bg-light border rounded">
+                        <label class="form-label"><i class="fas fa-lock text-warning"></i> Payment Method Code (Immutable)</label>
+                        <div class="form-control-plaintext fw-bold">
+                            <i class="fas fa-code"></i> @Model.Code
+                        </div>
+                        <small class="text-muted d-block mt-2">The payment method code cannot be changed after creation.</small>
+                    </div>
+
+                    <!-- Name & Display Order -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" 
+                                   id="Name" name="Name" placeholder="Credit Card" value="@Model.Name" required maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="DisplayOrder" class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="DisplayOrder" name="DisplayOrder" value="@Model.DisplayOrder" min="0" max="999" step="1">
+                        </div>
+                    </div>
+
+                    <!-- Icon & Status -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Icon" class="form-label">Icon / Emoji</label>
+                            <input type="text" class="form-control" id="Icon" name="Icon" placeholder="💳" value="@Model.Icon" maxlength="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="IsActive" class="form-label">Status</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" value="true" @(Model.IsActive ? "checked" : "")>
+                                <label class="form-check-label" for="IsActive">
+                                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                                        @(Model.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="Description" class="form-label">Description</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="2" 
+                                  placeholder="Brief description of this payment method..." maxlength="500">@Model.Description</textarea>
+                    </div>
+
+                    <!-- Fees -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="TransactionFeePercentage" class="form-label">Transaction Fee % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="TransactionFeePercentage" name="TransactionFeePercentage" 
+                                   value="@Model.TransactionFeePercentage" min="0" max="100" step="0.1" required>
+                            <small class="text-muted" id="feeWarning"></small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="TransactionFeeFixed" class="form-label">Fixed Fee (đ)</label>
+                            <input type="number" class="form-control" id="TransactionFeeFixed" name="TransactionFeeFixed" 
+                                   value="@Model.TransactionFeeFixed" min="0" step="1000">
+                        </div>
+                    </div>
+
+                    <!-- Amount Limits -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MinAmount" class="form-label">Minimum Amount (đ)</label>
+                            <input type="number" class="form-control" id="MinAmount" name="MinAmount" 
+                                   value="@Model.MinAmount" min="0" step="1000">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaxAmount" class="form-label">Maximum Amount (đ)</label>
+                            <input type="number" class="form-control" id="MaxAmount" name="MaxAmount" 
+                                   value="@Model.MaxAmount" min="0" step="1000">
+                        </div>
+                    </div>
+
+                    <!-- Processing Time -->
+                    <div class="mb-3">
+                        <label for="ProcessingTime" class="form-label">Processing Time <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ProcessingTime" name="ProcessingTime" 
+                               placeholder="e.g., Instant, 1-2 days" value="@Model.ProcessingTime" maxlength="100" required>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="mb-3">
+                        <label for="Requirements" class="form-label">Requirements</label>
+                        <textarea class="form-control" id="Requirements" name="Requirements" rows="2" 
+                                  placeholder="e.g., Valid credit card required" maxlength="500">@Model.Requirements</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="SupportedProviders" class="form-label">Supported Providers (CSV)</label>
+                        <textarea class="form-control" id="SupportedProviders" name="SupportedProviders" rows="2" 
+                                  placeholder="e.g., Visa, MasterCard, AmEx" maxlength="500">@Model.SupportedProviders</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="SupportedAreas" class="form-label">Supported Areas (CSV)</label>
+                        <textarea class="form-control" id="SupportedAreas" name="SupportedAreas" rows="2" 
+                                  placeholder="e.g., Vietnam, International" maxlength="500">@Model.SupportedAreas</textarea>
+                    </div>
+
+                    <!-- Admin Notes -->
+                    <div class="mb-3">
+                        <label for="AdminNotes" class="form-label">Admin Notes</label>
+                        <textarea class="form-control" id="AdminNotes" name="AdminNotes" rows="3" 
+                                  placeholder="Internal notes about this payment method..." maxlength="1000">@Model.AdminNotes</textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="/Payments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info bg-opacity-10">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Information</h5>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-lock text-warning"></i> Immutable Fields</h6>
+                <p class="small text-muted">
+                    The payment method code cannot be changed. If you need to change it, delete this method and create a new one with the correct code.
+                </p>
+
+                <hr>
+
+                <h6>Fee Calculation</h6>
+                <p class="small text-muted">
+                    Total fee = (Amount × Fee%) + Fixed Fee
+                </p>
+                <div id="feeExample" class="small bg-light p-2 rounded">
+                    Example: 1,000,000đ × 2.5% + 5,000đ = 30,000đ
+                </div>
+
+                <hr>
+
+                <h6>Status Changes</h6>
+                <p class="small text-muted">
+                    Toggle between Active/Inactive to enable or disable this payment method for customers.
+                </p>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card border-danger mt-3">
+            <div class="card-header bg-danger bg-opacity-10">
+                <h5 class="mb-0 text-danger"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">Once you delete a payment method, there is no going back.</p>
+                <a href="#" onclick="return confirm('Delete this payment method? This action cannot be undone.')" 
+                   class="btn btn-sm btn-danger w-100">
+                    <i class="fas fa-trash"></i> Delete Payment Method
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .form-control-plaintext {
+        font-size: 1.1rem;
+        padding: 0.375rem 0;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feeInput = document.getElementById('TransactionFeePercentage');
+    const feeWarning = document.getElementById('feeWarning');
+    
+    if (feeInput) {
+        feeInput.addEventListener('change', function() {
+            const fee = parseFloat(this.value) || 0;
+            if (fee >= 2.5) {
+                feeWarning.innerHTML = '<strong class="text-warning"><i class="fas fa-exclamation-circle"></i> High fee detected</strong>';
+            } else {
+                feeWarning.innerHTML = '';
+            }
+        });
+    }
+});
+</script>

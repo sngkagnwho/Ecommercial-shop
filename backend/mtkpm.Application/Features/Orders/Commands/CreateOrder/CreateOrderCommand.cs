@@ -7,7 +7,8 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
     public class CreateOrderCommand : IRequest<OrderDto>
     {
         public int UserId { get; set; }
-        public string ShippingAddress { get; set; }
+        public int? SavedAddressId { get; set; }
+        public string? ShippingAddress { get; set; }
         public string? BillingAddress { get; set; }
         public PaymentMethodType PaymentMethod { get; set; }
         public string? Note { get; set; }

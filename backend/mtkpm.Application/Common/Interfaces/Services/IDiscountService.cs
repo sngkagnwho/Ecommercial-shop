@@ -1,5 +1,7 @@
 using mtkpm.Application.Common.DTOs.Cart;
 
+using mtkpm.Domain.Entities.Business;
+
 namespace mtkpm.Application.Common.Interfaces.Services
 {
     /// <summary>
@@ -21,5 +23,15 @@ namespace mtkpm.Application.Common.Interfaces.Services
         /// Xây d?ng discount t? danh sách
         /// </summary>
         IDiscount BuildDiscount(params IDiscount[] discounts);
+
+        /// <summary>
+        /// Xây d?ng discount chain t? danh sách mã discount
+        /// </summary>
+        IDiscount BuildDiscountFromCodes(IEnumerable<string> discountCodes);
+
+        /// <summary>
+        /// Xây d?ng discount chain t? danh sách discount trong database
+        /// </summary>
+        IDiscount BuildDiscountFromDiscountEntities(IEnumerable<Discount> discounts);
     }
 }

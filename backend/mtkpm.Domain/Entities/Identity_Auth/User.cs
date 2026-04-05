@@ -25,6 +25,7 @@ namespace mtkpm.Domain.Entities.Identity_Auth
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
         public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public virtual ICollection<FavouriteProduct> FavouriteProducts { get; set; } = new List<FavouriteProduct>();
+        public virtual ICollection<UserAddress> UserAddresses { get; set; } = new List<UserAddress>();
         
         // Navigation Properties - Auth
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();

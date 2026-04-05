@@ -1,0 +1,304 @@
+@model mtkpm.Admin.Models.Payment.PaymentMethodViewModel
+
+@{
+    ViewData["Title"] = "Payment Method Details";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-info-circle"></i> Payment Method Details</h1>
+        <p class="text-muted">View complete information about this payment method</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Payments/Edit/@Model.Id" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="/Payments" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Basic Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-receipt"></i> Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Code</label>
+                        <div class="fw-bold">
+                            <span class="badge bg-secondary me-2">@Model.Code</span>
+                            <i class="fas fa-lock text-warning" data-bs-toggle="tooltip" title="Immutable field"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Name</label>
+                        <div class="fw-bold">@Model.Icon @Model.Name</div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Status</label>
+                        <div>
+                            <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                                <i class="fas @(Model.IsActive ? "fa-check-circle" : "fa-times-circle")"></i>
+                                @(Model.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Display Order</label>
+                        <div class="fw-bold">@Model.DisplayOrder</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted">Description</label>
+                    <div>@(string.IsNullOrEmpty(Model.Description) ? "N/A" : Model.Description)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fee Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-percent"></i> Fee Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Transaction Fee %</label>
+                        <div>
+                            <span class="fw-bold h5">@Model.TransactionFeePercentage.ToString("F1")%</span>
+                            @if (Model.IsHighFee)
+                            {
+                                <span class="badge bg-warning ms-2"><i class="fas fa-exclamation-circle"></i> High Fee</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Fixed Fee</label>
+                        <div class="fw-bold h5">@Model.TransactionFeeFixed.ToString("N0")đ</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted">Fee Summary</label>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-calculator"></i> @Model.FeeSummary
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amount Limits -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Amount Limits</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Minimum Amount</label>
+                        <div class="fw-bold h5">@Model.MinAmount.ToString("N0")đ</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Maximum Amount</label>
+                        <div class="fw-bold h5">@Model.MaxAmount.ToString("N0")đ</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted">Accepted Range</label>
+                    <div class="alert alert-primary mb-0">
+                        <i class="fas fa-arrows-alt-h"></i> @Model.AmountRange
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing & Support -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cog"></i> Processing & Support</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Processing Time</label>
+                    <div class="fw-bold">
+                        <i class="fas fa-clock"></i> @Model.ProcessingTime
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Requirements))
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Requirements</label>
+                        <div class="alert alert-secondary mb-0">@Model.Requirements</div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.SupportedProviders))
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Supported Providers</label>
+                        <div>
+                            @foreach (var provider in Model.SupportedProviders.Split(','))
+                            {
+                                <span class="badge bg-info me-1">@provider.Trim()</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.SupportedAreas))
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Supported Areas</label>
+                        <div>
+                            @foreach (var area in Model.SupportedAreas.Split(','))
+                            {
+                                <span class="badge bg-success me-1">@area.Trim()</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Admin Notes -->
+        @if (!string.IsNullOrEmpty(Model.AdminNotes))
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note"></i> Admin Notes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning mb-0">
+                        @Model.AdminNotes
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Summary Sidebar -->
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-header @(Model.IsActive ? "bg-success" : "bg-danger") bg-opacity-10">
+                <h5 class="mb-0">
+                    <i class="fas @(Model.IsActive ? "fa-check-circle" : "fa-times-circle")"></i>
+                    @(Model.IsActive ? "Active" : "Inactive")
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted mb-3">
+                    @(Model.IsActive ? "This payment method is available to customers" : "This payment method is disabled")
+                </p>
+                <form method="post" action="/Payments/ToggleStatus/@Model.Id">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="isActive" value="@(!Model.IsActive)" />
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-exchange-alt"></i> Toggle Status
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="h5 mb-1">@Model.TransactionFeePercentage.ToString("F1")</div>
+                        <small class="text-muted">Fee %</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h5 mb-1">@Model.MinAmount.ToString("N0")</div>
+                        <small class="text-muted">Min Amt</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="h5 mb-1">@Model.MaxAmount.ToString("N0")</div>
+                        <small class="text-muted">Max Amt</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h5 mb-1">@Model.TransactionFeeFixed.ToString("N0")</div>
+                        <small class="text-muted">Fixed Fee</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="/Payments/Edit/@Model.Id" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-edit"></i> Edit Payment Method
+                </a>
+                <form method="post" action="/Payments/Delete/@Model.Id" onsubmit="return confirm('Delete this payment method? This action cannot be undone.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Metadata Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Metadata</h5>
+            </div>
+            <div class="card-body">
+                <small>
+                    <div class="mb-2">
+                        <span class="text-muted">Created:</span><br>
+                        <span class="fw-bold">@Model.CreateAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">ID:</span><br>
+                        <code>@Model.Id</code>
+                    </div>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    code {
+        background-color: #f5f5f5;
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #d63384;
+        font-size: 0.85rem;
+    }
+</style>

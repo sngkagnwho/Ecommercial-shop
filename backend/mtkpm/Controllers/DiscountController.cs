@@ -2,6 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
+using mtkpm.Application.Common.DTOs.Discount;
+using mtkpm.Application.Features.Discounts.Commands.CreateDiscount;
+using mtkpm.Application.Features.Discounts.Commands.DeleteDiscount;
+using mtkpm.Application.Features.Discounts.Commands.UpdateDiscount;
+using mtkpm.Application.Features.Discounts.Queries.GetDiscountById;
+using mtkpm.Application.Features.Discounts.Queries.GetDiscounts;
 using mtkpm.Application.Features.Cart.Commands.CalculateDiscount;
 using mtkpm.Infrastructure.Services;
 
@@ -62,110 +68,121 @@ namespace mtkpm.Controllers
         [HttpGet("available")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(List<DiscountCodeInfo>), StatusCodes.Status200OK)]
-        public IActionResult GetAvailableDiscounts()
+        public async Task<IActionResult> GetAvailableDiscounts()
         {
-            var discountCodes = new List<DiscountCodeInfo>
+            var discounts = await _mediator.Send(new GetDiscountsQuery { IncludeInactive = false });
+            var discountCodes = discounts.Select(d => new DiscountCodeInfo
             {
-                new DiscountCodeInfo
-                {
-                    Code = "percentage_10",
-                    Name = "Giảm 10%",
-                    Description = "Giảm 10% trên giá hàng",
-                    Example = "percentage_10"
-                },
-                new DiscountCodeInfo
-                {
-                    Code = "percentage_20",
-                    Name = "Giảm 20%",
-                    Description = "Giảm 20% trên giá hàng",
-                    Example = "percentage_20"
-                },
-                new DiscountCodeInfo
-                {
-                    Code = "fixed_100000",
-                    Name = "Giảm 100K",
-                    Description = "Giảm 100.000 đ cố định",
-                    Example = "fixed_100000"
-                },
-                new DiscountCodeInfo
-                {
-                    Code = "free_shipping",
-                    Name = "Miễn phí vận chuyển",
-                    Description = "Miễn phí vận chuyển (tiết kiệm 50.000 đ)",
-                    Example = "free_shipping"
-                },
-                new DiscountCodeInfo
-                {
-                    Code = "loyalty_points_50",
-                    Name = "50 điểm thành viên",
-                    Description = "Sử dụng 50 điểm thành viên (50.000 đ)",
-                    Example = "loyalty_points_50"
-                },
-                new DiscountCodeInfo
-                {
-                    Code = "bundle_3_15",
-                    Name = "Chiết khấu combo (3+ sản phẩm -15%)",
-                    Description = "Mua 3+ sản phẩm được giảm 15%",
-                    Example = "bundle_3_15"
-                }
-            };
+                Code = d.Code,
+                Name = d.Name,
+                Description = d.Description ?? string.Empty,
+                Example = d.Code
+            }).ToList();
 
             return Ok(ApiResponse<List<DiscountCodeInfo>>.SuccessResponse(discountCodes));
         }
 
         /// <summary>
-        /// Hướng dẫn sử dụng Decorator Pattern
+        /// Lấy danh sách discount cho Admin
         /// </summary>
-        [HttpGet("guide")]
-        [AllowAnonymous]
-        public IActionResult GetDecoratorPatternGuide()
+        /// <remarks>
+        /// includeInactive=true để xem cả discount đã tắt/hết hạn, false để chỉ lấy discount đang hoạt động.
+        /// </remarks>
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(List<DiscountDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetDiscounts([FromQuery] bool includeInactive = true)
         {
-            var guide = @"
-Decorator Pattern - Hệ thống Chiết khấu
-
-**Mục đích:**
-Áp dụng nhiều chiết khấu lần lượt (stacking) mà không cần sửa code.
-
-**Cấu Trúc:**
-- BaseDiscount: Component cơ bản (không có chiết khấu)
-- DiscountDecorator: Base class cho tất cả decorators
-- PercentageDiscountDecorator: Chiết khấu theo phần trăm
-- FixedAmountDiscountDecorator: Chiết khấu số tiền cố định
-- FreeShippingDiscountDecorator: Miễn phí vận chuyển
-- LoyaltyPointsDiscountDecorator: Sử dụng điểm
-- BundleDiscountDecorator: Chiết khấu combo
-
-**Ví Dụ Sử Dụng:**
-
-1. Áp dụng một chiết khấu:
-   POST /api/discount/calculate
-   {
-     ""discountCodes"": [""percentage_10""]
-   }
-
-2. Stack nhiều chiết khấu:
-   POST /api/discount/calculate
-   {
-     ""discountCodes"": [""percentage_10"", ""free_shipping""]
-   }
-   
-   Kết quả: Giảm 10% + Miễn phí ship = Tiết kiệm cùng lúc
-
-3. Sử dụng điểm + Chiết khấu:
-   POST /api/discount/calculate
-   {
-     ""discountCodes"": [""percentage_20"", ""loyalty_points_100""]
-   }
-
-**Lợi Ích Decorator Pattern:**
-- Linh hoạt: Có thể kết hợp bất kỳ chiết khấu nào
-- Open/Closed: Dễ thêm chiết khấu mới
-- Không bùng nổ class: Không cần tạo nhiều class
-- Runtime Composition: Quyết định chiết khấu lúc runtime
-";
-
-            return Ok(new { guide });
+            var discounts = await _mediator.Send(new GetDiscountsQuery { IncludeInactive = includeInactive });
+            return Ok(ApiResponse<List<DiscountDto>>.SuccessResponse(discounts));
         }
+
+        /// <summary>
+        /// Lấy chi tiết một discount theo Id
+        /// </summary>
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(DiscountDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDiscountById(int id)
+        {
+            var discount = await _mediator.Send(new GetDiscountByIdQuery(id));
+            if (discount == null)
+            {
+                return NotFound(ApiResponse<DiscountDto>.FailureResponse("Không tìm thấy chiết khấu"));
+            }
+
+            return Ok(ApiResponse<DiscountDto>.SuccessResponse(discount));
+        }
+
+        /// <summary>
+        /// Tạo mới discount
+        /// </summary>
+        /// <remarks>
+        /// Chỉ Admin được phép tạo. Mã discount phải duy nhất trong hệ thống.
+        /// </remarks>
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(DiscountDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateDiscount([FromBody] CreateDiscountDto dto)
+        {
+            var result = await _mediator.Send(new CreateDiscountCommand
+            {
+                Dto = dto,
+                UserId = _currentUserService.UserId
+            });
+
+            return CreatedAtAction(nameof(GetDiscountById), new { id = result.Id }, ApiResponse<DiscountDto>.SuccessResponse(result, "Tạo chiết khấu thành công"));
+        }
+
+        /// <summary>
+        /// Cập nhật discount theo Id
+        /// </summary>
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(DiscountDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateDiscount(int id, [FromBody] UpdateDiscountDto dto)
+        {
+            var result = await _mediator.Send(new UpdateDiscountCommand
+            {
+                Id = id,
+                Dto = dto,
+                UserId = _currentUserService.UserId
+            });
+
+            if (result == null)
+            {
+                return NotFound(ApiResponse<DiscountDto>.FailureResponse("Không tìm thấy chiết khấu"));
+            }
+
+            return Ok(ApiResponse<DiscountDto>.SuccessResponse(result, "Cập nhật chiết khấu thành công"));
+        }
+
+        /// <summary>
+        /// Xóa mềm discount theo Id
+        /// </summary>
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteDiscount(int id)
+        {
+            var deleted = await _mediator.Send(new DeleteDiscountCommand
+            {
+                Id = id,
+                UserId = _currentUserService.UserId
+            });
+
+            if (!deleted)
+            {
+                return NotFound(ApiResponse<bool>.FailureResponse("Không tìm thấy chiết khấu"));
+            }
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Xóa chiết khấu thành công"));
+        }
+
     }
 
     public class CalculateCartDiscountRequest

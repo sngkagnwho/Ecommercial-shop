@@ -87,11 +87,35 @@ namespace mtkpm.Admin.Services
 
         public string? GetToken()
         {
+            // Try to get token from claims first (more reliable than session)
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var tokenClaim = user.FindFirst("AccessToken");
+                if (tokenClaim != null && !string.IsNullOrEmpty(tokenClaim.Value))
+                {
+                    return tokenClaim.Value;
+                }
+            }
+
+            // Fall back to session if claims don't have token
             return _httpContextAccessor.HttpContext?.Session.GetString(TokenKey);
         }
 
         public string? GetRefreshToken()
         {
+            // Try to get token from claims first (more reliable than session)
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var tokenClaim = user.FindFirst("RefreshToken");
+                if (tokenClaim != null && !string.IsNullOrEmpty(tokenClaim.Value))
+                {
+                    return tokenClaim.Value;
+                }
+            }
+
+            // Fall back to session if claims don't have token
             return _httpContextAccessor.HttpContext?.Session.GetString(RefreshTokenKey);
         }
 

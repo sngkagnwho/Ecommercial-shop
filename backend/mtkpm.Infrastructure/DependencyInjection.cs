@@ -137,7 +137,11 @@ namespace mtkpm.Infrastructure
             services.AddScoped<ICartItemRepository, CartItemRepository>();
             services.AddScoped<IFavouriteProductRepository, FavouriteProductRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            
+            services.AddScoped<IUserAddressRepository, UserAddressRepository>();
+            services.AddScoped<IDiscountRepository, DiscountRepository>();
+            services.AddScoped<IPricingRuleRepository, PricingRuleRepository>();
+            services.AddScoped<IPaymentMethodConfigRepository, PaymentMethodConfigRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
@@ -162,9 +166,10 @@ namespace mtkpm.Infrastructure
             
             // Add Notification Services - Observer Pattern
             services.AddSingleton<IEventPublisher, EventPublisher>();
-            services.AddScoped<EmailNotificationService>();
-            services.AddScoped<SMSNotificationService>();
-            services.AddScoped<PushNotificationService>();
+            services.AddSingleton<EmailNotificationService>();
+            services.AddSingleton<SMSNotificationService>();
+            services.AddSingleton<PushNotificationService>();
+            services.AddSingleton<INotificationMethodService, NotificationMethodService>();
             
             // Register subscriber
             services.AddHostedService<NotificationSubscriber>();

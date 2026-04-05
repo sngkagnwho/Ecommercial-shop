@@ -6,6 +6,11 @@ using Serilog;
 using System.Text;
 using mtkpm.Admin.Configuration;
 using mtkpm.Admin.Services;
+using mtkpm.Admin.Infrastructure.Http;
+using mtkpm.Admin.Infrastructure.Caching;
+using mtkpm.Admin.Features.Dashboard.Services;
+using mtkpm.Admin.Features.Analytics.Services;
+using mtkpm.Admin.Features.Reports.Services;
 
 namespace mtkpm.Admin
 {
@@ -24,8 +29,31 @@ namespace mtkpm.Admin
 
             builder.Host.UseSerilog();
 
+            // Add memory cache
+            builder.Services.AddMemoryCache();
+
             // Add services
             builder.Services.AddControllersWithViews();
+            
+            // Configure Razor View Engine to support feature-based view locations
+            builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions>(options =>
+            {
+                options.ViewLocationFormats.Clear();
+                options.ViewLocationFormats.Add("/Features/{1}/Views/{0}.cshtml");
+                options.ViewLocationFormats.Add("/Features/{1}/Views/Shared/{0}.cshtml");
+                options.ViewLocationFormats.Add("/Features/Shared/Views/{0}.cshtml");
+                options.ViewLocationFormats.Add("/Views/{1}/{0}.cshtml");
+                options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+                
+                options.AreaViewLocationFormats.Clear();
+                options.AreaViewLocationFormats.Add("/Areas/{2}/Features/{1}/Views/{0}.cshtml");
+                options.AreaViewLocationFormats.Add("/Areas/{2}/Features/Shared/Views/{0}.cshtml");
+                options.AreaViewLocationFormats.Add("/Areas/{2}/Views/{1}/{0}.cshtml");
+                options.AreaViewLocationFormats.Add("/Areas/{2}/Views/Shared/{0}.cshtml");
+                options.AreaViewLocationFormats.Add("/Features/Shared/Views/{0}.cshtml");
+                options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+            });
+            
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             builder.Services.AddHttpContextAccessor();
 
@@ -34,7 +62,21 @@ namespace mtkpm.Admin
             var apiSettings = builder.Configuration.GetSection("ApiSettings").Get<ApiSettings>() ?? new ApiSettings();
             builder.Services.AddSingleton(apiSettings);
 
-            // Add HttpClient for API communication
+            // Configure HTTP Client Settings
+            var httpClientConfig = new mtkpm.Admin.Infrastructure.Http.HttpClientConfiguration
+            {
+                BaseUrl = apiSettings.BaseUrl,
+                TimeoutSeconds = apiSettings.RequestTimeoutSeconds,
+                MaxRetries = 3,
+                EnableLogging = true
+            };
+            builder.Services.AddSingleton(httpClientConfig);
+
+            // Register Infrastructure Services
+            builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+            builder.Services.AddScoped<IHttpClientWrapper, HttpClientWrapper>();
+
+            // Add HttpClient for backward compatibility
             builder.Services.AddHttpClient<IApiService, ApiService>()
                 .ConfigureHttpClient(client =>
                 {
@@ -42,16 +84,33 @@ namespace mtkpm.Admin
                     client.Timeout = TimeSpan.FromSeconds(apiSettings.RequestTimeoutSeconds);
                 });
 
-            // Register application services
+            // Register BackendApiClient for direct API communication
+            builder.Services.AddHttpClient<BackendApiClient>()
+                .ConfigureHttpClient(client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(apiSettings.RequestTimeoutSeconds);
+                });
+
+            // Register Core Application Services
             builder.Services.AddScoped<ITokenManager, TokenManager>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<IDiscountService, DiscountService>();
+            builder.Services.AddScoped<IAdminDiscountService, AdminDiscountService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IAdminPaymentService, AdminPaymentService>();
+            builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
+
+            // Register Orders Feature Services
+            builder.Services.AddScoped<mtkpm.Admin.Features.Orders.Services.IUserAddressService, mtkpm.Admin.Features.Orders.Services.UserAddressService>();
+
+            // Register Feature Services
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
             // Configure JWT Settings (for validation if needed)
             var jwtSettings = new JwtSettings();
@@ -62,7 +121,7 @@ namespace mtkpm.Admin
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/Auth/Login";
+                    options.LoginPath = "/Auth/Login"; // Works with feature-based routing
                     options.LogoutPath = "/Auth/Logout";
                     options.AccessDeniedPath = "/Auth/Unauthorized";
                     options.ExpireTimeSpan = TimeSpan.FromHours(24);

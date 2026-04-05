@@ -8,15 +8,18 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
     public class CalculateCartDiscountCommandHandler : IRequestHandler<CalculateCartDiscountCommand, CalculateCartDiscountResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDiscountRepository _discountRepository;
         private readonly IDiscountService _discountService;
         private readonly ILoggerService _logger;
 
         public CalculateCartDiscountCommandHandler(
             IUnitOfWork unitOfWork,
+            IDiscountRepository discountRepository,
             IDiscountService discountService,
             ILoggerService logger)
         {
             _unitOfWork = unitOfWork;
+            _discountRepository = discountRepository;
             _discountService = discountService;
             _logger = logger;
         }
@@ -57,12 +60,38 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
                 }).ToList()
             };
 
-            // Use DiscountService to parse and build discounts
-            // For now, apply default discounts
             var discount = _discountService.GetDefaultDiscounts();
+            var appliedDiscounts = new List<string>();
 
-            // Tính giá sau discount
+            var requestedCodes = request.DiscountCodes
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (requestedCodes.Any())
+            {
+                var activeDiscounts = await _discountRepository.GetActiveDiscountsAsync();
+                var activeDiscountMap = activeDiscounts.ToDictionary(d => d.Code, StringComparer.OrdinalIgnoreCase);
+
+                var selectedDiscounts = requestedCodes
+                    .Where(code => activeDiscountMap.ContainsKey(code))
+                    .Select(code => activeDiscountMap[code])
+                    .Where(d => d.CanBeUsed)
+                    .ToList();
+
+                if (selectedDiscounts.Any())
+                {
+                    discount = _discountService.BuildDiscountFromDiscountEntities(selectedDiscounts);
+                    appliedDiscounts = selectedDiscounts.Select(d => d.Code).ToList();
+                }
+            }
+
             var discountInfo = _discountService.CalculateDiscountedPrice(cartDto, discount);
+            if (!appliedDiscounts.Any())
+            {
+                appliedDiscounts = discountInfo.AppliedDiscounts;
+            }
 
             return new CalculateCartDiscountResponse
             {
@@ -72,8 +101,8 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
                 TotalDiscountAmount = discountInfo.DiscountAmount,
                 FinalAmount = discountInfo.FinalAmount,
                 SavingsPercent = discountInfo.SavingsPercent,
-                AppliedDiscounts = discountInfo.AppliedDiscounts,
-                Message = $"Applied {discountInfo.AppliedDiscounts.Count} discount(s). You saved {discountInfo.DiscountAmount:C}!"
+                AppliedDiscounts = appliedDiscounts,
+                Message = $"Applied {appliedDiscounts.Count} discount(s). You saved {discountInfo.DiscountAmount:C}!"
             };
         }
     }

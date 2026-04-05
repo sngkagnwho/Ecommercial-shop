@@ -50,12 +50,23 @@ namespace mtkpm.Admin.Services
     public class OrderService : IOrderService
     {
         private readonly IApiService _apiService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IApiService apiService, ILogger<OrderService> logger)
+        public OrderService(IApiService apiService, ITokenManager tokenManager, ILogger<OrderService> logger)
         {
             _apiService = apiService;
+            _tokenManager = tokenManager;
             _logger = logger;
+        }
+
+        private void SetAuthHeader()
+        {
+            var token = _tokenManager.GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetAuthorizationHeader(token);
+            }
         }
 
         public async Task<Models.PaginatedResponse<OrderViewModel>?> GetOrdersAsync(int pageIndex, int pageSize)
@@ -102,6 +113,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var request = new { status, note };
                 var result = await _apiService.PutAsync<object>($"/orders/{id}/status", request);
                 return result != null;
@@ -117,6 +129,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var result = await _apiService.PutAsync<object>($"/orders/{id}/mark-as-paid", null);
                 return result != null;
             }
@@ -131,6 +144,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.DeleteAsync($"/orders/{id}");
             }
             catch (Exception ex)

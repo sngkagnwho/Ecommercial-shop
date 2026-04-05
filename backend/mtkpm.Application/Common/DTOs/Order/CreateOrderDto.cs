@@ -6,9 +6,16 @@ namespace mtkpm.Application.Common.DTOs.Order
 {
     public class CreateOrderDto
     {
-        [Required(ErrorMessage = "Địa chỉ giao hàng là bắt buộc")]
+        /// <summary>
+        /// ID của địa chỉ đã lưu (nếu dùng địa chỉ có sẵn)
+        /// </summary>
+        public int? SavedAddressId { get; set; }
+
+        /// <summary>
+        /// Địa chỉ giao hàng (bắt buộc nếu không chọn SavedAddressId)
+        /// </summary>
         [StringLength(500, ErrorMessage = "Địa chỉ giao hàng không được vượt quá 500 ký tự")]
-        public string ShippingAddress { get; set; }
+        public string? ShippingAddress { get; set; }
 
         [StringLength(500, ErrorMessage = "Địa chỉ thanh toán không được vượt quá 500 ký tự")]
         public string? BillingAddress { get; set; }

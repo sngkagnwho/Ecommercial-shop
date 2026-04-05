@@ -38,6 +38,9 @@ namespace mtkpm.Application.Features.Products.Queries.GetProductsPaginated
 
             query = query.Where(p => !p.IsDeleted);
 
+            // Sort by newest first
+            query = query.OrderByDescending(p => p.CreateAt);
+
             return await query.ToPaginatedListAsync<Domain.Entities.Business.Product, ProductDto>(
                 request.PageIndex, 
                 request.PageSize, 

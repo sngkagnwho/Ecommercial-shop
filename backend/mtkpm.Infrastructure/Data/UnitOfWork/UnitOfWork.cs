@@ -16,7 +16,8 @@ namespace mtkpm.Infrastructure.Data.UnitOfWork
             IOrderRepository orders,
             ICartItemRepository cartItems,
             IFavouriteProductRepository favouriteProducts,
-            IRefreshTokenRepository refreshTokens)
+            IRefreshTokenRepository refreshTokens,
+            IUserAddressRepository userAddresses)
         {
             _context = context;
             Products = products;
@@ -25,6 +26,7 @@ namespace mtkpm.Infrastructure.Data.UnitOfWork
             CartItems = cartItems;
             FavouriteProducts = favouriteProducts;
             RefreshTokens = refreshTokens;
+            UserAddresses = userAddresses;
         }
 
         public IProductRepository Products { get; }
@@ -33,6 +35,7 @@ namespace mtkpm.Infrastructure.Data.UnitOfWork
         public ICartItemRepository CartItems { get; }
         public IFavouriteProductRepository FavouriteProducts { get; }
         public IRefreshTokenRepository RefreshTokens { get; }
+        public IUserAddressRepository UserAddresses { get; }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

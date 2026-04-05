@@ -60,12 +60,23 @@ namespace mtkpm.Admin.Services
     public class ProductService : IProductService
     {
         private readonly IApiService _apiService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IApiService apiService, ILogger<ProductService> logger)
+        public ProductService(IApiService apiService, ITokenManager tokenManager, ILogger<ProductService> logger)
         {
             _apiService = apiService;
+            _tokenManager = tokenManager;
             _logger = logger;
+        }
+
+        private void SetAuthHeader()
+        {
+            var token = _tokenManager.GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetAuthorizationHeader(token);
+            }
         }
 
         public async Task<Models.PaginatedResponse<ProductViewModel>?> GetProductsAsync(int pageIndex, int pageSize, int? categoryId = null, string? searchTerm = null)
@@ -130,6 +141,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.PostAsync<ProductViewModel>(ApiEndpoints.Products.Base, request);
             }
             catch (Exception ex)
@@ -143,6 +155,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.PutAsync<ProductViewModel>($"/products/{id}", request);
             }
             catch (Exception ex)
@@ -156,6 +169,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.DeleteAsync($"/products/{id}");
             }
             catch (Exception ex)
@@ -169,6 +183,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var result = await _apiService.PutAsync<object>($"/products/{id}/stock", new { quantity });
                 return result != null;
             }

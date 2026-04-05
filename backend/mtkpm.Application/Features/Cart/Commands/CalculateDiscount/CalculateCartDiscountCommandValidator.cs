@@ -17,8 +17,8 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
             RuleForEach(x => x.DiscountCodes)
                 .NotEmpty()
                 .WithMessage("Each discount code cannot be empty")
-                .Matches(@"^(percentage_\d+|fixed_\d+|free_shipping|loyalty_points_\d+|bundle_\d+_\d+)$")
-                .WithMessage("Invalid discount code format");
+                .MaximumLength(50)
+                .WithMessage("Discount code cannot exceed 50 characters");
         }
     }
 }

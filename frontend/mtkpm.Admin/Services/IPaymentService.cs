@@ -21,12 +21,23 @@ namespace mtkpm.Admin.Services
     public class PaymentService : IPaymentService
     {
         private readonly IApiService _apiService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<PaymentService> _logger;
 
-        public PaymentService(IApiService apiService, ILogger<PaymentService> logger)
+        public PaymentService(IApiService apiService, ITokenManager tokenManager, ILogger<PaymentService> logger)
         {
             _apiService = apiService;
+            _tokenManager = tokenManager;
             _logger = logger;
+        }
+
+        private void SetAuthHeader()
+        {
+            var token = _tokenManager.GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetAuthorizationHeader(token);
+            }
         }
 
         public async Task<PaymentHistoryViewModel?> GetPaymentHistoryAsync()
@@ -72,6 +83,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.PostAsync<PaymentViewModel>(ApiEndpoints.Payments.Process, request);
             }
             catch (Exception ex)
@@ -85,6 +97,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var request = new { refundAmount, reason };
                 var result = await _apiService.PostAsync<object>($"/payments/{paymentId}/refund", request);
                 return result != null;

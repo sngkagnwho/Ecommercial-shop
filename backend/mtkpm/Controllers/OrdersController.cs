@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
@@ -7,6 +8,7 @@ using mtkpm.Application.Features.Orders.Commands.CancelOrder;
 using mtkpm.Application.Features.Orders.Commands.CreateOrder;
 using mtkpm.Application.Features.Orders.Commands.MarkAsPaid;
 using mtkpm.Application.Features.Orders.Commands.UpdateOrderStatus;
+using mtkpm.Application.Features.Orders.Queries.GetAllOrders;
 using mtkpm.Application.Features.Orders.Queries.GetOrderById;
 using mtkpm.Application.Features.Orders.Queries.GetOrderByNumber;
 using mtkpm.Application.Features.Orders.Queries.GetUserOrders;
@@ -28,6 +30,19 @@ namespace mtkpm.Controllers
         {
             _mediator = mediator;
             _currentUserService = currentUserService;
+        }
+
+        /// <summary>
+        /// Lấy danh sách tất cả đơn hàng (Admin only)
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(IEnumerable<OrderDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var query = new GetAllOrdersQuery();
+            var result = await _mediator.Send(query);
+            return Ok(ApiResponse<IEnumerable<OrderDto>>.SuccessResponse(result));
         }
 
         /// <summary>
@@ -105,6 +120,7 @@ namespace mtkpm.Controllers
             var command = new CreateOrderCommand
             {
                 UserId = userId,
+                SavedAddressId = dto.SavedAddressId,
                 ShippingAddress = dto.ShippingAddress,
                 BillingAddress = dto.BillingAddress,
                 PaymentMethod = dto.PaymentMethod,
@@ -159,5 +175,6 @@ namespace mtkpm.Controllers
             await _mediator.Send(command);
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Đánh dấu đã thanh toán"));
         }
+
     }
 }

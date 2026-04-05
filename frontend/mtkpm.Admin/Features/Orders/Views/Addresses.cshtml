@@ -1,0 +1,91 @@
+@model mtkpm.Admin.Features.Orders.Models.UserAddressViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Addresses";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-map-marker-alt"></i> My Addresses</h1>
+        <p class="text-muted">Manage your saved delivery addresses</p>
+    </div>
+    <div>
+        <a href="/Orders/AddressCreate" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Address
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    @if (ViewBag.Addresses != null && ((List<mtkpm.Admin.Features.Orders.Models.UserAddressViewModel>)ViewBag.Addresses).Count > 0)
+    {
+        @foreach (var address in (List<mtkpm.Admin.Features.Orders.Models.UserAddressViewModel>)ViewBag.Addresses)
+        {
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card h-100 @(address.IsDefault ? "border-primary" : "")">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-info">@address.Label</span>
+                            @if (address.IsDefault)
+                            {
+                                <span class="badge bg-success ms-2"><i class="fas fa-star"></i> Default</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-user"></i> @address.ReceiverName</strong>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-phone"></i> @address.PhoneNumber
+                        </p>
+                        <p class="mb-0 text-muted">
+                            @address.GetFullAddress()
+                        </p>
+                    </div>
+                    <div class="card-footer bg-light d-flex gap-2">
+                        <a href="/Orders/AddressEdit/@address.Id" class="btn btn-sm btn-warning flex-grow-1">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="post" action="/Orders/AddressDelete/@address.Id" style="flex-grow: 1;" onsubmit="return confirm('Are you sure?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger w-100">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No saved addresses yet</p>
+                    <a href="/Orders/AddressCreate" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Your First Address
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

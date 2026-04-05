@@ -1,0 +1,432 @@
+@{
+    ViewData["Title"] = "Discount Console";
+    var discounts = (List<mtkpm.Admin.Models.Discount.DiscountViewModel>?)ViewBag.Discounts ?? new List<mtkpm.Admin.Models.Discount.DiscountViewModel>();
+    var availableDiscounts = (List<mtkpm.Admin.Models.Discount.DiscountCodeDto>?)ViewBag.AvailableDiscounts ?? new List<mtkpm.Admin.Models.Discount.DiscountCodeDto>();
+    var stats = (mtkpm.Admin.Models.Discount.DiscountStatisticsViewModel?)ViewBag.Statistics ?? new mtkpm.Admin.Models.Discount.DiscountStatisticsViewModel();
+    var errorMsg = (string?)TempData["ErrorMessage"];
+    var successMsg = (string?)TempData["SuccessMessage"];
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-percentage"></i> Discount Console</h1>
+        <p class="text-muted">Manage discount codes and test stacking combinations</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Discounts/Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> New Discount
+        </a>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMsg))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @errorMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(successMsg))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @successMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-layer-group fa-2x text-primary mb-2"></i>
+                <h6 class="text-muted mb-2">Total Discounts</h6>
+                <h3 class="mb-0">@stats.TotalDiscounts</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h6 class="text-muted mb-2">Active</h6>
+                <h3 class="mb-0">@stats.ActiveDiscounts</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-calendar-times fa-2x text-warning mb-2"></i>
+                <h6 class="text-muted mb-2">Expired</h6>
+                <h3 class="mb-0">@stats.ExpiredDiscounts</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-ban fa-2x text-danger mb-2"></i>
+                <h6 class="text-muted mb-2">Budget Exhausted</h6>
+                <h3 class="mb-0">@stats.BudgetExhaustedDiscounts</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Discount List -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Discount List (@discounts.Count)</h5>
+    </div>
+    <div class="card-body">
+        @if (discounts.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Valid Until</th>
+                            <th>Status</th>
+                            <th>Usage</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var discount in discounts)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">@discount.Code</span>
+                                </td>
+                                <td>@discount.Name</td>
+                                <td>
+                                    <span class="badge bg-info">@discount.DiscountType</span>
+                                </td>
+                                <td>
+                                    @if (discount.DiscountType == "Percentage")
+                                    {
+                                        <strong>@discount.DiscountValue%</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong>@discount.DiscountValue.ToString("N0")đ</strong>
+                                    }
+                                </td>
+                                <td>
+                                    @if (discount.IsExpired)
+                                    {
+                                        <span class="badge bg-danger">Expired</span>
+                                    }
+                                    else
+                                    {
+                                        @discount.EndDate.ToString("dd/MM/yyyy")
+                                    }
+                                </td>
+                                <td>
+                                    @if (discount.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>@discount.UsedCount/@(discount.MaxUsageCount ?? 999)</td>
+                                <td class="text-center">
+                                    <a href="/Discounts/Edit/@discount.Id" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="/Discounts/Delete/@discount.Id" style="display:inline;" 
+                                          onsubmit="return confirm('Delete this discount?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> No discounts found. 
+                <a href="/Discounts/Create" class="alert-link">Create the first discount</a>
+            </div>
+        }
+    </div>
+</div>
+
+<hr class="my-4">
+
+<!-- Available Discount Codes -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-tag"></i> Available Discount Codes (@availableDiscounts.Count)</h5>
+    </div>
+    <div class="card-body">
+        @if (availableDiscounts.Any())
+        {
+            <div class="row">
+                @foreach (var discount in availableDiscounts)
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3 bg-light">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <span class="badge bg-primary">@discount.Code</span>
+                                    </h6>
+                                    <strong>@discount.Name</strong>
+                                </div>
+                            </div>
+                            <p class="mb-2 small text-muted">@discount.Description</p>
+                            <small class="text-secondary">Example: <code>@discount.Example</code></small>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> No discount codes available
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Discount Calculator / Tester -->
+<div class="card mb-4">
+    <div class="card-header bg-primary bg-opacity-10">
+        <h5 class="mb-0"><i class="fas fa-calculator"></i> Discount Calculator</h5>
+    </div>
+    <div class="card-body">
+        <form id="discountForm" class="row g-3">
+            <div class="col-md-6">
+                <label for="cartAmount" class="form-label">Cart Amount (đ) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="cartAmount" name="cartAmount" placeholder="1000000" 
+                       min="0" step="1000" required value="1000000">
+                <small class="text-muted">Enter the cart total amount</small>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Select Discount Codes <span class="text-danger">*</span></label>
+                <div class="discount-codes-list">
+                    @if (availableDiscounts.Any())
+                    {
+                        @foreach (var discount in availableDiscounts)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input discount-code-checkbox" type="checkbox" 
+                                       id="code_@discount.Code" name="discountCodes" value="@discount.Code">
+                                <label class="form-check-label" for="code_@discount.Code">
+                                    <strong>@discount.Code</strong> - @discount.Name
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+                <small class="text-muted d-block mt-2">Select one or more codes to test stacking</small>
+            </div>
+            <div class="col-md-12">
+                <button type="button" id="calculateBtn" class="btn btn-primary">
+                    <i class="fas fa-calculator"></i> Calculate Discount
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Discount Result -->
+<div id="resultSection" class="card" style="display: none;">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-check-circle"></i> Calculation Result</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <label class="form-label text-muted">Original Amount</label>
+                    <div class="h5"><span id="originalAmount">0</span>đ</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <label class="form-label text-muted">Total Savings</label>
+                    <div class="h5 text-success"><span id="totalSavings">0</span>đ</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <label class="form-label text-muted">Savings %</label>
+                    <div class="h5 text-info"><span id="savingsPercent">0</span>%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <label class="form-label text-muted">Final Amount</label>
+                    <div class="h5 text-primary"><span id="finalAmount">0</span>đ</div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h6><i class="fas fa-list"></i> Discount Breakdown</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th class="text-end">Discount Amount</th>
+                        <th class="text-end">After Discount</th>
+                    </tr>
+                </thead>
+                <tbody id="breakdownTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .discount-codes-list {
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+    document.getElementById('calculateBtn').addEventListener('click', async function() {
+        const cartAmount = parseFloat(document.getElementById('cartAmount').value);
+        const checkboxes = document.querySelectorAll('.discount-code-checkbox:checked');
+        const discountCodes = Array.from(checkboxes).map(cb => cb.value);
+
+        if (!cartAmount) {
+            alert('Please enter cart amount');
+            return;
+        }
+
+        if (discountCodes.length === 0) {
+            alert('Please select at least one discount code');
+            return;
+        }
+
+        try {
+            const response = await fetch('/Discounts/Calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cartAmount: cartAmount,
+                    discountCodes: discountCodes
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const data = result.data;
+                
+                // Update display values
+                document.getElementById('originalAmount').textContent = cartAmount.toLocaleString();
+                document.getElementById('totalSavings').textContent = data.discountAmount.toLocaleString();
+                const percent = ((data.discountAmount / cartAmount) * 100).toFixed(1);
+                document.getElementById('savingsPercent').textContent = percent;
+                document.getElementById('finalAmount').textContent = data.finalAmount.toLocaleString();
+
+                // Fill breakdown table
+                const tbody = document.getElementById('breakdownTable');
+                tbody.innerHTML = '';
+                
+                if (data.appliedDiscounts && data.appliedDiscounts.length > 0) {
+                    let runningAmount = cartAmount;
+                    data.appliedDiscounts.forEach((discount, index) => {
+                        const row = tbody.insertRow();
+                        runningAmount -= discount.discountAmount;
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td><span class="badge bg-secondary">${discount.discountCode}</span></td>
+                            <td>${discount.discountName}</td>
+                            <td class="text-end text-success">-${discount.discountAmount.toLocaleString()}đ</td>
+                            <td class="text-end">${runningAmount.toLocaleString()}đ</td>
+                        `;
+                    });
+                }
+
+                document.getElementById('resultSection').style.display = 'block';
+            } else {
+                alert(result.message || 'Error calculating discount');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error calculating discount');
+        }
+    });
+</script>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .page-header h1 {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    .page-header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+</style>

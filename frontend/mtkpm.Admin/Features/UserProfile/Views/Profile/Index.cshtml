@@ -1,0 +1,195 @@
+@model mtkpm.Admin.Models.User.UserViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p class="text-muted">View and manage your account information</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/UserProfile/Edit" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Profile Information Card -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">User ID</label>
+                        <p class="lead">@Model.Id</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Username</label>
+                        <p class="lead">@Model.Username</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email Address</label>
+                        <p class="lead">@Model.Email</p>
+                        @if (Model.EmailConfirmed)
+                        {
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Verified
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">
+                                <i class="fas fa-exclamation-circle"></i> Not Verified
+                            </span>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Phone Number</label>
+                        @if (string.IsNullOrEmpty(Model.PhoneNumber))
+                        {
+                            <p class="lead text-muted">-</p>
+                        }
+                        else
+                        {
+                            <p class="lead">@Model.PhoneNumber</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Account Status</label>
+                        @if (Model.IsActive)
+                        {
+                            <p class="lead"><span class="badge bg-success"><i class="fas fa-check"></i> Active</span></p>
+                        }
+                        else
+                        {
+                            <p class="lead"><span class="badge bg-danger"><i class="fas fa-times"></i> Inactive</span></p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Member Since</label>
+                        <p class="lead">@Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+
+                @if (Model.LastLoginAt.HasValue)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Last Login</label>
+                            <p class="lead">@Model.LastLoginAt.Value.ToString("MMMM dd, yyyy 'at' hh:mm tt")</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- User Roles Card -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">User Roles</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Roles != null && Model.Roles.Count > 0)
+                {
+                    <div class="role-list">
+                        @foreach (var role in Model.Roles)
+                        {
+                            <span class="badge bg-primary mb-2 me-2" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">
+                                <i class="fas fa-shield-alt"></i> @role
+                            </span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No roles assigned</p>
+                }
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/UserProfile/Edit" class="btn btn-outline-primary">
+                        <i class="fas fa-pencil-alt"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .page-header h1 {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .page-header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .role-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+</style>

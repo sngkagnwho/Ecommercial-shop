@@ -21,19 +21,32 @@ namespace mtkpm.Admin.Services
     public class CategoryService : ICategoryService
     {
         private readonly IApiService _apiService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<CategoryService> _logger;
 
-        public CategoryService(IApiService apiService, ILogger<CategoryService> logger)
+        public CategoryService(IApiService apiService, ITokenManager tokenManager, ILogger<CategoryService> logger)
         {
             _apiService = apiService;
+            _tokenManager = tokenManager;
             _logger = logger;
+        }
+
+        private void SetAuthHeader()
+        {
+            var token = _tokenManager.GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetAuthorizationHeader(token);
+            }
         }
 
         public async Task<List<CategoryViewModel>?> GetAllCategoriesAsync()
         {
             try
             {
-                return await _apiService.GetAsync<List<CategoryViewModel>>(ApiEndpoints.Categories.GetAll);
+                // Backend returns ApiResponse<IEnumerable<CategoryDto>>
+                var result = await _apiService.GetAsync<List<CategoryViewModel>>(ApiEndpoints.Categories.GetAll);
+                return result;
             }
             catch (Exception ex)
             {
@@ -59,6 +72,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.PostAsync<CategoryViewModel>(ApiEndpoints.Categories.Base, request);
             }
             catch (Exception ex)
@@ -72,6 +86,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.PutAsync<CategoryViewModel>($"/categories/{id}", request);
             }
             catch (Exception ex)
@@ -85,6 +100,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.DeleteAsync($"/categories/{id}");
             }
             catch (Exception ex)

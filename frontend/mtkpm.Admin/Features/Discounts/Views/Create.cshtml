@@ -1,0 +1,196 @@
+@{
+    ViewData["Title"] = "Create Discount";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-plus-circle"></i> Create New Discount</h1>
+        <p class="text-muted">Add a new discount code to your system</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Discounts" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-form"></i> Discount Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/Discounts/Create">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Code" class="form-label">Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="Code" name="Code" placeholder="percentage_10" required>
+                            <small class="text-muted">Unique discount code identifier</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Summer Sale 10%" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Description" class="form-label">Description</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="3" placeholder="Describe this discount..."></textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="DiscountType" class="form-label">Discount Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="DiscountType" name="DiscountType" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount (đ)</option>
+                                <option value="FreeShipping">Free Shipping</option>
+                                <option value="LoyaltyPoints">Loyalty Points</option>
+                                <option value="Bundle">Bundle Discount</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="DiscountValue" class="form-label">Discount Value <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="DiscountValue" name="DiscountValue" placeholder="10" step="0.01" min="0" required>
+                            <small class="text-muted">% for percentage, đ for fixed amounts</small>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-cog"></i> Conditions</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MinimumOrderAmount" class="form-label">Minimum Order Amount (đ)</label>
+                            <input type="number" class="form-control" id="MinimumOrderAmount" name="MinimumOrderAmount" placeholder="0" step="1000" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaximumDiscountAmount" class="form-label">Maximum Discount Amount (đ)</label>
+                            <input type="number" class="form-control" id="MaximumDiscountAmount" name="MaximumDiscountAmount" placeholder="No limit" step="1000" min="0">
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-calendar"></i> Validity Period</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="StartDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" required value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="EndDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" required value="@DateTime.Now.AddDays(30).ToString("yyyy-MM-ddTHH:mm")">
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-chart-bar"></i> Usage Limits</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MaxUsageCount" class="form-label">Max Total Uses</label>
+                            <input type="number" class="form-control" id="MaxUsageCount" name="MaxUsageCount" placeholder="No limit" min="1">
+                            <small class="text-muted">Total times this discount can be used</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaxUsagePerUser" class="form-label">Max Uses Per User</label>
+                            <input type="number" class="form-control" id="MaxUsagePerUser" name="MaxUsagePerUser" placeholder="No limit" min="1">
+                            <small class="text-muted">Times per customer</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="BudgetLimit" class="form-label">Budget Limit (đ)</label>
+                            <input type="number" class="form-control" id="BudgetLimit" name="BudgetLimit" placeholder="No limit" step="1000" min="0">
+                            <small class="text-muted">Total discount budget available</small>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-sliders-h"></i> Flags</h6>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="IsNewUserOnly" name="IsNewUserOnly" value="true">
+                        <label class="form-check-label" for="IsNewUserOnly">
+                            <strong>New Users Only</strong> - Only applicable for new customers
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="IsStackable" name="IsStackable" value="true" checked>
+                        <label class="form-check-label" for="IsStackable">
+                            <strong>Stackable</strong> - Can be combined with other discounts
+                        </label>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Create Discount
+                        </button>
+                        <a href="/Discounts" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-2">Code Format</h6>
+                <p class="small text-muted mb-3">Use descriptive codes like:</p>
+                <ul class="small text-muted">
+                    <li><code>percentage_10</code> - 10% off</li>
+                    <li><code>fixed_50000</code> - 50,000đ off</li>
+                    <li><code>free_shipping</code> - Free shipping</li>
+                    <li><code>newyear_2024</code> - New year 2024</li>
+                </ul>
+
+                <h6 class="mb-2 mt-3">Usage Tips</h6>
+                <ul class="small text-muted">
+                    <li>Set realistic budget limits</li>
+                    <li>Enable stacking to allow combinations</li>
+                    <li>Mark as "New Users Only" for acquisition</li>
+                    <li>Set end dates to create urgency</li>
+                </ul>
+
+                <h6 class="mb-2 mt-3">Discount Types</h6>
+                <ul class="small text-muted">
+                    <li><strong>Percentage:</strong> 10% off cart</li>
+                    <li><strong>Fixed:</strong> Exact amount off</li>
+                    <li><strong>Free Shipping:</strong> Waive shipping fee</li>
+                    <li><strong>Loyalty Points:</strong> Redeem points</li>
+                    <li><strong>Bundle:</strong> Buy X get Y off</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>

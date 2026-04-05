@@ -1,0 +1,212 @@
+@{
+    ViewData["Title"] = "Edit Discount";
+    var discountId = (int?)ViewBag.DiscountId ?? 0;
+    var discountCode = (string?)ViewBag.DiscountCode ?? "";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-edit"></i> Edit Discount</h1>
+        <p class="text-muted">
+            Modify discount settings for <span class="badge bg-primary">@discountCode</span>
+        </p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Discounts" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-form"></i> Discount Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/Discounts/Edit/@discountId">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Code" class="form-label">Code (Read-only)</label>
+                            <input type="text" class="form-control" id="Code" disabled value="@discountCode">
+                            <small class="text-muted">Code cannot be changed</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Summer Sale 10%" value="@Model?.Name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Description" class="form-label">Description</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="3" placeholder="Describe this discount...">@Model?.Description</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="DiscountType" class="form-label">Discount Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="DiscountType" name="DiscountType" required>
+                                <option value="">-- Select Type --</option>
+                                @foreach (var type in new[] { "Percentage", "Fixed", "FreeShipping", "LoyaltyPoints", "Bundle" })
+                                {
+                                    var label = type switch
+                                    {
+                                        "Percentage" => "Percentage (%)",
+                                        "Fixed" => "Fixed Amount (đ)",
+                                        "FreeShipping" => "Free Shipping",
+                                        "LoyaltyPoints" => "Loyalty Points",
+                                        "Bundle" => "Bundle Discount",
+                                        _ => type
+                                    };
+                                    <option value="@type" selected="@(Model?.DiscountType == type)">@label</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="DiscountValue" class="form-label">Discount Value <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="DiscountValue" name="DiscountValue" placeholder="10" step="0.01" min="0" value="@Model?.DiscountValue" required>
+                            <small class="text-muted">% for percentage, đ for fixed amounts</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3"><i class="fas fa-cog"></i> Conditions</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MinimumOrderAmount" class="form-label">Minimum Order Amount (đ)</label>
+                            <input type="number" class="form-control" id="MinimumOrderAmount" name="MinimumOrderAmount" placeholder="0" step="1000" min="0" value="@Model?.MinimumOrderAmount">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaximumDiscountAmount" class="form-label">Maximum Discount Amount (đ)</label>
+                            <input type="number" class="form-control" id="MaximumDiscountAmount" name="MaximumDiscountAmount" placeholder="No limit" step="1000" min="0" value="@Model?.MaximumDiscountAmount">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3"><i class="fas fa-calendar"></i> Validity Period</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="StartDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" required value="@Model?.StartDate.ToString("yyyy-MM-ddTHH:mm")">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="EndDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" required value="@Model?.EndDate.ToString("yyyy-MM-ddTHH:mm")">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3"><i class="fas fa-chart-bar"></i> Usage Limits</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MaxUsageCount" class="form-label">Max Total Uses</label>
+                            <input type="number" class="form-control" id="MaxUsageCount" name="MaxUsageCount" placeholder="No limit" min="1" value="@Model?.MaxUsageCount">
+                            <small class="text-muted">Total times this discount can be used</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaxUsagePerUser" class="form-label">Max Uses Per User</label>
+                            <input type="number" class="form-control" id="MaxUsagePerUser" name="MaxUsagePerUser" placeholder="No limit" min="1" value="@Model?.MaxUsagePerUser">
+                            <small class="text-muted">Times per customer</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="BudgetLimit" class="form-label">Budget Limit (đ)</label>
+                            <input type="number" class="form-control" id="BudgetLimit" name="BudgetLimit" placeholder="No limit" step="1000" min="0" value="@Model?.BudgetLimit">
+                            <small class="text-muted">Total discount budget available</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3"><i class="fas fa-sliders-h"></i> Status &amp; Flags</h6>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" value="true" checked="@(Model?.IsActive == true)">
+                        <label class="form-check-label" for="IsActive">
+                            <strong>Active</strong> - This discount is currently active
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="IsNewUserOnly" name="IsNewUserOnly" value="true" checked="@(Model?.IsNewUserOnly == true)">
+                        <label class="form-check-label" for="IsNewUserOnly">
+                            <strong>New Users Only</strong> - Only applicable for new customers
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="IsStackable" name="IsStackable" value="true" checked="@(Model?.IsStackable == true)">
+                        <label class="form-check-label" for="IsStackable">
+                            <strong>Stackable</strong> - Can be combined with other discounts
+                        </label>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="/Discounts" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-2">Editing Rules</h6>
+                <ul class="small text-muted">
+                    <li>Code cannot be changed</li>
+                    <li>Keep discount type consistent</li>
+                    <li>Extend dates to keep running</li>
+                    <li>Increase budget as needed</li>
+                </ul>
+
+                <h6 class="mb-2 mt-3">Status Control</h6>
+                <ul class="small text-muted">
+                    <li><strong>Active:</strong> Discount is usable</li>
+                    <li><strong>Inactive:</strong> Hidden from customers</li>
+                    <li>Deactivate before deleting</li>
+                </ul>
+
+                <div class="alert alert-info mt-3 mb-0 small">
+                    <i class="fas fa-info-circle"></i> Changes take effect immediately
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>

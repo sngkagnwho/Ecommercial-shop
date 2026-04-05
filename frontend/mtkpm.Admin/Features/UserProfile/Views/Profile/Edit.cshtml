@@ -1,0 +1,184 @@
+@model mtkpm.Admin.Models.User.UpdateCurrentUserViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit My Profile";
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-edit"></i> Edit My Profile</h1>
+        <p class="text-muted">Update your account information</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Account Information</h5>
+            </div>
+            <div class="card-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="fas fa-exclamation-circle"></i> Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                foreach (var error in modelState.Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            }
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form action="/UserProfile/Edit" method="post" id="editProfileForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Username Field -->
+                    <div class="mb-3">
+                        <label for="Username" class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="Username" 
+                               name="Username" 
+                               value="@Model?.Username"
+                               placeholder="Enter your username">
+                        <small class="text-muted">Your display name</small>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="Email" 
+                               name="Email" 
+                               value="@Model?.Email"
+                               placeholder="Enter your email address">
+                        <small class="text-muted">We'll use this to contact you for important updates</small>
+                    </div>
+
+                    <!-- Phone Number Field -->
+                    <div class="mb-3">
+                        <label for="PhoneNumber" class="form-label">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="PhoneNumber" 
+                               name="PhoneNumber" 
+                               value="@Model?.PhoneNumber"
+                               placeholder="Enter your phone number">
+                        <small class="text-muted">Optional: We'll use this for order notifications</small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/UserProfile" class="btn btn-secondary w-100">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Card -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Note:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Username is optional and can be changed</li>
+                        <li>Email address must be unique</li>
+                        <li>Phone number format: +84XXXXXXXXX</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .page-header h1 {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+</style>

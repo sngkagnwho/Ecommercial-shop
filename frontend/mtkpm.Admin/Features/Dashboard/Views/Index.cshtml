@@ -1,0 +1,267 @@
+@model mtkpm.Admin.Features.Dashboard.Models.DashboardStats
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard-container">
+    <h1 class="page-title">Dashboard</h1>
+
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="metric-content">
+                <h3>Đơn hàng</h3>
+                <p class="metric-value">@Model.TotalOrders</p>
+                <span class="metric-label">Tổng cộng</span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="metric-content">
+                <h3>Sản phẩm</h3>
+                <p class="metric-value">@Model.TotalProducts</p>
+                <span class="metric-label">Tổng cộng</span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-content">
+                <h3>Người dùng</h3>
+                <p class="metric-value">@Model.TotalUsers</p>
+                <span class="metric-label">Tổng cộng</span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="metric-content">
+                <h3>Doanh thu</h3>
+                <p class="metric-value">@Model.TotalRevenue.ToString("N0")</p>
+                <span class="metric-label">VND</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="chart-container" style="flex: 2;">
+            <h3>Doanh thu theo tháng</h3>
+            <canvas id="revenueChart" height="300"></canvas>
+        </div>
+
+        <div class="chart-container" style="flex: 1;">
+            <h3>Sản phẩm bán chạy nhất</h3>
+            <div class="top-products">
+                @if (Model.TopProducts?.Count > 0)
+                {
+                    @foreach (var product in Model.TopProducts.Take(5))
+                    {
+                        <div class="product-item">
+                            <span class="product-name">@product.Name</span>
+                            <span class="product-sales">@product.SalesCount bán</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="no-data">Chưa có dữ liệu</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="chart-container full-width" style="margin-top: 2rem;">
+        <h3>Xu hướng đơn hàng (30 ngày gần đây)</h3>
+        <canvas id="orderTrendChart" height="100"></canvas>
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 2rem;
+        background: #f5f7fa;
+        border-radius: 8px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        color: #2d3748;
+        margin-bottom: 2rem;
+        font-weight: 700;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .metric-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .metric-content h3 {
+        color: #718096;
+        font-size: 0.875rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .metric-value {
+        color: #2d3748;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+
+    .metric-label {
+        color: #a0aec0;
+        font-size: 0.75rem;
+    }
+
+    .charts-section {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container.full-width {
+        width: 100%;
+    }
+
+    .chart-container h3 {
+        margin-top: 0;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .top-products {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: #f7fafc;
+        border-radius: 6px;
+        border-left: 4px solid #667eea;
+    }
+
+    .product-name {
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .product-sales {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .no-data {
+        color: #a0aec0;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    @@media (max-width: 768px) {
+        .charts-section {
+            flex-direction: column;
+        }
+
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revenueCtx) {
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueCharts.Select(x => x.Month))),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueCharts.Select(x => x.Amount))),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Order Trend Chart
+        const trendCtx = document.getElementById('orderTrendChart')?.getContext('2d');
+        if (trendCtx) {
+            new Chart(trendCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OrderTrends.Select(x => x.Date.ToString("dd/MM")))),
+                    datasets: [{
+                        label: 'Đơn hàng',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OrderTrends.Select(x => x.Count))),
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'],
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true, indexAxis: 'x' }
+            });
+        }
+    </script>
+}

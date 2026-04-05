@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper;
 using MediatR;
 using mtkpm.Application.Common.DTOs.Order;
 using mtkpm.Application.Common.Interfaces;
@@ -22,13 +23,35 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
 
         public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
+            // Xác định địa chỉ giao hàng
+            string shippingAddress = request.ShippingAddress;
+
+            if (request.SavedAddressId.HasValue)
+            {
+                var savedAddress = await _unitOfWork.UserAddresses
+                    .GetByIdAndUserIdAsync(request.SavedAddressId.Value, request.UserId, cancellationToken);
+
+                if (savedAddress == null)
+                {
+                    throw new InvalidOperationException("Địa chỉ đã lưu không tìm thấy hoặc không thuộc về người dùng này");
+                }
+
+                // Chuyển UserAddress thành chuỗi định dạng để lưu vào Order
+                shippingAddress = FormatAddressToString(savedAddress);
+            }
+
+            if (string.IsNullOrEmpty(shippingAddress))
+            {
+                throw new InvalidOperationException("Địa chỉ giao hàng không được để trống");
+            }
+
             var orderNumber = GenerateOrderNumber();
             decimal subTotal = 0;
 
             var order = new Order(
                 userId: request.UserId,
                 orderNumber: orderNumber,
-                shippingAddress: request.ShippingAddress,
+                shippingAddress: shippingAddress,
                 billingAddress: request.BillingAddress,
                 subTotal: 0,
                 shippingFee: 30000,
@@ -79,6 +102,11 @@ namespace mtkpm.Application.Features.Orders.Commands.CreateOrder
         private string GenerateOrderNumber()
         {
             return $"ORD-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper()}";
+        }
+
+        private string FormatAddressToString(dynamic address)
+        {
+            return $"{address.Street}, {address.Ward}, {address.District}, {address.City}, {address.PostalCode}, {address.Country}";
         }
     }
 }

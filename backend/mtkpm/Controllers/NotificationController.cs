@@ -1,8 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Application.Common.DTOs.Common;
+using mtkpm.Application.Common.DTOs.Notification;
+using mtkpm.Application.Features.NotificationMethods.Commands.SubscribeNotificationMethod;
+using mtkpm.Application.Features.NotificationMethods.Commands.UnsubscribeNotificationMethod;
+using mtkpm.Application.Features.NotificationMethods.Queries.GetNotificationMethods;
 using mtkpm.Application.Common.Interfaces.Services;
 using mtkpm.Domain.Events;
+using MediatR;
 
 namespace mtkpm.Controllers
 {
@@ -12,32 +18,99 @@ namespace mtkpm.Controllers
     [Authorize(Roles = "Admin")]
     public class NotificationController : ControllerBase
     {
+        private readonly IMediator _mediator;
         private readonly IEventPublisher _eventPublisher;
 
-        public NotificationController(IEventPublisher eventPublisher)
+        public NotificationController(
+            IMediator mediator,
+            IEventPublisher eventPublisher)
         {
+            _mediator = mediator;
             _eventPublisher = eventPublisher;
         }
 
         /// <summary>
+        /// Lấy danh sách các phương thức thông báo và trạng thái bật/tắt
+        /// </summary>
+        /// <remarks>
+        /// Dùng để quản trị các kênh thông báo như Email, SMS, Push trong hệ thống.
+        /// </remarks>
+        [HttpGet("methods")]
+        [ProducesResponseType(typeof(List<NotificationMethodDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetNotificationMethods()
+        {
+            var methods = await _mediator.Send(new GetNotificationMethodsQuery());
+
+            return Ok(ApiResponse<List<NotificationMethodDto>>.SuccessResponse(methods));
+        }
+
+        /// <summary>
+        /// Bật (subscribe) một phương thức thông báo
+        /// </summary>
+        /// <remarks>
+        /// methodName hỗ trợ: email, sms, push (hoặc emailnotification/smsnotification/pushnotification).
+        /// </remarks>
+        [HttpPost("methods/{methodName}/subscribe")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> SubscribeMethod(string methodName)
+        {
+            var result = await _mediator.Send(new SubscribeNotificationMethodCommand
+            {
+                MethodName = methodName
+            });
+
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailureResponse("Không tìm thấy phương thức thông báo"));
+            }
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Đã bật phương thức thông báo"));
+        }
+
+        /// <summary>
+        /// Tắt (unsubscribe) một phương thức thông báo
+        /// </summary>
+        /// <remarks>
+        /// methodName hỗ trợ: email, sms, push (hoặc emailnotification/smsnotification/pushnotification).
+        /// </remarks>
+        [HttpDelete("methods/{methodName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnsubscribeMethod(string methodName)
+        {
+            var result = await _mediator.Send(new UnsubscribeNotificationMethodCommand
+            {
+                MethodName = methodName
+            });
+
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailureResponse("Không tìm thấy phương thức thông báo"));
+            }
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Đã tắt phương thức thông báo"));
+        }
+
+        /// <summary>
         /// Lấy danh sách các observer đang đăng ký
-        /// Observer Pattern - Hiện thị tất cả subscribers
+        /// Observer Pattern - Hiển thị tất cả subscribers
         /// </summary>
         [HttpGet("subscribers")]
-        [ProducesResponseType(typeof(SubscribersResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SubscribersResponseDto), StatusCodes.Status200OK)]
         public IActionResult GetSubscribers()
         {
             var count = _eventPublisher.GetSubscriberCount();
             var names = _eventPublisher.GetSubscriberNames();
 
-            var response = new SubscribersResponse
+            var response = new SubscribersResponseDto
             {
                 TotalSubscribers = count,
                 Subscribers = names,
                 Message = $"{count} observer đang lắng nghe các sự kiện"
             };
 
-            return Ok(ApiResponse<SubscribersResponse>.SuccessResponse(response));
+            return Ok(ApiResponse<SubscribersResponseDto>.SuccessResponse(response));
         }
 
         /// <summary>
@@ -148,66 +221,5 @@ namespace mtkpm.Controllers
             ));
         }
 
-        /// <summary>
-        /// Hướng dẫn sử dụng Observer Pattern
-        /// </summary>
-        [HttpGet("guide")]
-        [AllowAnonymous]
-        public IActionResult GetObserverPatternGuide()
-        {
-            var guide = @"
-Observer Pattern - Hệ thống Thông báo
-
-**Mục đích:**
-Thông báo tới nhiều observers khi có sự kiện xảy ra mà không cần coupling.
-
-**Cấu Trúc:**
-- Subject (EventPublisher): Quản lý observers, phát events
-- Observer (INotificationObserver): Interface mà observers implement
-- ConcreteObservers: EmailNotificationService, SMSNotificationService, PushNotificationService
-
-**Các Sự Kiện:**
-- OrderCreatedEvent: Đơn hàng được tạo
-- OrderConfirmedEvent: Đơn hàng được xác nhận
-- OrderShippedEvent: Đơn hàng được gửi đi
-- OrderDeliveredEvent: Đơn hàng được giao
-- OrderCancelledEvent: Đơn hàng bị hủy
-- PaymentCompletedEvent: Thanh toán hoàn thành
-- PaymentFailedEvent: Thanh toán thất bại
-- PaymentRefundedEvent: Hoàn tiền
-
-**Ví Dụ Sử Dụng:**
-
-1. Lấy danh sách observers:
-   GET /api/notification/subscribers
-
-2. Test sự kiện tạo đơn hàng:
-   POST /api/notification/test/order-created
-
-3. Test thanh toán hoàn thành:
-   POST /api/notification/test/payment-completed
-
-**Lợi Ích Observer Pattern:**
-- Loose Coupling: Subject không biết chi tiết observers
-- Dynamic Subscription: Thêm/xóa observers lúc runtime
-- Broadcast Communication: Một sự kiện gửi tới nhiều observers
-- Separation of Concerns: Mỗi observer có trách nhiệm riêng
-- Easy to Extend: Thêm observer mới mà không sửa code cũ
-
-**Sử Dụng Thực Tế:**
-- Khi đơn hàng được tạo, tất cả observers (Email, SMS, Push) cùng lúc nhận thông báo
-- Khi thanh toán thất bại, khách hàng được thông báo qua email + SMS + push
-- Dễ mở rộng: thêm Slack notification, Discord notification, v.v.
-";
-
-            return Ok(new { guide });
-        }
-    }
-
-    public class SubscribersResponse
-    {
-        public int TotalSubscribers { get; set; }
-        public List<string> Subscribers { get; set; }
-        public string Message { get; set; }
     }
 }

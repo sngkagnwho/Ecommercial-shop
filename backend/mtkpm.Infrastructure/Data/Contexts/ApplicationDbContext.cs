@@ -21,6 +21,11 @@ namespace mtkpm.Infrastructure.Data.Contexts
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<FavouriteProduct> FavouriteProducts => Set<FavouriteProduct>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+        public DbSet<Discount> Discounts => Set<Discount>();
+        public DbSet<DiscountUsageHistory> DiscountUsageHistories => Set<DiscountUsageHistory>();
+        public DbSet<PricingRule> PricingRules => Set<PricingRule>();
+        public DbSet<PaymentMethodConfig> PaymentMethodConfigs => Set<PaymentMethodConfig>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +36,9 @@ namespace mtkpm.Infrastructure.Data.Contexts
             modelBuilder.HasQueryFilter<User>(u => !u.IsDeleted);
             modelBuilder.HasQueryFilter<Product>(p => !p.IsDeleted);
             modelBuilder.HasQueryFilter<FavouriteProduct>(f => !f.IsDeleted);
+            modelBuilder.HasQueryFilter<Discount>(d => !d.IsDeleted);
+            modelBuilder.HasQueryFilter<PricingRule>(pr => !pr.IsDeleted);
+            modelBuilder.HasQueryFilter<PaymentMethodConfig>(pmc => !pmc.IsDeleted);
 
             SeedRoles(modelBuilder);
         }

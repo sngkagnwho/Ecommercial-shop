@@ -1,0 +1,83 @@
+@model mtkpm.Admin.Models.Category.CategoryViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit Category";
+}
+
+<div class="page-header">
+    <hgroup>
+        <h1><i class="fas fa-edit"></i> Edit Category</h1>
+        <p class="text-muted">Update category information</p>
+    </hgroup>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Category Information</h5>
+            </div>
+            <div class="card-body">
+                <form id="editForm" method="post" action="/Categories/Edit/@Model.Id">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id">
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="Name" 
+                               value="@Model.Name" placeholder="Enter category name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="Description" rows="4">@Model.Description</textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-history"></i> Created: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+
+                    <div class="btn-group mt-4" role="group">
+                        <button type="submit" class="btn btn-warning" id="submitBtn">
+                            <i class="fas fa-save"></i> Update Category
+                        </button>
+                        <a href="/Categories/Details/@Model.Id" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Information</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Created:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header hgroup {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page-header h1 {
+        margin-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 1rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+</style>
+

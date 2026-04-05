@@ -12,7 +12,7 @@ namespace mtkpm.Admin.Constants
             public const string Register = "/api/auth/register";
             public const string RefreshToken = "/api/auth/refresh-token";
             public const string Logout = "/api/auth/logout";
-            public const string ValidateToken = "/api/auth/validate";
+            public const string ChangePassword = "/api/auth/change-password";
         }
 
         // Products endpoints
@@ -39,7 +39,7 @@ namespace mtkpm.Admin.Constants
             public const string GetByNumber = "/api/orders/number/{orderNumber}";
             public const string Create = "/api/orders";
             public const string UpdateStatus = "/api/orders/{id}/status";
-            public const string MarkAsPaid = "/api/orders/{id}/mark-as-paid";
+            public const string MarkAsPaid = "/api/orders/{id}/mark-paid";
             public const string Cancel = "/api/orders/{id}/cancel";
         }
 
@@ -47,75 +47,93 @@ namespace mtkpm.Admin.Constants
         public static class Users
         {
             public const string Base = "/api/users";
-            public const string GetById = "/api/users/{id}";
-            public const string GetAll = "/api/users/all";
-            public const string GetProfile = "/api/users/profile";
-            public const string Create = "/api/users";
-            public const string Update = "/api/users/{id}";
-            public const string Delete = "/api/users/{id}";
-            public const string ChangePassword = "/api/users/{id}/change-password";
+            public const string GetMe = "/api/users/me";
+            public const string UpdateMe = "/api/users/me";
+            public const string Favourites = "/api/users/favourites";
+            public const string AddFavourite = "/api/users/favourites";
+            public const string RemoveFavourite = "/api/users/favourites/{productId}";
+            public const string GetAll = "/api/users";
         }
 
         // Categories endpoints
         public static class Categories
         {
             public const string Base = "/api/categories";
-            public const string GetAll = "/api/categories/all";
+            public const string GetAll = "/api/categories";
             public const string GetById = "/api/categories/{id}";
             public const string Create = "/api/categories";
             public const string Update = "/api/categories/{id}";
             public const string Delete = "/api/categories/{id}";
         }
 
-        // Discounts endpoints
-        public static class Discounts
+        // Discount endpoints
+        public static class Discount
         {
-            public const string Base = "/api/discounts";
-            public const string GetAll = "/api/discounts/all";
-            public const string GetById = "/api/discounts/{id}";
-            public const string Create = "/api/discounts";
-            public const string Update = "/api/discounts/{id}";
-            public const string Delete = "/api/discounts/{id}";
-            public const string Apply = "/api/discounts/apply";
+            public const string Calculate = "/api/discount/calculate";
+            public const string Available = "/api/discount/available";
+            public const string Guide = "/api/discount/guide";
         }
 
-        // Payments endpoints
-        public static class Payments
+        // Payment endpoints
+        public static class Payment
         {
-            public const string Base = "/api/payments";
-            public const string GetHistory = "/api/payments/history";
-            public const string GetById = "/api/payments/{id}";
-            public const string Process = "/api/payments/process";
-            public const string Refund = "/api/payments/{id}/refund";
+            public const string Methods = "/api/payment/methods";
+            public const string MethodDetail = "/api/payment/methods/{code}";
+            public const string Process = "/api/payment/process";
+            public const string Status = "/api/payment/status/{orderId}";
         }
 
-        // Notifications endpoints
+        // Notification endpoints
         public static class Notifications
         {
-            public const string Base = "/api/notifications";
-            public const string GetAll = "/api/notifications";
-            public const string GetById = "/api/notifications/{id}";
-            public const string Send = "/api/notifications/send";
-            public const string Delete = "/api/notifications/{id}";
+            public const string Subscribers = "/api/notification/subscribers";
+            public const string TestOrderCreated = "/api/notification/test/order-created";
+            public const string TestPaymentCompleted = "/api/notification/test/payment-completed";
+            public const string TestOrderShipped = "/api/notification/test/order-shipped";
+            public const string TestPaymentFailed = "/api/notification/test/payment-failed";
+            public const string TestOrderCancelled = "/api/notification/test/order-cancelled";
+            public const string Guide = "/api/notification/guide";
+            public const string GetAll = "/api/notification/subscribers";
+            public const string Send = "/api/notification/test/order-created";
+        }
+
+        // Discounts endpoints (plural for services)
+        public static class Discounts
+        {
+            public const string GetAll = "/api/discount/available";
+            public const string Calculate = "/api/discount/calculate";
+            public const string Guide = "/api/discount/guide";
+            public const string Base = "/api/discount/calculate";
+        }
+
+        // Payments endpoints (plural for services)
+        public static class Payments
+        {
+            public const string GetHistory = "/api/payment/status/{orderId}";
+            public const string Process = "/api/payment/process";
+            public const string Methods = "/api/payment/methods";
+            public const string MethodDetail = "/api/payment/methods/{code}";
+            public const string Status = "/api/payment/status/{orderId}";
+            public const string GetById = "/api/payment/methods";
         }
 
         // Pricing endpoints
         public static class Pricing
         {
-            public const string Base = "/api/pricing";
-            public const string GetRules = "/api/pricing/rules";
-            public const string CalculatePrice = "/api/pricing/calculate";
+            public const string Calculate = "/api/pricing/calculate";
+            public const string Strategies = "/api/pricing/strategies";
         }
 
         // Cart endpoints
         public static class Cart
         {
             public const string Base = "/api/cart";
-            public const string GetMyCart = "/api/cart/my-cart";
-            public const string AddItem = "/api/cart/add";
-            public const string RemoveItem = "/api/cart/remove/{itemId}";
-            public const string UpdateQuantity = "/api/cart/{itemId}/quantity";
-            public const string Clear = "/api/cart/clear";
+            public const string Get = "/api/cart";
+            public const string Add = "/api/cart";
+            public const string Update = "/api/cart/{cartItemId}";
+            public const string Delete = "/api/cart/{cartItemId}";
+            public const string DeleteAll = "/api/cart";
+            public const string Count = "/api/cart/count";
         }
     }
 }

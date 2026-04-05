@@ -66,20 +66,20 @@ namespace mtkpm.Admin.Services
                 var content = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    // Try to deserialize directly as T first
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(content);
-                    if (directResult != null)
-                    {
-                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
-                        return directResult;
-                    }
-
-                    // If that fails, try ApiResponse<T> wrapper
+                    // First try to deserialize as ApiResponse<T> wrapper (backend always wraps responses)
                     var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(content);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
                         return wrappedResult.Data;
+                    }
+
+                    // If that fails, try to deserialize directly as T (for cases without wrapper)
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(content);
+                    if (directResult != null)
+                    {
+                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
+                        return directResult;
                     }
 
                     _logger.LogWarning($"Response could not be deserialized to {typeof(T).Name}");
@@ -107,11 +107,11 @@ namespace mtkpm.Admin.Services
                     : null;
 
                 var response = await _httpClient.PostAsync(endpoint, content);
-                
+
                 var responseContent = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation($"POST {endpoint} - Status: {response.StatusCode}");
                 _logger.LogInformation($"Response Body: {responseContent}");
-                
+
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogWarning($"POST request failed: {response.StatusCode} - {endpoint}");
@@ -120,20 +120,20 @@ namespace mtkpm.Admin.Services
 
                 try
                 {
-                    // Try to deserialize directly as T first (for API responses without ApiResponse wrapper)
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
-                    if (directResult != null)
-                    {
-                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
-                        return directResult;
-                    }
-
-                    // If that fails, try to deserialize as ApiResponse<T> wrapper
+                    // First try to deserialize as ApiResponse<T> wrapper
                     var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
                         return wrappedResult.Data;
+                    }
+
+                    // If that fails, try to deserialize directly as T
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
+                    if (directResult != null)
+                    {
+                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
+                        return directResult;
                     }
 
                     _logger.LogWarning($"Response could not be deserialized to {typeof(T).Name}");
@@ -170,20 +170,20 @@ namespace mtkpm.Admin.Services
                 var responseContent = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    // Try to deserialize directly as T first
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
-                    if (directResult != null)
-                    {
-                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
-                        return directResult;
-                    }
-
-                    // If that fails, try ApiResponse<T> wrapper
+                    // First try to deserialize as ApiResponse<T> wrapper
                     var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
                         return wrappedResult.Data;
+                    }
+
+                    // If that fails, try to deserialize directly as T
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
+                    if (directResult != null)
+                    {
+                        _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
+                        return directResult;
                     }
 
                     _logger.LogWarning($"Response could not be deserialized to {typeof(T).Name}");

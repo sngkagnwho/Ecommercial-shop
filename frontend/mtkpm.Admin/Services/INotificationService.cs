@@ -21,12 +21,23 @@ namespace mtkpm.Admin.Services
     public class NotificationService : INotificationService
     {
         private readonly IApiService _apiService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<NotificationService> _logger;
 
-        public NotificationService(IApiService apiService, ILogger<NotificationService> logger)
+        public NotificationService(IApiService apiService, ITokenManager tokenManager, ILogger<NotificationService> logger)
         {
             _apiService = apiService;
+            _tokenManager = tokenManager;
             _logger = logger;
+        }
+
+        private void SetAuthHeader()
+        {
+            var token = _tokenManager.GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetAuthorizationHeader(token);
+            }
         }
 
         public async Task<List<NotificationViewModel>?> GetNotificationsAsync()
@@ -59,6 +70,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var result = await _apiService.PostAsync<object>(ApiEndpoints.Notifications.Send, request);
                 return result != null;
             }
@@ -73,6 +85,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 return await _apiService.DeleteAsync($"/notifications/{id}");
             }
             catch (Exception ex)
@@ -86,6 +99,7 @@ namespace mtkpm.Admin.Services
         {
             try
             {
+                SetAuthHeader();
                 var result = await _apiService.PutAsync<object>($"/notifications/{notificationId}/mark-as-read", null);
                 return result != null;
             }

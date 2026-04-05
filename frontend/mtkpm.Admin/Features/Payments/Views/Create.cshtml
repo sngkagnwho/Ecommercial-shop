@@ -1,0 +1,305 @@
+@model mtkpm.Admin.Models.Payment.CreatePaymentMethodViewModel
+
+@{
+    ViewData["Title"] = "Create Payment Method";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-plus"></i> New Payment Method</h1>
+        <p class="text-muted">Create and configure a new payment method</p>
+    </div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @ViewBag.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-form"></i> Payment Method Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Code & Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Code" class="form-label">Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" 
+                                   id="Code" name="Code" placeholder="credit_card" value="@Model.Code" required 
+                                   pattern="[a-z_]+" maxlength="50">
+                            <small class="text-muted">Lowercase letters and underscores only (e.g., credit_card, bank_transfer)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" 
+                                   id="Name" name="Name" placeholder="Credit Card" value="@Model.Name" required maxlength="100">
+                        </div>
+                    </div>
+
+                    <!-- Icon & Display Order -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Icon" class="form-label">Icon / Emoji</label>
+                            <input type="text" class="form-control" id="Icon" name="Icon" placeholder="💳" value="@Model.Icon" maxlength="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="DisplayOrder" class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="DisplayOrder" name="DisplayOrder" value="@Model.DisplayOrder" min="0" max="999" step="1">
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="Description" class="form-label">Description</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="2" 
+                                  placeholder="Brief description of this payment method..." maxlength="500">@Model.Description</textarea>
+                    </div>
+
+                    <!-- Fees -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="TransactionFeePercentage" class="form-label">Transaction Fee % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="TransactionFeePercentage" name="TransactionFeePercentage" 
+                                   value="@Model.TransactionFeePercentage" min="0" max="100" step="0.1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="TransactionFeeFixed" class="form-label">Fixed Fee (đ)</label>
+                            <input type="number" class="form-control" id="TransactionFeeFixed" name="TransactionFeeFixed" 
+                                   value="@Model.TransactionFeeFixed" min="0" step="1000">
+                        </div>
+                    </div>
+
+                    <!-- Amount Limits -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="MinAmount" class="form-label">Minimum Amount (đ)</label>
+                            <input type="number" class="form-control" id="MinAmount" name="MinAmount" 
+                                   value="@Model.MinAmount" min="0" step="1000">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MaxAmount" class="form-label">Maximum Amount (đ)</label>
+                            <input type="number" class="form-control" id="MaxAmount" name="MaxAmount" 
+                                   value="@Model.MaxAmount" min="0" step="1000">
+                        </div>
+                    </div>
+
+                    <!-- Processing Time -->
+                    <div class="mb-3">
+                        <label for="ProcessingTime" class="form-label">Processing Time <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ProcessingTime" name="ProcessingTime" 
+                               placeholder="e.g., Instant, 1-2 days" value="@Model.ProcessingTime" maxlength="100" required>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="mb-3">
+                        <label for="Requirements" class="form-label">Requirements</label>
+                        <textarea class="form-control" id="Requirements" name="Requirements" rows="2" 
+                                  placeholder="e.g., Valid credit card required" maxlength="500">@Model.Requirements</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="SupportedProviders" class="form-label">Supported Providers (CSV)</label>
+                        <textarea class="form-control" id="SupportedProviders" name="SupportedProviders" rows="2" 
+                                  placeholder="e.g., Visa, MasterCard, AmEx" maxlength="500">@Model.SupportedProviders</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="SupportedAreas" class="form-label">Supported Areas (CSV)</label>
+                        <textarea class="form-control" id="SupportedAreas" name="SupportedAreas" rows="2" 
+                                  placeholder="e.g., Vietnam, International" maxlength="500">@Model.SupportedAreas</textarea>
+                    </div>
+
+                    <!-- Admin Notes -->
+                    <div class="mb-3">
+                        <label for="AdminNotes" class="form-label">Admin Notes</label>
+                        <textarea class="form-control" id="AdminNotes" name="AdminNotes" rows="3" 
+                                  placeholder="Internal notes about this payment method..." maxlength="1000">@Model.AdminNotes</textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Payment Method
+                        </button>
+                        <a href="/Payments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Panel -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info bg-opacity-10">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>Quick Templates</h6>
+                <div class="d-grid gap-2 mb-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyPaymentTemplate('credit_card')">
+                        <i class="fas fa-credit-card"></i> credit_card
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyPaymentTemplate('bank_transfer')">
+                        <i class="fas fa-university"></i> bank_transfer
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyPaymentTemplate('paypal')">
+                        <i class="fab fa-paypal"></i> paypal
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyPaymentTemplate('mobile_wallet')">
+                        <i class="fas fa-wallet"></i> mobile_wallet
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyPaymentTemplate('cod')">
+                        <i class="fas fa-money-bill-wave"></i> cod
+                    </button>
+                </div>
+
+                <hr>
+
+                <h6>Payment Method Types</h6>
+                <ul class="small">
+                    <li><strong>credit_card</strong> - Credit/Debit cards</li>
+                    <li><strong>bank_transfer</strong> - Bank transfers</li>
+                    <li><strong>paypal</strong> - PayPal</li>
+                    <li><strong>mobile_wallet</strong> - e-wallets</li>
+                    <li><strong>cod</strong> - Cash on Delivery</li>
+                </ul>
+
+                <hr>
+
+                <h6>Fee Calculation</h6>
+                <p class="small text-muted">
+                    Total fee = (Amount × Fee%) + Fixed Fee
+                </p>
+
+                <hr>
+
+                <h6>Amount Limits</h6>
+                <p class="small text-muted">
+                    Set realistic min/max amounts based on your business requirements.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>
+
+<script>
+    function applyPaymentTemplate(type) {
+        const templates = {
+            credit_card: {
+                code: 'credit_card',
+                name: 'Credit Card',
+                icon: '💳',
+                processingTime: 'Instant',
+                feePercent: 2.5,
+                feeFixed: 0,
+                minAmount: 10000,
+                maxAmount: 50000000,
+                requirements: 'Valid credit/debit card required',
+                providers: 'Visa, MasterCard, AmEx'
+            },
+            bank_transfer: {
+                code: 'bank_transfer',
+                name: 'Bank Transfer',
+                icon: '🏦',
+                processingTime: '1-2 hours',
+                feePercent: 0,
+                feeFixed: 3000,
+                minAmount: 10000,
+                maxAmount: 100000000,
+                requirements: 'Internet banking or bank account required',
+                providers: 'Vietcombank, BIDV, Techcombank, MB Bank'
+            },
+            paypal: {
+                code: 'paypal',
+                name: 'PayPal',
+                icon: '🅿️',
+                processingTime: 'Instant',
+                feePercent: 3.5,
+                feeFixed: 0,
+                minAmount: 10000,
+                maxAmount: 200000000,
+                requirements: 'PayPal account required',
+                providers: 'PayPal'
+            },
+            mobile_wallet: {
+                code: 'mobile_wallet',
+                name: 'Mobile Wallet',
+                icon: '📱',
+                processingTime: 'Instant',
+                feePercent: 1.0,
+                feeFixed: 1000,
+                minAmount: 5000,
+                maxAmount: 20000000,
+                requirements: 'Supported e-wallet account required',
+                providers: 'MoMo, ZaloPay, VNPay'
+            },
+            cod: {
+                code: 'cod',
+                name: 'Cash on Delivery',
+                icon: '💵',
+                processingTime: 'Upon delivery',
+                feePercent: 0,
+                feeFixed: 15000,
+                minAmount: 0,
+                maxAmount: 10000000,
+                requirements: 'Available for eligible delivery areas only',
+                providers: 'In-house delivery, Partner couriers'
+            }
+        };
+
+        const t = templates[type];
+        if (!t) return;
+
+        document.getElementById('Code').value = t.code;
+        document.getElementById('Name').value = t.name;
+        document.getElementById('Icon').value = t.icon;
+        document.getElementById('ProcessingTime').value = t.processingTime;
+        document.getElementById('TransactionFeePercentage').value = t.feePercent;
+        document.getElementById('TransactionFeeFixed').value = t.feeFixed;
+        document.getElementById('MinAmount').value = t.minAmount;
+        document.getElementById('MaxAmount').value = t.maxAmount;
+        document.getElementById('Requirements').value = t.requirements;
+        document.getElementById('SupportedProviders').value = t.providers;
+    }
+</script>
