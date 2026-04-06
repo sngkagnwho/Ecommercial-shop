@@ -5,7 +5,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// Push Notification Observer - G?i push notification
+    /// Push Notification Observer - Gửi push notification
     /// Observer Pattern - Third concrete observer
     /// </summary>
     public class PushNotificationService : INotificationObserver

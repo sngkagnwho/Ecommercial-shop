@@ -103,6 +103,7 @@ namespace mtkpm.Admin
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IAdminPaymentService, AdminPaymentService>();
             builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
+            builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
 
             // Register Orders Feature Services
             builder.Services.AddScoped<mtkpm.Admin.Features.Orders.Services.IUserAddressService, mtkpm.Admin.Features.Orders.Services.UserAddressService>();

@@ -5,7 +5,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// Email Notification Observer - G?i email th�ng b�o
+    /// Email Notification Observer - Gửi email thông báo
     /// Observer Pattern - Observer concrete implementation
     /// </summary>
     public class EmailNotificationService : INotificationObserver

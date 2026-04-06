@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using FluentValidation;
+
 namespace mtkpm.Application.Features.PaymentMethodConfigs.Commands.UpdatePaymentMethodConfig
 {
     public class UpdatePaymentMethodConfigCommandValidator : AbstractValidator<UpdatePaymentMethodConfigCommand>

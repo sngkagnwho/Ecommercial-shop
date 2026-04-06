@@ -1,278 +1,256 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using mtkpm.Admin.Features.Orders.Models;
-using mtkpm.Admin.Models;
+using mtkpm.Admin.Models.Order;
 using mtkpm.Admin.Services;
-using System.Text.Json;
 
 namespace mtkpm.Admin.Features.Orders.Controllers
 {
-    /// <summary>
-    /// Orders management controller
-    /// </summary>
     [Authorize]
+    [Route("[controller]")]
     public class OrdersController : Controller
     {
-        private readonly ITokenManager _tokenManager;
+        private readonly IAdminOrderService _orderService;
         private readonly ILogger<OrdersController> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly Services.IUserAddressService _userAddressService;
 
-        public OrdersController(
-            ITokenManager tokenManager,
-            ILogger<OrdersController> logger,
-            IConfiguration configuration,
-            Services.IUserAddressService userAddressService)
+        public OrdersController(IAdminOrderService orderService, ILogger<OrdersController> logger)
         {
-            _tokenManager = tokenManager;
+            _orderService = orderService;
             _logger = logger;
-            _configuration = configuration;
-            _userAddressService = userAddressService;
         }
 
-        private string GetApiBaseUrl()
-        {
-            return _configuration["Backend:ApiUrl"] ?? "https://localhost:5107/api";
-        }
-
-        private HttpClient GetHttpClientWithAuth()
-        {
-            var httpClient = new HttpClient();
-            var token = _tokenManager.GetToken();
-            
-            if (!string.IsNullOrEmpty(token))
-            {
-                httpClient.DefaultRequestHeaders.Authorization = 
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                _logger.LogInformation($"Authorization header added - Token length: {token.Length}");
-            }
-            else
-            {
-                _logger.LogWarning("No token available - Authorization header NOT added");
-            }
-            
-            return httpClient;
-        }
-
-        /// <summary>
-        /// Display paginated list of all orders
-        /// </summary>
+        // GET: /Orders
         [HttpGet]
-        public async Task<IActionResult> Index(int pageIndex = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchTerm = "", int? status = null, int page = 1)
         {
             try
             {
-                var httpClient = GetHttpClientWithAuth();
-                var apiUrl = GetApiBaseUrl();
-                
-                var response = await httpClient.GetAsync($"{apiUrl}/orders");
-                var responseContent = await response.Content.ReadAsStringAsync();
-                
-                _logger.LogInformation($"GET orders - Status: {response.StatusCode}");
-                
-                var orders = new List<OrderViewModel>();
-                var pagination = new PaginationModel { CurrentPage = pageIndex, PageSize = pageSize };
-                
-                if (response.IsSuccessStatusCode && !string.IsNullOrEmpty(responseContent))
+                var statistics = await _orderService.GetOrderStatisticsAsync();
+                var allOrders = await _orderService.GetAllOrdersAsync();
+
+                // Filter by status if provided
+                if (status.HasValue)
                 {
-                    try
-                    {
-                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                        
-                        using (JsonDocument doc = JsonDocument.Parse(responseContent))
-                        {
-                            JsonElement root = doc.RootElement;
-                            
-                            if (root.TryGetProperty("data", out JsonElement dataElement) && 
-                                dataElement.ValueKind == JsonValueKind.Array)
-                            {
-                                var itemsJson = dataElement.GetRawText();
-                                var allOrders = JsonSerializer.Deserialize<List<OrderViewModel>>(itemsJson, options) ?? new List<OrderViewModel>();
-                                
-                                // Manual pagination
-                                pagination.TotalItems = allOrders.Count;
-                                orders = allOrders
-                                    .OrderByDescending(o => o.OrderDate)
-                                    .Skip((pageIndex - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToList();
-                            }
-                        }
-                    }
-                    catch (Exception parseEx)
-                    {
-                        _logger.LogWarning($"Error parsing API response: {parseEx.Message}");
-                    }
-                    
-                    _logger.LogInformation($"Orders loaded: {orders.Count}, Total: {pagination.TotalItems}");
+                    allOrders = allOrders.Where(o => o.Status == status.Value).ToList();
                 }
-                else
+
+                // Filter by search term (order number or customer name)
+                if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    _logger.LogWarning($"API returned error: {response.StatusCode}");
+                    allOrders = allOrders.Where(o =>
+                        o.OrderNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        (o.UserName != null && o.UserName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
                 }
-                
-                // Sort orders by ID ascending
-                orders = orders.OrderBy(o => o.Id).ToList();
-                
-                ViewBag.Pagination = pagination;
-                return View(orders);
+
+                // Convert to list view models
+                var orderListModels = allOrders.Select(o => new OrderListViewModel
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    OrderDate = o.OrderDate,
+                    CustomerName = o.UserName,
+                    TotalItems = o.OrderItems?.Count ?? 0,
+                    TotalAmount = o.TotalAmount,
+                    Status = o.Status,
+                    IsPaid = o.IsPaid,
+                    PaymentMethodDisplay = ((PaymentMethodType)o.PaymentMethod).ToString()
+                }).OrderByDescending(o => o.OrderDate).ToList();
+
+                ViewBag.Statistics = statistics;
+                ViewBag.SearchTerm = searchTerm;
+                ViewBag.SelectedStatus = status;
+                ViewBag.StatusList = GetStatusList();
+
+                return View(orderListModels);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                TempData["ErrorMessage"] = "Session expired. Please login again.";
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Index", "Orders") });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error loading orders from API: {ex.Message}");
-                TempData["ErrorMessage"] = "Error loading orders";
-                return View(new List<OrderViewModel>());
+                _logger.LogError($"Error loading orders: {ex.Message}");
+                ViewBag.ErrorMessage = $"Error loading orders: {ex.Message}";
+                return View(new List<OrderListViewModel>());
             }
         }
 
-        /// <summary>
-        /// Display order details
-        /// </summary>
-        [HttpGet]
+        // GET: /Orders/Details/5
+        [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
             try
             {
-                var httpClient = GetHttpClientWithAuth();
-                var apiUrl = GetApiBaseUrl();
-                
-                var response = await httpClient.GetAsync($"{apiUrl}/orders/{id}");
-                
-                if (!response.IsSuccessStatusCode)
-                    return NotFound();
+                var order = await _orderService.GetOrderByIdAsync(id);
 
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                
-                OrderViewModel? order = null;
-                
-                using (JsonDocument doc = JsonDocument.Parse(responseContent))
-                {
-                    JsonElement root = doc.RootElement;
-                    if (root.TryGetProperty("data", out JsonElement dataElement) && 
-                        dataElement.ValueKind != JsonValueKind.Null)
-                    {
-                        order = JsonSerializer.Deserialize<OrderViewModel>(
-                            dataElement.GetRawText(), options);
-                    }
-                }
-                
                 if (order == null)
-                    return NotFound();
+                {
+                    TempData["ErrorMessage"] = "Order not found";
+                    return RedirectToAction("Index");
+                }
 
-                // Load user's saved addresses
-                var userAddresses = await _userAddressService.GetMyAddressesAsync();
-                ViewBag.UserAddresses = userAddresses;
+                // Convert to detail view model
+                var detailModel = new OrderDetailViewModel
+                {
+                    Id = order.Id,
+                    OrderNumber = order.OrderNumber,
+                    OrderDate = order.OrderDate,
+                    UserId = order.UserId,
+                    UserName = order.UserName,
+                    ShippingAddress = order.ShippingAddress,
+                    BillingAddress = order.BillingAddress,
+                    SubTotal = order.SubTotal,
+                    ShippingFee = order.ShippingFee,
+                    Discount = order.Discount,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    PaymentMethod = order.PaymentMethod,
+                    IsPaid = order.IsPaid,
+                    PaidAt = order.PaidAt,
+                    Note = order.Note,
+                    CreatedAt = order.CreatedAt,
+                    UpdatedAt = order.UpdatedAt,
+                    OrderItems = order.OrderItems?.Select(i => new OrderItemDetailViewModel
+                    {
+                        Id = i.Id,
+                        ProductId = i.ProductId,
+                        ProductName = i.ProductName,
+                        Quantity = i.Quantity,
+                        PriceAtOrder = i.PriceAtOrder,
+                        TotalPrice = i.TotalPrice
+                    }).ToList() ?? new List<OrderItemDetailViewModel>()
+                };
 
-                return View(order);
+                ViewBag.StatusList = GetStatusList();
+
+                return View(detailModel);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                TempData["ErrorMessage"] = "Session expired. Please login again.";
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Details", "Orders", new { id }) });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error loading order details: {ex.Message}");
-                return NotFound();
+                _logger.LogError($"Error loading order {id}: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error loading order: {ex.Message}";
+                return RedirectToAction("Index");
             }
         }
 
-        /// <summary>
-        /// Update order status form
-        /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> UpdateStatus(int id)
+        // POST: /Orders/UpdateStatus/5
+        [HttpPost("UpdateStatus/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, int status)
         {
             try
             {
-                var httpClient = GetHttpClientWithAuth();
-                var apiUrl = GetApiBaseUrl();
-                
-                var response = await httpClient.GetAsync($"{apiUrl}/orders/{id}");
-                
-                if (!response.IsSuccessStatusCode)
-                    return NotFound();
+                var result = await _orderService.UpdateOrderStatusAsync(id, status);
 
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                
-                OrderViewModel? order = null;
-                
-                using (JsonDocument doc = JsonDocument.Parse(responseContent))
+                if (result != null)
                 {
-                    JsonElement root = doc.RootElement;
-                    if (root.TryGetProperty("data", out JsonElement dataElement) && 
-                        dataElement.ValueKind != JsonValueKind.Null)
-                    {
-                        order = JsonSerializer.Deserialize<OrderViewModel>(
-                            dataElement.GetRawText(), options);
-                    }
-                }
-                
-                if (order == null)
-                    return NotFound();
-
-                ViewBag.CurrentStatus = order.Status;
-                ViewBag.OrderId = id;
-                return View(order);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error loading update status form: {ex.Message}");
-                return NotFound();
-            }
-        }
-
-        /// <summary>
-        /// Update order status
-        /// </summary>
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
-        {
-            if (string.IsNullOrWhiteSpace(status))
-            {
-                ModelState.AddModelError("", "Status is required");
-                ViewBag.OrderId = id;
-                return View();
-            }
-
-            try
-            {
-                var httpClient = GetHttpClientWithAuth();
-                var apiUrl = GetApiBaseUrl();
-                
-                // Parse status as integer
-                if (!int.TryParse(status, out var statusInt))
-                {
-                    ModelState.AddModelError("", "Invalid status value");
-                    ViewBag.OrderId = id;
-                    return View();
+                    TempData["SuccessMessage"] = $"Order status updated to {((OrderStatus)status).ToString()}";
+                    return RedirectToAction("Details", new { id });
                 }
 
-                var updateDto = new { status = statusInt };
-                var jsonContent = new StringContent(
-                    System.Text.Json.JsonSerializer.Serialize(updateDto),
-                    System.Text.Encoding.UTF8,
-                    "application/json");
-
-                var response = await httpClient.PatchAsync($"{apiUrl}/orders/{id}/status", jsonContent);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["SuccessMessage"] = "Order status updated successfully";
-                    return RedirectToAction(nameof(Details), new { id });
-                }
-
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogError($"Error updating order status: {errorContent}");
-                ViewBag.ErrorMessage = "Failed to update order status";
-                ViewBag.OrderId = id;
-                return View();
+                TempData["ErrorMessage"] = "Failed to update order status";
+                return RedirectToAction("Details", new { id });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                TempData["ErrorMessage"] = "Session expired. Please login again.";
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Details", "Orders", new { id }) });
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error updating order status: {ex.Message}");
-                ViewBag.ErrorMessage = "Error updating order status";
-                ViewBag.OrderId = id;
-                return View();
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return RedirectToAction("Details", new { id });
             }
+        }
+
+        // POST: /Orders/MarkAsPaid/5
+        [HttpPost("MarkAsPaid/{id}")]
+        public async Task<IActionResult> MarkAsPaid(int id)
+        {
+            try
+            {
+                var result = await _orderService.MarkOrderAsPaidAsync(id);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Order marked as paid";
+                    return RedirectToAction("Details", new { id });
+                }
+
+                TempData["ErrorMessage"] = "Failed to mark order as paid";
+                return RedirectToAction("Details", new { id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error marking order as paid: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return RedirectToAction("Details", new { id });
+            }
+        }
+
+        // POST: /Orders/Cancel/5
+        [HttpPost("Cancel/{id}")]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(id);
+
+                if (order == null)
+                {
+                    TempData["ErrorMessage"] = "Order not found";
+                    return RedirectToAction("Index");
+                }
+
+                // Check if order can be cancelled
+                if (order.Status == (int)OrderStatus.Shipping || 
+                    order.Status == (int)OrderStatus.Delivered || 
+                    order.Status == (int)OrderStatus.Completed)
+                {
+                    TempData["ErrorMessage"] = $"Cannot cancel order in {((OrderStatus)order.Status).ToString()} status";
+                    return RedirectToAction("Details", new { id });
+                }
+
+                var result = await _orderService.CancelOrderAsync(id);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Order cancelled successfully";
+                    return RedirectToAction("Details", new { id });
+                }
+
+                TempData["ErrorMessage"] = "Failed to cancel order";
+                return RedirectToAction("Details", new { id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error cancelling order: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return RedirectToAction("Details", new { id });
+            }
+        }
+
+        // Helper method to get status list for dropdown
+        private List<StatusItem> GetStatusList()
+        {
+            return new List<StatusItem>
+            {
+                new StatusItem { Value = (int)OrderStatus.Pending, Name = OrderStatus.Pending.ToString(), Badge = "badge-warning" },
+                new StatusItem { Value = (int)OrderStatus.Confirmed, Name = OrderStatus.Confirmed.ToString(), Badge = "badge-info" },
+                new StatusItem { Value = (int)OrderStatus.Processing, Name = OrderStatus.Processing.ToString(), Badge = "badge-primary" },
+                new StatusItem { Value = (int)OrderStatus.Shipping, Name = OrderStatus.Shipping.ToString(), Badge = "badge-secondary" },
+                new StatusItem { Value = (int)OrderStatus.Delivered, Name = OrderStatus.Delivered.ToString(), Badge = "badge-success" },
+                new StatusItem { Value = (int)OrderStatus.Completed, Name = OrderStatus.Completed.ToString(), Badge = "badge-success" },
+                new StatusItem { Value = (int)OrderStatus.Cancelled, Name = OrderStatus.Cancelled.ToString(), Badge = "badge-danger" },
+                new StatusItem { Value = (int)OrderStatus.Returned, Name = OrderStatus.Returned.ToString(), Badge = "badge-orange" },
+                new StatusItem { Value = (int)OrderStatus.Failed, Name = OrderStatus.Failed.ToString(), Badge = "badge-dark" }
+            };
         }
     }
 }

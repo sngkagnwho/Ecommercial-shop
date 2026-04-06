@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using FluentValidation;
+
 namespace mtkpm.Application.Features.NotificationMethods.Commands.UnsubscribeNotificationMethod
 {
     public class UnsubscribeNotificationMethodCommandValidator : AbstractValidator<UnsubscribeNotificationMethodCommand>

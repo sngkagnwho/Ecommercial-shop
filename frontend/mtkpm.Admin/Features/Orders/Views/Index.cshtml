@@ -1,17 +1,135 @@
-@model List<mtkpm.Admin.Features.Orders.Models.OrderViewModel>
+@model List<mtkpm.Admin.Models.Order.OrderListViewModel>
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Orders Management";
 }
 
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1><i class="fas fa-shopping-cart"></i> Orders Management</h1>
-        <p class="text-muted">Manage customer orders</p>
+        <p class="text-muted">View and manage customer orders</p>
     </div>
 </div>
 
+<!-- Statistics Cards -->
+@{
+    var stats = ViewBag.Statistics as mtkpm.Admin.Models.Order.OrderStatisticsViewModel;
+}
+@if (stats != null)
+{
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Total Orders</h6>
+                            <h3 class="fw-bold">@stats.TotalOrders</h3>
+                        </div>
+                        <i class="fas fa-list fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Pending Orders</h6>
+                            <h3 class="fw-bold">@stats.PendingOrders</h3>
+                        </div>
+                        <i class="fas fa-hourglass-start fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Shipping</h6>
+                            <h3 class="fw-bold">@stats.ShippingOrders</h3>
+                        </div>
+                        <i class="fas fa-truck fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Completed</h6>
+                            <h3 class="fw-bold">@stats.CompletedOrders</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Cancelled</h6>
+                            <h3 class="fw-bold">@stats.CancelledOrders</h3>
+                        </div>
+                        <i class="fas fa-times-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Unpaid</h6>
+                            <h3 class="fw-bold">@stats.UnpaidOrders</h3>
+                        </div>
+                        <i class="fas fa-credit-card fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Today Revenue</h6>
+                            <h3 class="fw-bold">$@stats.TodayRevenue.ToString("F0")</h3>
+                        </div>
+                        <i class="fas fa-money-bill fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title mb-0">Avg Order Value</h6>
+                            <h3 class="fw-bold">$@stats.AverageOrderValue.ToString("F0")</h3>
+                        </div>
+                        <i class="fas fa-chart-bar fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -20,13 +138,55 @@
     </div>
 }
 
-@if (TempData["ErrorMessage"] != null)
+@if (ViewBag.ErrorMessage != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <i class="fas fa-exclamation-circle"></i> @ViewBag.ErrorMessage
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
+
+<!-- Search & Filter -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="mb-0">Search & Filter</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" action="/Orders" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Order # or Customer Name" 
+                       value="@ViewBag.SearchTerm" />
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    @if (ViewBag.StatusList != null)
+                    {
+                        @foreach (var status in ViewBag.StatusList)
+                        {
+                            @if (ViewBag.SelectedStatus == status.Value)
+                            {
+                                <option value="@status.Value" selected>@status.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@status.Value">@status.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-5">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <a href="/Orders" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- Orders Table -->
 <div class="card">
@@ -34,14 +194,14 @@
         <h6 class="mb-0">Order List</h6>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th>ID</th>
                     <th>Order #</th>
                     <th>Customer</th>
-                    <th>Order Date</th>
-                    <th>Total Amount</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
                     <th>Status</th>
                     <th>Payment</th>
                     <th>Actions</th>
@@ -53,45 +213,49 @@
                     @foreach (var order in Model)
                     {
                         <tr>
-                            <td><span class="badge bg-secondary">@order.Id</span></td>
-                            <td><strong>@order.OrderNumber</strong></td>
-                            <td>@order.UserName</td>
-                            <td>@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
-                            <td><strong class="text-success">${@order.TotalAmount.ToString("F2")}</strong></td>
                             <td>
-                                @{
-                                    var statusClass = order.Status switch
+                                <strong><i class="fas fa-hashtag"></i> @order.OrderNumber</strong>
+                            </td>
+                            <td>@order.CustomerName</td>
+                            <td>
+                                <small class="text-muted">@order.OrderDate.ToString("MMM dd, yyyy")</small><br />
+                                <small class="text-muted">@order.OrderDate.ToString("HH:mm:ss")</small>
+                            </td>
+                            <td><span class="badge bg-light text-dark">@order.TotalItems item(s)</span></td>
+                            <td><strong class="text-success">$@order.TotalAmount.ToString("F2")</strong></td>
+                            <td>
+                                <span class="badge @order.StatusBadge">@(order.Status switch
+                                {
+                                    1 => "Pending",
+                                    2 => "Confirmed",
+                                    3 => "Processing",
+                                    4 => "Shipping",
+                                    5 => "Delivered",
+                                    6 => "Completed",
+                                    7 => "Cancelled",
+                                    8 => "Returned",
+                                    9 => "Failed",
+                                    _ => "Unknown"
+                                })</span>
+                            </td>
+                            <td>
+                                <span class="@order.PaymentBadge">
+                                    @if (order.IsPaid)
                                     {
-                                        1 => "warning",      // Pending
-                                        2 => "info",         // Confirmed
-                                        3 => "primary",      // Processing
-                                        4 => "secondary",    // Shipping
-                                        5 => "success",      // Delivered
-                                        6 => "success",      // Completed
-                                        7 => "danger",       // Cancelled
-                                        8 => "warning",      // Returned
-                                        9 => "danger",       // Failed
-                                        _ => "secondary"
-                                    };
-                                }
-                                <span class="badge bg-@statusClass">@order.StatusDisplay</span>
+                                        <i class="fas fa-check-circle"></i> <span class="badge bg-success">Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-minus-circle"></i> <span class="badge bg-warning">Unpaid</span>
+                                    }
+                                </span>
                             </td>
                             <td>
-                                @if (order.IsPaid)
-                                {
-                                    <span class="badge bg-success"><i class="fas fa-check"></i> Paid</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning"><i class="fas fa-clock"></i> Pending</span>
-                                }
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="/Orders/Details/@order.Id" class="btn btn-sm btn-info" title="View">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="/Orders/Details/@order.Id" class="btn btn-outline-primary" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="/Orders/UpdateStatus/@order.Id" class="btn btn-sm btn-warning" title="Update Status">
+                                    <a href="/Orders/Details/@order.Id" class="btn btn-outline-warning" title="Edit Order">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </div>
@@ -102,73 +266,23 @@
                 else
                 {
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">
-                            <i class="fas fa-inbox" style="font-size: 2rem;"></i>
-                            <p>No orders found</p>
+                        <td colspan="8" class="text-center py-5">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3">No orders found</p>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
-    <!-- Pagination -->
-    @if (ViewBag.Pagination != null && ViewBag.Pagination.TotalPages > 1)
-    {
-        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
-            <div class="text-muted">
-                Page <strong>@ViewBag.Pagination.CurrentPage</strong> of <strong>@ViewBag.Pagination.TotalPages</strong>
-                (<strong>@ViewBag.Pagination.TotalItems</strong> total items)
-            </div>
-            <nav>
-                <ul class="pagination mb-0">
-                    @if (ViewBag.Pagination.HasPreviousPage)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="?pageIndex=@(ViewBag.Pagination.CurrentPage - 1)">
-                                <i class="fas fa-chevron-left"></i> Previous
-                            </a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="page-item disabled">
-                            <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
-                        </li>
-                    }
-
-                    @for (int i = 1; i <= ViewBag.Pagination.TotalPages; i++)
-                    {
-                        @if (i == ViewBag.Pagination.CurrentPage)
-                        {
-                            <li class="page-item active">
-                                <span class="page-link">@i</span>
-                            </li>
-                        }
-                        else if (i <= ViewBag.Pagination.CurrentPage + 2 && i >= ViewBag.Pagination.CurrentPage - 2)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="?pageIndex=@i">@i</a>
-                            </li>
-                        }
-                    }
-
-                    @if (ViewBag.Pagination.HasNextPage)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="?pageIndex=@(ViewBag.Pagination.CurrentPage + 1)">
-                                Next <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="page-item disabled">
-                            <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
-                        </li>
-                    }
-                </ul>
-            </nav>
-        </div>
-    }
 </div>
+
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+</script>

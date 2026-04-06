@@ -75,7 +75,12 @@ namespace mtkpm.Admin.Features.Payments.Controllers
         public async Task<IActionResult> Create(CreatePaymentMethodViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                ViewBag.ErrorMessage = string.Join("; ", errors.Select(e => e.ErrorMessage));
+                _logger.LogWarning($"Form validation failed: {ViewBag.ErrorMessage}");
                 return View(model);
+            }
 
             try
             {
@@ -92,7 +97,7 @@ namespace mtkpm.Admin.Features.Payments.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error creating payment method: {ex.Message}");
-                ViewBag.ErrorMessage = ex.Message;
+                ViewBag.ErrorMessage = $"Error: {ex.Message}";
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(model);
             }

@@ -1,22 +1,21 @@
-@model mtkpm.Admin.Features.Orders.Models.OrderViewModel
+@model mtkpm.Admin.Models.Order.OrderDetailViewModel
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Order Details";
+    ViewData["Title"] = "Order Details - " + Model.OrderNumber;
 }
 
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1><i class="fas fa-receipt"></i> Order Details</h1>
-        <p class="text-muted">Order #@Model.OrderNumber</p>
+        <p class="text-muted">Order #<strong>@Model.OrderNumber</strong></p>
     </div>
-    <div>
-        <a href="/Orders/Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </a>
-    </div>
+    <a href="/Orders" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
 </div>
 
+<!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -34,65 +33,56 @@
 }
 
 <div class="row">
-    <!-- Order Header -->
+    <!-- Main Content -->
     <div class="col-lg-8">
+        <!-- Order Header -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">Order Information</h6>
-                <div>
-                    @{
-                        var statusClass = Model.Status switch
-                        {
-                            1 => "warning",      // Pending
-                            2 => "info",         // Confirmed
-                            3 => "primary",      // Processing
-                            4 => "secondary",    // Shipping
-                            5 => "success",      // Delivered
-                            6 => "success",      // Completed
-                            7 => "danger",       // Cancelled
-                            8 => "warning",      // Returned
-                            9 => "danger",       // Failed
-                            _ => "secondary"
-                        };
-                    }
-                    <span class="badge bg-@statusClass" style="font-size: 1rem;">@Model.StatusDisplay</span>
-                </div>
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Order Information</h6>
+                <span class="badge @Model.StatusBadge" style="font-size: 0.9rem;">
+                    @Model.StatusDisplay
+                </span>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="text-muted">Order Number</label>
-                        <p class="fw-bold">@Model.OrderNumber</p>
+                        <label class="text-muted small">Order Number</label>
+                        <p class="fw-bold"><i class="fas fa-hashtag"></i> @Model.OrderNumber</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-muted">Order Date</label>
-                        <p class="fw-bold">@Model.OrderDate.ToString("MMMM dd, yyyy HH:mm:ss")</p>
+                        <label class="text-muted small">Order Date</label>
+                        <p class="fw-bold">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm:ss")</p>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="text-muted">Customer</label>
+                        <label class="text-muted small">Customer Name</label>
                         <p class="fw-bold">@Model.UserName</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-muted">Payment Status</label>
-                        <p class="fw-bold">
-                            @if (Model.IsPaid)
-                            {
-                                <span class="badge bg-success"><i class="fas fa-check"></i> Paid</span>
-                                <small class="text-muted">@Model.PaidAt?.ToString("MMMM dd, yyyy HH:mm:ss")</small>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning"><i class="fas fa-clock"></i> Pending</span>
-                            }
-                        </p>
+                        <label class="text-muted small">Payment Method</label>
+                        <p class="fw-bold">@Model.PaymentMethodDisplay</p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="text-muted">Payment Method</label>
-                        <p class="fw-bold">@Model.PaymentMethodDisplay</p>
+                        <label class="text-muted small">Payment Status</label>
+                        <p class="fw-bold">
+                            @if (Model.IsPaid)
+                            {
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Paid</span>
+                                <br />
+                                <small class="text-muted">@Model.PaidAt?.ToString("MMM dd, yyyy HH:mm:ss")</small>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning"><i class="fas fa-clock"></i> Unpaid</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Items Count</label>
+                        <p class="fw-bold"><span class="badge bg-light text-dark">@Model.OrderItems.Count item(s)</span></p>
                     </div>
                 </div>
             </div>
@@ -101,41 +91,47 @@
         <!-- Order Items -->
         <div class="card mb-4">
             <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-list"></i> Order Items</h6>
+                <h6 class="mb-0"><i class="fas fa-box"></i> Order Items</h6>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
-                    <thead>
+                    <thead class="table-light">
                         <tr>
                             <th>Product</th>
-                            <th class="text-center">Quantity</th>
-                            <th class="text-end">Unit Price</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
                             <th class="text-end">Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.OrderItems != null && Model.OrderItems.Count > 0)
+                        @if (Model.OrderItems.Any())
                         {
                             @foreach (var item in Model.OrderItems)
                             {
                                 <tr>
                                     <td>
                                         <div>
-                                            <p class="fw-bold mb-1">@item.ProductName</p>
-                                            <small class="text-muted">Product ID: @item.ProductId</small>
+                                            <p class="fw-bold mb-0">@item.ProductName</p>
+                                            <small class="text-muted">SKU: @item.ProductSku</small>
                                         </div>
                                     </td>
-                                    <td class="text-center">@item.Quantity</td>
-                                    <td class="text-end">${@item.PriceAtOrder.ToString("F2")}</td>
-                                    <td class="text-end fw-bold">${@item.TotalPrice.ToString("F2")}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark">@item.Quantity</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>$@item.PriceAtOrder.ToString("F2")</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong class="text-success">$@item.TotalPrice.ToString("F2")</strong>
+                                    </td>
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-3 text-muted">
-                                    No items in this order
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox"></i> No items in this order
                                 </td>
                             </tr>
                         }
@@ -147,49 +143,49 @@
         <!-- Order Note -->
         @if (!string.IsNullOrEmpty(Model.Note))
         {
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-sticky-note"></i> Order Note</h6>
                 </div>
                 <div class="card-body">
-                    <p>@Model.Note</p>
+                    <p class="mb-0">@Model.Note</p>
                 </div>
             </div>
         }
     </div>
 
-    <!-- Order Summary & Addresses -->
+    <!-- Sidebar -->
     <div class="col-lg-4">
         <!-- Order Summary -->
         <div class="card mb-4">
             <div class="card-header">
-                <h6 class="mb-0">Order Summary</h6>
+                <h6 class="mb-0"><i class="fas fa-calculator"></i> Order Summary</h6>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
-                    <span>${@Model.SubTotal.ToString("F2")}</span>
+                    <span class="text-muted">Subtotal:</span>
+                    <span class="fw-bold">$@Model.SubTotal.ToString("F2")</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
-                    <span>Shipping Fee:</span>
-                    <span>${@Model.ShippingFee.ToString("F2")}</span>
+                    <span class="text-muted">Shipping Fee:</span>
+                    <span class="fw-bold">+$@Model.ShippingFee.ToString("F2")</span>
                 </div>
                 @if (Model.Discount > 0)
                 {
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="d-flex justify-content-between mb-2">
                         <span class="text-success">Discount:</span>
-                        <span class="text-success">-${@Model.Discount.ToString("F2")}</span>
+                        <span class="text-success fw-bold">-$@Model.Discount.ToString("F2")</span>
                     </div>
                 }
                 <hr />
-                <div class="d-flex justify-content-between fw-bold" style="font-size: 1.1rem;">
-                    <span>Total Amount:</span>
-                    <span class="text-success">${@Model.TotalAmount.ToString("F2")}</span>
+                <div class="d-flex justify-content-between" style="font-size: 1.1rem;">
+                    <span class="fw-bold">Total Amount:</span>
+                    <span class="fw-bold text-success">$@Model.TotalAmount.ToString("F2")</span>
                 </div>
             </div>
         </div>
 
-        <!-- Shipping Address -->
+        <!-- Addresses -->
         <div class="card mb-4">
             <div class="card-header">
                 <h6 class="mb-0"><i class="fas fa-map-marker-alt"></i> Shipping Address</h6>
@@ -197,16 +193,15 @@
             <div class="card-body">
                 @if (!string.IsNullOrEmpty(Model.ShippingAddress))
                 {
-                    <p class="mb-0">@Model.ShippingAddress</p>
+                    <p class="mb-0 text-break">@Model.ShippingAddress</p>
                 }
                 else
                 {
-                    <p class="text-muted mb-0">No shipping address provided</p>
+                    <p class="mb-0 text-muted"><em>No shipping address provided</em></p>
                 }
             </div>
         </div>
 
-        <!-- Billing Address -->
         <div class="card mb-4">
             <div class="card-header">
                 <h6 class="mb-0"><i class="fas fa-home"></i> Billing Address</h6>
@@ -214,60 +209,108 @@
             <div class="card-body">
                 @if (!string.IsNullOrEmpty(Model.BillingAddress))
                 {
-                    <p class="mb-0">@Model.BillingAddress</p>
+                    <p class="mb-0 text-break">@Model.BillingAddress</p>
                 }
                 else
                 {
-                    <p class="text-muted mb-0">No billing address provided</p>
+                    <p class="mb-0 text-muted"><em>No billing address provided</em></p>
                 }
             </div>
         </div>
 
-        <!-- Saved Addresses Reference -->
-        @if (ViewBag.UserAddresses != null && ((List<mtkpm.Admin.Features.Orders.Models.UserAddressViewModel>)ViewBag.UserAddresses).Count > 0)
-        {
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0"><i class="fas fa-bookmark"></i> Your Saved Addresses</h6>
-                    <a href="/Orders/Addresses" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-cog"></i> Manage
-                    </a>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        @foreach (var addr in (List<mtkpm.Admin.Features.Orders.Models.UserAddressViewModel>)ViewBag.UserAddresses)
-                        {
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            @addr.Label
-                                            @if (addr.IsDefault)
-                                            {
-                                                <span class="badge bg-success ms-2"><i class="fas fa-star"></i> Default</span>
-                                            }
-                                        </h6>
-                                        <p class="mb-0 text-muted small">
-                                            @addr.ReceiverName | @addr.PhoneNumber
-                                        </p>
-                                        <p class="mb-0 text-muted small">
-                                            @addr.Street, @addr.Ward, @addr.District, @addr.City
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
+        <!-- Dates -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-calendar"></i> Dates</h6>
             </div>
-        }
+            <div class="card-body">
+                <div class="mb-2">
+                    <label class="text-muted small">Created</label>
+                    <p class="mb-0">@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm:ss")</p>
+                </div>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <div>
+                        <label class="text-muted small">Last Updated</label>
+                        <p class="mb-0">@Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm:ss")</p>
+                    </div>
+                }
+            </div>
+        </div>
 
         <!-- Actions -->
-        <div>
-            <a href="/Orders/UpdateStatus/@Model.Id" class="btn btn-warning w-100 mb-2">
-                <i class="fas fa-edit"></i> Update Status
-            </a>
-            <a href="/Orders/Index" class="btn btn-secondary w-100">
-                <i class="fas fa-arrow-left"></i> Back to List
-            </a>
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-cogs"></i> Actions</h6>
+            </div>
+            <div class="card-body">
+                <!-- Update Status -->
+                <form action="/Orders/UpdateStatus/@Model.Id" method="post" class="mb-3">
+                    @Html.AntiForgeryToken()
+                    <label class="form-label small mb-2">Update Status</label>
+                    <div class="input-group">
+                        <select name="status" class="form-select" required>
+                            <option value="">Select new status...</option>
+                            @if (ViewBag.StatusList != null)
+                            {
+                                @foreach (var status in ViewBag.StatusList)
+                                {
+                                    @if (Model.Status == status.Value)
+                                    {
+                                        <option value="@status.Value" disabled>@status.Name (Current)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@status.Value">@status.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            <i class="fas fa-save"></i> Update
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Mark as Paid -->
+                @if (!Model.IsPaid)
+                {
+                    <form action="/Orders/MarkAsPaid/@Model.Id" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success w-100 btn-sm">
+                            <i class="fas fa-money-bill"></i> Mark as Paid
+                        </button>
+                    </form>
+                }
+
+                <!-- Cancel Order -->
+                @if (Model.CanCancel)
+                {
+                    <form action="/Orders/Cancel/@Model.Id" method="post" 
+                          onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger w-100 btn-sm">
+                            <i class="fas fa-times"></i> Cancel Order
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-info alert-sm mb-0">
+                        <small><i class="fas fa-info-circle"></i> Cannot cancel order in @Model.StatusDisplay status</small>
+                    </div>
+                }
+            </div>
         </div>
+    </div>
+</div>
+
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+</script>

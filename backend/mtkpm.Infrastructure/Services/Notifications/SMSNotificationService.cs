@@ -5,7 +5,7 @@ using mtkpm.Domain.Events;
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// SMS Notification Observer - G?i SMS th�ng b�o
+    /// SMS Notification Observer - Gửi SMS thông báo
     /// Observer Pattern - Another concrete observer
     /// </summary>
     public class SMSNotificationService : INotificationObserver

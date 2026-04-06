@@ -45,6 +45,10 @@ namespace mtkpm.Admin.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ApiService> _logger;
+        private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
         public ApiService(HttpClient httpClient, ILogger<ApiService> logger)
         {
@@ -67,7 +71,7 @@ namespace mtkpm.Admin.Services
                 try
                 {
                     // First try to deserialize as ApiResponse<T> wrapper (backend always wraps responses)
-                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(content);
+                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(content, JsonOptions);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
@@ -75,7 +79,7 @@ namespace mtkpm.Admin.Services
                     }
 
                     // If that fails, try to deserialize directly as T (for cases without wrapper)
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(content);
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(content, JsonOptions);
                     if (directResult != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
@@ -121,7 +125,7 @@ namespace mtkpm.Admin.Services
                 try
                 {
                     // First try to deserialize as ApiResponse<T> wrapper
-                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent);
+                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent, JsonOptions);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
@@ -129,7 +133,7 @@ namespace mtkpm.Admin.Services
                     }
 
                     // If that fails, try to deserialize directly as T
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent, JsonOptions);
                     if (directResult != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");
@@ -171,7 +175,7 @@ namespace mtkpm.Admin.Services
                 try
                 {
                     // First try to deserialize as ApiResponse<T> wrapper
-                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent);
+                    var wrappedResult = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<T>>(responseContent, JsonOptions);
                     if (wrappedResult?.Data != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} from ApiResponse wrapper");
@@ -179,7 +183,7 @@ namespace mtkpm.Admin.Services
                     }
 
                     // If that fails, try to deserialize directly as T
-                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent);
+                    var directResult = System.Text.Json.JsonSerializer.Deserialize<T>(responseContent, JsonOptions);
                     if (directResult != null)
                     {
                         _logger.LogInformation($"Successfully deserialized {typeof(T).Name} directly");

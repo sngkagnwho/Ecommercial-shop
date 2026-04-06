@@ -134,6 +134,11 @@ namespace mtkpm.Admin.Services
             {
                 httpClient.DefaultRequestHeaders.Authorization = 
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _logger.LogInformation($"‚úÖ JWT token set successfully. Token length: {token.Length}");
+            }
+            else
+            {
+                _logger.LogWarning("‚ö†Ô∏è JWT token is NULL or EMPTY - User may not be authenticated!");
             }
         }
 
@@ -156,7 +161,7 @@ namespace mtkpm.Admin.Services
                 {
                     _logger.LogWarning($"Failed to get payment methods: {response.StatusCode}");
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException(BuildBackendErrorMessage("KhÙng th? t?i danh s·ch ph??ng th?c thanh to·n", errorContent));
+                    throw new InvalidOperationException(BuildBackendErrorMessage("KhÔøΩng th? t?i danh sÔøΩch ph??ng th?c thanh toÔøΩn", errorContent));
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -193,7 +198,7 @@ namespace mtkpm.Admin.Services
                 {
                     _logger.LogWarning($"Payment method not found: {code}");
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException(BuildBackendErrorMessage("KhÙng tÏm th?y ph??ng th?c thanh to·n", errorContent));
+                    throw new InvalidOperationException(BuildBackendErrorMessage("KhÔøΩng tÔøΩm th?y ph??ng th?c thanh toÔøΩn", errorContent));
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -232,7 +237,7 @@ namespace mtkpm.Admin.Services
                 {
                     _logger.LogWarning($"Failed to create payment method: {response.StatusCode}");
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException(BuildBackendErrorMessage("T?o ph??ng th?c thanh to·n th?t b?i", errorContent));
+                    throw new InvalidOperationException(BuildBackendErrorMessage("T?o ph??ng th?c thanh toÔøΩn th?t b?i", errorContent));
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -271,7 +276,7 @@ namespace mtkpm.Admin.Services
                 {
                     _logger.LogWarning($"Failed to update payment method: {response.StatusCode}");
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException(BuildBackendErrorMessage("C?p nh?t ph??ng th?c thanh to·n th?t b?i", errorContent));
+                    throw new InvalidOperationException(BuildBackendErrorMessage("C?p nh?t ph??ng th?c thanh toÔøΩn th?t b?i", errorContent));
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -309,7 +314,7 @@ namespace mtkpm.Admin.Services
 
                 _logger.LogWarning($"Failed to delete payment method: {response.StatusCode}");
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new InvalidOperationException(BuildBackendErrorMessage("XÛa ph??ng th?c thanh to·n th?t b?i", errorContent));
+                throw new InvalidOperationException(BuildBackendErrorMessage("XÔøΩa ph??ng th?c thanh toÔøΩn th?t b?i", errorContent));
             }
             catch (Exception ex)
             {

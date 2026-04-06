@@ -9,6 +9,7 @@
         <h1><i class="fas fa-plus"></i> New Payment Method</h1>
         <p class="text-muted">Create and configure a new payment method</p>
     </div>
+</div>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -51,8 +52,8 @@
                             <label for="Code" class="form-label">Code <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" 
                                    id="Code" name="Code" placeholder="credit_card" value="@Model.Code" required 
-                                   pattern="[a-z_]+" maxlength="50">
-                            <small class="text-muted">Lowercase letters and underscores only (e.g., credit_card, bank_transfer)</small>
+                                   pattern="[a-z0-9_]+" maxlength="50">
+                            <small class="text-muted">Lowercase letters, numbers, and underscores (e.g., credit_card, bank_transfer_v2)</small>
                         </div>
                         <div class="col-md-6">
                             <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
@@ -224,67 +225,180 @@
 </style>
 
 <script>
+    // Form validation on submit
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            // Validate required fields
+            if (!validateForm()) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            // Restore button after delay if something goes wrong
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }, 5000);
+        });
+    });
+
+    function validateForm() {
+        const code = document.getElementById('Code').value.trim();
+        const name = document.getElementById('Name').value.trim();
+        const processingTime = document.getElementById('ProcessingTime').value.trim();
+        const feePercent = document.getElementById('TransactionFeePercentage').value;
+        const minAmount = parseFloat(document.getElementById('MinAmount').value) || 0;
+        const maxAmount = parseFloat(document.getElementById('MaxAmount').value) || 0;
+
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+        let isValid = true;
+        const errors = [];
+
+        // Validate Code
+        if (!code) {
+            errors.push('Code is required');
+            isValid = false;
+        } else if (!/^[a-z0-9_]+$/.test(code)) {
+            errors.push('Code must be lowercase letters, numbers, and underscores only');
+            isValid = false;
+        } else if (code.length > 50) {
+            errors.push('Code must be 50 characters or less');
+            isValid = false;
+        }
+
+        // Validate Name
+        if (!name) {
+            errors.push('Name is required');
+            isValid = false;
+        } else if (name.length < 3 || name.length > 100) {
+            errors.push('Name must be 3-100 characters');
+            isValid = false;
+        }
+
+        // Validate Processing Time
+        if (!processingTime) {
+            errors.push('Processing Time is required');
+            isValid = false;
+        }
+
+        // Validate Fee Percentage
+        if (feePercent === '') {
+            errors.push('Transaction Fee % is required');
+            isValid = false;
+        } else if (feePercent < 0 || feePercent > 100) {
+            errors.push('Transaction Fee % must be 0-100');
+            isValid = false;
+        }
+
+        // Validate Amount Range
+        if (maxAmount < minAmount) {
+            errors.push('Maximum Amount must be greater than or equal to Minimum Amount');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            // Show comprehensive error alert
+            let errorMsg = 'Please fix the following errors:\n\n' + errors.join('\n');
+            alert(errorMsg);
+            console.log('Validation errors:', errors);
+        }
+
+        return isValid;
+    }
+
     function applyPaymentTemplate(type) {
         const templates = {
             credit_card: {
                 code: 'credit_card',
                 name: 'Credit Card',
+                description: 'Accept major credit and debit cards for payments',
                 icon: '💳',
+                displayOrder: 1,
                 processingTime: 'Instant',
                 feePercent: 2.5,
                 feeFixed: 0,
                 minAmount: 10000,
                 maxAmount: 50000000,
-                requirements: 'Valid credit/debit card required',
-                providers: 'Visa, MasterCard, AmEx'
+                requirements: 'Valid credit/debit card required, CVV for security',
+                providers: 'Visa, MasterCard, AmEx, UnionPay',
+                areas: 'Worldwide, Vietnam',
+                adminNotes: 'PCI DSS compliant, high security standard. Main payment method for E-commerce.'
             },
             bank_transfer: {
                 code: 'bank_transfer',
                 name: 'Bank Transfer',
+                description: 'Direct bank account to bank account transfer',
                 icon: '🏦',
+                displayOrder: 2,
                 processingTime: '1-2 hours',
                 feePercent: 0,
                 feeFixed: 3000,
                 minAmount: 10000,
                 maxAmount: 100000000,
-                requirements: 'Internet banking or bank account required',
-                providers: 'Vietcombank, BIDV, Techcombank, MB Bank'
+                requirements: 'Internet banking or bank account required, valid bank details',
+                providers: 'Vietcombank, BIDV, Techcombank, MB Bank, ACB, TPBank',
+                areas: 'Vietnam',
+                adminNotes: 'Manual verification required for large transactions. Most popular in Vietnam.'
             },
             paypal: {
                 code: 'paypal',
                 name: 'PayPal',
+                description: 'International payment via PayPal platform',
                 icon: '🅿️',
+                displayOrder: 3,
                 processingTime: 'Instant',
                 feePercent: 3.5,
                 feeFixed: 0,
                 minAmount: 10000,
                 maxAmount: 200000000,
-                requirements: 'PayPal account required',
-                providers: 'PayPal'
+                requirements: 'PayPal account required, account verification completed',
+                providers: 'PayPal Global',
+                areas: 'International, select countries',
+                adminNotes: 'Good for international transactions. Buyer protection included.'
             },
             mobile_wallet: {
                 code: 'mobile_wallet',
                 name: 'Mobile Wallet',
+                description: 'Payment via mobile e-wallet applications',
                 icon: '📱',
+                displayOrder: 4,
                 processingTime: 'Instant',
                 feePercent: 1.0,
                 feeFixed: 1000,
                 minAmount: 5000,
                 maxAmount: 20000000,
-                requirements: 'Supported e-wallet account required',
-                providers: 'MoMo, ZaloPay, VNPay'
+                requirements: 'Supported e-wallet account with sufficient balance',
+                providers: 'MoMo, ZaloPay, VNPay, ShopeePay, GrabPay',
+                areas: 'Vietnam, Southeast Asia',
+                adminNotes: 'Growing payment method, very popular with young consumers.'
             },
             cod: {
                 code: 'cod',
                 name: 'Cash on Delivery',
+                description: 'Pay when the product is delivered to your location',
                 icon: '💵',
+                displayOrder: 5,
                 processingTime: 'Upon delivery',
                 feePercent: 0,
                 feeFixed: 15000,
                 minAmount: 0,
                 maxAmount: 10000000,
-                requirements: 'Available for eligible delivery areas only',
-                providers: 'In-house delivery, Partner couriers'
+                requirements: 'Available for eligible delivery areas only, order confirmation required',
+                providers: 'In-house delivery, Partner couriers (GHN, SPX, etc.)',
+                areas: 'Vietnam - Major cities only',
+                adminNotes: 'No pre-payment required. Limited to local delivery areas. Requires order confirmation.'
             }
         };
 
@@ -293,7 +407,9 @@
 
         document.getElementById('Code').value = t.code;
         document.getElementById('Name').value = t.name;
+        document.getElementById('Description').value = t.description;
         document.getElementById('Icon').value = t.icon;
+        document.getElementById('DisplayOrder').value = t.displayOrder;
         document.getElementById('ProcessingTime').value = t.processingTime;
         document.getElementById('TransactionFeePercentage').value = t.feePercent;
         document.getElementById('TransactionFeeFixed').value = t.feeFixed;
@@ -301,5 +417,9 @@
         document.getElementById('MaxAmount').value = t.maxAmount;
         document.getElementById('Requirements').value = t.requirements;
         document.getElementById('SupportedProviders').value = t.providers;
+        document.getElementById('SupportedAreas').value = t.areas;
+        document.getElementById('AdminNotes').value = t.adminNotes;
+
+        console.log(`✅ Template "${type}" applied successfully with all fields filled!`);
     }
 </script>

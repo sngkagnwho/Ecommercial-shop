@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace mtkpm.Infrastructure.Services.Notifications
 {
     /// <summary>
-    /// Notification Subscriber - T✓ ✔ng ✔ng k� observers khi app start
+    /// Notification Subscriber - Tự động đăng ký observers khi ứng dụng khởi động
     /// </summary>
     public class NotificationSubscriber : IHostedService
     {
@@ -29,7 +29,7 @@ namespace mtkpm.Infrastructure.Services.Notifications
         {
             _logger.LogInfo("✔ Starting Notification Subscriber", "NotificationSubscriber");
 
-            // Auto-register t?t c✓ observers
+            // Tự động đăng ký tất cả observers
             using (var scope = _serviceProvider.CreateScope())
             {
                 var emailService = scope.ServiceProvider.GetRequiredService<EmailNotificationService>();

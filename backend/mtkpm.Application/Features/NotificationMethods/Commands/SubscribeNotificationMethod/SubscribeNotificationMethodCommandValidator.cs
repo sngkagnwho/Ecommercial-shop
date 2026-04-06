@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using FluentValidation;
+
 namespace mtkpm.Application.Features.NotificationMethods.Commands.SubscribeNotificationMethod
 {
     public class SubscribeNotificationMethodCommandValidator : AbstractValidator<SubscribeNotificationMethodCommand>

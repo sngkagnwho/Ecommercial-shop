@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mtkpm.Admin.Features.Dashboard.Models;
 using mtkpm.Admin.Features.Dashboard.Services;
+using mtkpm.Admin.Services;
 
 namespace mtkpm.Admin.Features.Dashboard.Controllers
 {
@@ -9,11 +10,16 @@ namespace mtkpm.Admin.Features.Dashboard.Controllers
     public class DashboardController : Controller
     {
         private readonly IDashboardService _dashboardService;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<DashboardController> _logger;
 
-        public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger)
+        public DashboardController(
+            IDashboardService dashboardService,
+            ITokenManager tokenManager,
+            ILogger<DashboardController> logger)
         {
             _dashboardService = dashboardService;
+            _tokenManager = tokenManager;
             _logger = logger;
         }
 
@@ -24,6 +30,12 @@ namespace mtkpm.Admin.Features.Dashboard.Controllers
         {
             try
             {
+                if (!_tokenManager.IsTokenValid())
+                {
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Index", "Dashboard") });
+                }
+
                 var stats = await _dashboardService.GetDashboardStatsAsync();
                 return View(stats ?? new DashboardStats());
             }
