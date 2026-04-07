@@ -173,7 +173,7 @@ namespace mtkpm.Infrastructure.Services.Discounts
                     continue;
                 }
 
-                var discountType = discount.DiscountType?.Trim().ToLowerInvariant();
+                var discountType = NormalizeDiscountType(discount.DiscountType, discount.Code);
 
                 switch (discountType)
                 {
@@ -203,6 +203,23 @@ namespace mtkpm.Infrastructure.Services.Discounts
             }
 
             return chain;
+        }
+
+        private static string NormalizeDiscountType(string? discountType, string? discountCode)
+        {
+            var type = discountType?.Trim().ToLowerInvariant() ?? string.Empty;
+            var code = discountCode?.Trim().ToLowerInvariant() ?? string.Empty;
+
+            if (type.Contains("percentage") || code.StartsWith("percentage_"))
+                return "percentage";
+
+            if (type.Contains("fixed") || code.StartsWith("fixed_"))
+                return "fixed";
+
+            if (type.Contains("shipping") || code.Contains("free_shipping"))
+                return "free_shipping";
+
+            return type;
         }
     }
 }

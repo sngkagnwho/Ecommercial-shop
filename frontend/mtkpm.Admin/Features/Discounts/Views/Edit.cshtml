@@ -50,15 +50,13 @@
                             <label for="DiscountType" class="form-label">Discount Type <span class="text-danger">*</span></label>
                             <select class="form-select" id="DiscountType" name="DiscountType" required>
                                 <option value="">-- Select Type --</option>
-                                @foreach (var type in new[] { "Percentage", "Fixed", "FreeShipping", "LoyaltyPoints", "Bundle" })
+                                @foreach (var type in new[] { "Percentage", "FixedAmount", "FreeShipping" })
                                 {
                                     var label = type switch
                                     {
                                         "Percentage" => "Percentage (%)",
-                                        "Fixed" => "Fixed Amount (đ)",
+                                        "FixedAmount" => "Fixed Amount (đ)",
                                         "FreeShipping" => "Free Shipping",
-                                        "LoyaltyPoints" => "Loyalty Points",
-                                        "Bundle" => "Bundle Discount",
                                         _ => type
                                     };
                                     <option value="@type" selected="@(Model?.DiscountType == type)">@label</option>
@@ -66,9 +64,9 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="DiscountValue" class="form-label">Discount Value <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="DiscountValue" name="DiscountValue" placeholder="10" step="0.01" min="0" value="@Model?.DiscountValue" required>
-                            <small class="text-muted">% for percentage, đ for fixed amounts</small>
+                            <label for="DiscountValue" class="form-label">Discount Value <span class="text-danger" id="discountValueRequired">*</span></label>
+                            <input type="number" class="form-control" id="DiscountValue" name="DiscountValue" placeholder="10" step="0.01" min="0" value="@Model?.DiscountValue">
+                            <small class="text-muted" id="discountValueHint">% for percentage, đ for fixed amounts</small>
                         </div>
                     </div>
 
@@ -210,3 +208,49 @@
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const discountTypeSelect = document.getElementById('DiscountType');
+        const discountValueInput = document.getElementById('DiscountValue');
+        const discountValueRequired = document.getElementById('discountValueRequired');
+        const discountValueHint = document.getElementById('discountValueHint');
+
+        function updateDiscountValueField() {
+            const selectedType = discountTypeSelect.value;
+
+            if (selectedType === 'FreeShipping') {
+                discountValueInput.required = false;
+                discountValueInput.disabled = false;
+                discountValueInput.placeholder = '50000';
+                discountValueRequired.style.display = 'none';
+                discountValueHint.innerHTML = '<strong>Optional:</strong> Enter shipping cost (e.g., 50000 for 50,000đ). Leave blank to use default 50,000đ';
+                discountValueInput.classList.add('bg-light');
+            } else if (selectedType === 'Percentage' || selectedType === 'FixedAmount') {
+                discountValueInput.required = true;
+                discountValueInput.disabled = false;
+                discountValueInput.placeholder = '10';
+                discountValueRequired.style.display = 'inline';
+                if (selectedType === 'Percentage') {
+                    discountValueHint.textContent = 'Enter percentage (e.g., 10 for 10% off)';
+                } else {
+                    discountValueHint.textContent = 'Enter amount in đ (e.g., 50000 for 50,000đ off)';
+                }
+                discountValueInput.classList.remove('bg-light');
+            } else {
+                discountValueInput.required = true;
+                discountValueInput.disabled = false;
+                discountValueInput.placeholder = '10';
+                discountValueRequired.style.display = 'inline';
+                discountValueHint.textContent = '% for percentage, đ for fixed amounts';
+                discountValueInput.classList.remove('bg-light');
+            }
+        }
+
+        // Initial state
+        updateDiscountValueField();
+
+        // Listen for changes
+        discountTypeSelect.addEventListener('change', updateDiscountValueField);
+    });
+</script>

@@ -754,7 +754,7 @@
 
 <script>
   // ============ CONFIGURATION ============
-  const API_BASE_URL = "https://localhost:5107";
+  const API_BASE_URL = "http://localhost:5107";
 
   // ============ STATE ============
   let state = {
@@ -1295,14 +1295,16 @@
         body: JSON.stringify({ discountCodes: [code] })
       });
       const d = res.data;
-      state.cartSummary.discount      = d.discountAmount || 0;
-      state.cartSummary.finalTotal    = Math.max(0, state.cartSummary.subtotal - state.cartSummary.discount);
+      state.cartSummary.discount      = d.totalDiscountAmount ?? d.discountAmount ?? 0;
+      state.cartSummary.finalTotal    = Math.max(0, d.finalAmount ?? (state.cartSummary.subtotal - state.cartSummary.discount));
       state.cartSummary.discountCodes = [code];
 
       result.style.display = 'block';
       result.className = 'discount-result-box success';
-      const applied = d.appliedDiscounts?.map(a => a.name).join(', ') || 'Mã hợp lệ';
-      result.innerHTML = `✅ ${applied} — Giảm <strong>${fmtVND(d.discountAmount)}</strong>`;
+      const applied = Array.isArray(d.appliedDiscounts) && d.appliedDiscounts.length
+        ? d.appliedDiscounts.join(', ')
+        : 'Mã hợp lệ';
+      result.innerHTML = `✅ ${applied} — Giảm <strong>${fmtVND(state.cartSummary.discount)}</strong>`;
       document.getElementById('sum-total').textContent = fmtVND(state.cartSummary.finalTotal);
       showToast('Áp dụng mã giảm giá thành công!', 'success');
     } catch (err) {

@@ -24,6 +24,8 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
         public int TotalItems { get; set; }
         public decimal OriginalAmount { get; set; }
         public decimal TotalDiscountAmount { get; set; }
+        // Backward-compatible alias for clients using `discountAmount`
+        public decimal DiscountAmount => TotalDiscountAmount;
         public decimal FinalAmount { get; set; }
         public decimal SavingsPercent { get; set; }
         public List<string> AppliedDiscounts { get; set; } = new();

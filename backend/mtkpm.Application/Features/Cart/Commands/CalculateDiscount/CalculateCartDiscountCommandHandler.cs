@@ -30,9 +30,9 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
         {
             _logger.LogInfo($"Calculating cart discount for User {request.UserId}", "DiscountHandler");
 
-            // Get user's cart
-            var cartItems = await _unitOfWork.CartItems.FindAsync(
-                ci => ci.UserId == request.UserId,
+            // Get user's cart with product info (price) to calculate total correctly
+            var cartItems = await _unitOfWork.CartItems.GetByUserIdWithProductsAsync(
+                request.UserId,
                 cancellationToken);
 
             if (!cartItems.Any())
@@ -82,6 +82,7 @@ namespace mtkpm.Application.Features.Cart.Commands.CalculateDiscount
 
                 if (selectedDiscounts.Any())
                 {
+                    _logger.LogInfo($"Applying discount codes: {string.Join(", ", selectedDiscounts.Select(d => $"{d.Code} ({d.DiscountType}:{d.DiscountValue})"))}", "DiscountHandler");
                     discount = _discountService.BuildDiscountFromDiscountEntities(selectedDiscounts);
                     appliedDiscounts = selectedDiscounts.Select(d => d.Code).ToList();
                 }
