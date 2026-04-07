@@ -1348,69 +1348,54 @@ function renderCartPage() {
   }
 
   async function applyDiscount() {
-    const selectEl = document.getElementById('discount-input');
+    const inputEl = document.getElementById('discount-input');
     const result = document.getElementById('discount-result');
     const btn = document.getElementById('btn-apply-discount');
-    
-    const code = selectEl.value; 
-    
-    if (!code) { 
-        showToast('Vui lòng chọn một mã giảm giá', 'error'); 
-        return; 
+    const code = (inputEl?.value || '').trim();
+
+    if (!code) {
+      showToast('Vui lòng nhập/chọn mã giảm giá', 'error');
+      return;
     }
 
-    btn.textContent = 'ĐANG ÁP DỤNG...'; 
+    btn.textContent = 'Đang kiểm tra...';
     btn.disabled = true;
 
     try {
-        // GỌI API THẬT: POST /api/Discount/calculate
-        // Request body đúng chuẩn: { "discountCodes": ["string"] }
-        const res = await apiFetchAuth('/api/Discount/calculate', {
-            method: 'POST',
-            body: JSON.stringify({
-                discountCodes: [code] 
-            })
-        });
+      const res = await apiFetchAuth('/api/discount/calculate', {
+        method: 'POST',
+        body: JSON.stringify({ discountCodes: [code] })
+      });
 
-        // Giả sử API trả về kết quả trong res.data
-        if (res.success && res.data) {
-            const data = res.data;
+      const d = res.data;
+      state.cartSummary.discount = d.totalDiscountAmount ?? d.discountAmount ?? d.totalDiscount ?? 0;
+      state.cartSummary.finalTotal = Math.max(0, d.finalAmount ?? d.finalTotal ?? (state.cartSummary.subtotal - state.cartSummary.discount));
+      state.cartSummary.discountCodes = [code];
 
-            // 1. Cập nhật State toàn cục
-            state.cartSummary.discount = data.totalDiscount || 0;
-            state.cartSummary.finalTotal = data.finalTotal;
-            state.cartSummary.discountCodes = [code];
+      result.style.display = 'block';
+      result.className = 'discount-result-box success';
+      const applied = Array.isArray(d.appliedDiscounts) && d.appliedDiscounts.length
+        ? d.appliedDiscounts.join(', ')
+        : 'Mã hợp lệ';
+      result.innerHTML = `✅ ${applied} — Giảm <strong>${fmtVND(state.cartSummary.discount)}</strong>`;
 
-            // 2. Hiển thị thông báo thành công
-            result.style.display = 'block';
-            result.style.color = 'green';
-            result.innerHTML = `✅ Áp dụng thành công mã <strong>${code}</strong>. Giảm: <strong>${fmtVND(data.totalDiscount)}</strong>`;
-            
-            // 3. Cập nhật số tiền hiển thị trên giao diện
-            const sumTotalEl = document.getElementById('sum-total');
-            if (sumTotalEl) {
-                sumTotalEl.textContent = fmtVND(data.finalTotal);
-            }
-            
-            showToast(`Đã giảm ${fmtVND(data.totalDiscount)} vào đơn hàng!`, 'success');
-        } else {
-            throw new Error(res.message || "Mã giảm giá không hợp lệ hoặc đã hết hạn");
-        }
-
+      const sumTotalEl = document.getElementById('sum-total');
+      if (sumTotalEl) sumTotalEl.textContent = fmtVND(state.cartSummary.finalTotal);
+      showToast('Áp dụng mã giảm giá thành công!', 'success');
     } catch (err) {
-        console.error("Lỗi Discount:", err);
-        result.style.display = 'block';
-        result.style.color = 'red';
-        result.innerHTML = `❌ ${err.message}`;
-        
-        // Reset lại chiết khấu về 0 nếu áp dụng lỗi
-        state.cartSummary.discount = 0;
-        state.cartSummary.discountCodes = [];
+      result.style.display = 'block';
+      result.className = 'discount-result-box error';
+      result.innerHTML = `❌ ${err.message}`;
+      state.cartSummary.discount = 0;
+      state.cartSummary.discountCodes = [];
+      state.cartSummary.finalTotal = state.cartSummary.subtotal;
+      const sumTotalEl = document.getElementById('sum-total');
+      if (sumTotalEl) sumTotalEl.textContent = fmtVND(state.cartSummary.finalTotal);
     } finally {
-        btn.textContent = 'ÁP DỤNG';
-        btn.disabled = false;
+      btn.textContent = 'Áp dụng';
+      btn.disabled = false;
     }
-}
+  }
   // ════════════════════════════════════════════════════════
   //  CHECKOUT
   // ════════════════════════════════════════════════════════
