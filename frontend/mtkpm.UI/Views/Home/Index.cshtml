@@ -1364,7 +1364,6 @@ function renderCartPage() {
 
     try {
         // GỌI API THẬT: POST /api/Discount/calculate
-        // Request body đúng chuẩn: { "discountCodes": ["string"] }
         const res = await apiFetchAuth('/api/Discount/calculate', {
             method: 'POST',
             body: JSON.stringify({
@@ -1376,23 +1375,29 @@ function renderCartPage() {
         if (res.success && res.data) {
             const data = res.data;
 
-            // 1. Cập nhật State toàn cục
-            state.cartSummary.discount = data.totalDiscount || 0;
-            state.cartSummary.finalTotal = data.finalTotal;
+            // 1. Cập nhật State toàn cục (FIX LẠI KEY TỪ API)
+            state.cartSummary.discount = data.totalDiscountAmount || 0; // Sửa từ totalDiscount
+            state.cartSummary.finalTotal = data.finalAmount;            // Sửa từ finalTotal
             state.cartSummary.discountCodes = [code];
 
-            // 2. Hiển thị thông báo thành công
+            // 2. Hiển thị thông báo thành công (FIX LẠI KEY)
             result.style.display = 'block';
             result.style.color = 'green';
-            result.innerHTML = `✅ Áp dụng thành công mã <strong>${code}</strong>. Giảm: <strong>${fmtVND(data.totalDiscount)}</strong>`;
+            result.innerHTML = `✅ Áp dụng thành công mã <strong>${code}</strong>. Giảm: <strong>${fmtVND(data.totalDiscountAmount)}</strong>`;
             
-            // 3. Cập nhật số tiền hiển thị trên giao diện
+            // 3. Cập nhật số tiền hiển thị trên giao diện (FIX LẠI KEY)
             const sumTotalEl = document.getElementById('sum-total');
             if (sumTotalEl) {
-                sumTotalEl.textContent = fmtVND(data.finalTotal);
+                sumTotalEl.textContent = fmtVND(data.finalAmount);
             }
             
-            showToast(`Đã giảm ${fmtVND(data.totalDiscount)} vào đơn hàng!`, 'success');
+            // Render lại số tiền giảm giá trên UI (gọi lại hàm hoặc gán tay)
+            const discountEl = document.getElementById('sum-discount');
+            if (discountEl) {
+                discountEl.textContent = `-${fmtVND(data.totalDiscountAmount)}`;
+            }
+
+            showToast(`Đã giảm ${fmtVND(data.totalDiscountAmount)} vào đơn hàng!`, 'success');
         } else {
             throw new Error(res.message || "Mã giảm giá không hợp lệ hoặc đã hết hạn");
         }
@@ -1411,6 +1416,7 @@ function renderCartPage() {
         btn.disabled = false;
     }
 }
+
   // ════════════════════════════════════════════════════════
   //  CHECKOUT
   // ════════════════════════════════════════════════════════
