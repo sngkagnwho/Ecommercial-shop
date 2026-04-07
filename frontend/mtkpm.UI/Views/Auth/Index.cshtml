@@ -1,0 +1,982 @@
+﻿@{
+    Layout = null;
+    var initialTab = ViewData["Tab"]?.ToString() ?? "login";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopVN - Đăng nhập / Đăng ký</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & DESIGN TOKENS  (mirrors Index.cshtml variables)
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:      #0f3460;
+  --primary-dark: #0a2545;
+  --accent:       #e94560;
+  --accent-hover: #c73652;
+  --bg:           #f5f6fa;
+  --card:         #ffffff;
+  --text:         #1a1a2e;
+  --muted:        #6b7280;
+  --border:       #e5e7eb;
+  --success:      #10b981;
+  --danger:       #ef4444;
+  --shadow:       0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg:    0 8px 40px rgba(0,0,0,0.14);
+  --radius:       12px;
+  --radius-sm:    8px;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ============================================================
+   LAYOUT — SPLIT SCREEN
+   ============================================================ */
+.auth-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* LEFT PANEL — brand hero */
+.brand-panel {
+  width: 42%;
+  background: var(--primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* decorative circles */
+.brand-panel::before {
+  content: '';
+  position: absolute;
+  width: 520px; height: 520px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.07);
+  top: -160px; right: -180px;
+}
+.brand-panel::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(233,69,96,0.12);
+  bottom: -80px; left: -60px;
+}
+
+.brand-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 48px;
+  position: relative; z-index: 1;
+}
+.brand-logo span { color: var(--accent); }
+
+.brand-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  line-height: 1.22;
+  color: #fff;
+  margin-bottom: 20px;
+  position: relative; z-index: 1;
+}
+.brand-headline em { color: var(--accent); font-style: normal; }
+
+.brand-sub {
+  color: rgba(255,255,255,0.65);
+  font-size: 15px;
+  max-width: 360px;
+  line-height: 1.75;
+  margin-bottom: 48px;
+  position: relative; z-index: 1;
+}
+
+.brand-stats {
+  display: flex;
+  gap: 36px;
+  position: relative; z-index: 1;
+}
+.brand-stat strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.brand-stat span {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+}
+
+.brand-back {
+  position: absolute;
+  top: 28px; left: 56px;
+  display: flex; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; z-index: 2;
+  transition: color 0.2s;
+}
+.brand-back:hover { color: #fff; }
+.brand-back svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* RIGHT PANEL — form */
+.form-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.auth-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 44px 48px;
+  width: 100%;
+  max-width: 460px;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.auth-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 32px;
+  gap: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 11px 0;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all 0.22s;
+}
+.tab-btn.active {
+  background: var(--card);
+  color: var(--primary);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+}
+
+/* ============================================================
+   FORM SECTIONS
+   ============================================================ */
+.form-section { display: none; }
+.form-section.active { display: block; }
+
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+.form-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 7px;
+  letter-spacing: 0.2px;
+}
+.field-wrap {
+  position: relative;
+}
+.field-wrap .field-icon {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  color: var(--muted);
+}
+.field input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15,52,96,0.09);
+}
+.field input.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.09);
+}
+.field-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 5px;
+  display: none;
+  font-weight: 600;
+}
+.field-error.show { display: block; }
+
+/* password toggle */
+.toggle-pw {
+  position: absolute;
+  right: 13px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer; font-size: 16px;
+  color: var(--muted);
+  padding: 2px;
+  transition: color 0.2s;
+}
+.toggle-pw:hover { color: var(--primary); }
+
+/* remember-me / terms */
+.field-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.field-check input[type="checkbox"] {
+  width: 17px; height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.field-check a { color: var(--accent); font-weight: 600; }
+
+/* forgot password link */
+.forgot-link {
+  float: right;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(233,69,96,0.32);
+}
+.btn-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* spinner inside button */
+.btn-spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.btn-submit.loading .btn-spinner { display: block; }
+.btn-submit.loading .btn-text    { display: none; }
+
+@@keyframes spin { to { transform: rotate(360deg); } }
+
+/* divider */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 22px 0; color: var(--muted); font-size: 13px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+
+/* switch link */
+.switch-msg {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 22px;
+}
+.switch-msg a {
+  color: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+.switch-msg a:hover { text-decoration: underline; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast-container {
+  position: fixed;
+  top: 22px; right: 22px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  padding: 13px 18px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  max-width: 340px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.info    { background: var(--primary); }
+
+@@keyframes slideIn {
+  from { transform: translateX(60px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(60px); opacity: 0; }
+}
+
+/* ============================================================
+   SUCCESS OVERLAY  (shown after login)
+   ============================================================ */
+.success-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,52,96,0.9);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9998; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.success-overlay.show { opacity: 1; pointer-events: all; }
+.success-overlay .check {
+  font-size: 72px;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.success-overlay h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; color: #fff;
+  margin: 16px 0 8px;
+}
+.success-overlay p {
+  color: rgba(255,255,255,0.65);
+  font-size: 15px;
+}
+@@keyframes popIn {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@@media (max-width: 860px) {
+  .brand-panel { display: none; }
+  .form-panel  { padding: 32px 20px; }
+  .auth-card   { padding: 32px 26px; }
+}
+@@media (max-width: 480px) {
+  .form-row    { grid-template-columns: 1fr; }
+  .auth-card   { padding: 28px 18px; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container"></div>
+
+<!-- ===== SUCCESS OVERLAY ===== -->
+<div class="success-overlay" id="success-overlay">
+  <div class="check">✅</div>
+  <h2>Thành công!</h2>
+  <p id="success-msg">Đang chuyển hướng...</p>
+</div>
+
+<div class="auth-wrapper">
+
+  <!-- ===== BRAND PANEL (left) ===== -->
+  <div class="brand-panel">
+    <a class="brand-back" href="/">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Quay lại cửa hàng
+    </a>
+
+    <div class="brand-logo">Shop<span>VN</span></div>
+
+    <h1 class="brand-headline">
+      Mua sắm <em>thông minh</em><br>Nâng tầm<br>phong cách
+    </h1>
+    <p class="brand-sub">
+      Hơn 10.000 sản phẩm chất lượng từ 500+ thương hiệu hàng đầu. 
+      Giao hàng toàn quốc, đổi trả dễ dàng, thanh toán bảo mật.
+    </p>
+
+    <div class="brand-stats">
+      <div class="brand-stat"><strong>10k+</strong><span>Khách hàng</span></div>
+      <div class="brand-stat"><strong>500+</strong><span>Thương hiệu</span></div>
+      <div class="brand-stat"><strong>99%</strong><span>Hài lòng</span></div>
+    </div>
+  </div>
+
+  <!-- ===== FORM PANEL (right) ===== -->
+  <div class="form-panel">
+    <div class="auth-card">
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Đăng nhập</button>
+        <button class="tab-btn"        id="tab-register" onclick="switchTab('register')">Đăng ký</button>
+      </div>
+
+      <!-- ===== LOGIN FORM ===== -->
+      <div class="form-section active" id="section-login">
+        <h2 class="form-title">Chào mừng trở lại 👋</h2>
+        <p class="form-sub">Đăng nhập vào tài khoản ShopVN của bạn</p>
+
+        <div class="field">
+          <label for="login-username">Tên đăng nhập / Email</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" id="login-username" placeholder="username hoặc email@@" autocomplete="username">
+          </div>
+          <div class="field-error" id="err-login-username">Vui lòng nhập tên đăng nhập hoặc email</div>
+        </div>
+
+        <div class="field">
+          <span class="forgot-link" onclick="showForgotToast()">Quên mật khẩu?</span>
+          <label for="login-password">Mật khẩu</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="toggle-pw" onclick="togglePw('login-password', this)" title="Hiện/ẩn mật khẩu">👁</button>
+          </div>
+          <div class="field-error" id="err-login-password">Vui lòng nhập mật khẩu</div>
+        </div>
+
+        <label class="field-check">
+          <input type="checkbox" id="login-remember" checked>
+          Ghi nhớ đăng nhập
+        </label>
+
+        <button class="btn-submit" id="btn-login" onclick="handleLogin()">
+          <span class="btn-text">Đăng nhập</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+        <p class="switch-msg">
+          Chưa có tài khoản? <a onclick="switchTab('register')">Đăng ký ngay →</a>
+        </p>
+      </div>
+
+      <!-- ===== REGISTER FORM ===== -->
+      <div class="form-section" id="section-register">
+        <h2 class="form-title">Tạo tài khoản mới ✨</h2>
+        <p class="form-sub">Tham gia ShopVN — miễn phí, nhanh chóng</p>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="reg-username">Tên đăng nhập <span style="color:var(--accent)">*</span></label>
+            <div class="field-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="reg-username" placeholder="username..." autocomplete="username">
+            </div>
+            <div class="field-error" id="err-reg-username">Tối thiểu 3 ký tự</div>
+          </div>
+
+          <div class="field">
+            <label for="reg-phone">Số điện thoại</label>
+            <div class="field-wrap">
+              <span class="field-icon">📱</span>
+              <input type="tel" id="reg-phone" placeholder="09xxxxxxxx" autocomplete="tel">
+            </div>
+            <div class="field-error" id="err-reg-phone">Số điện thoại không hợp lệ</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-email">Email <span style="color:var(--accent)">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon">📧</span>
+            <input type="email" id="reg-email" placeholder="email@example.com" autocomplete="email">
+          </div>
+          <div class="field-error" id="err-reg-email">Email không hợp lệ</div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="reg-password">Mật khẩu <span style="color:var(--accent)">*</span></label>
+            <div class="field-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+              <button type="button" class="toggle-pw" onclick="togglePw('reg-password', this)" title="Hiện/ẩn">👁</button>
+            </div>
+            <div class="field-error" id="err-reg-password">Tối thiểu 6 ký tự</div>
+          </div>
+
+          <div class="field">
+            <label for="reg-confirm">Xác nhận mật khẩu <span style="color:var(--accent)">*</span></label>
+            <div class="field-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="reg-confirm" placeholder="••••••••" autocomplete="new-password">
+              <button type="button" class="toggle-pw" onclick="togglePw('reg-confirm', this)" title="Hiện/ẩn">👁</button>
+            </div>
+            <div class="field-error" id="err-reg-confirm">Mật khẩu không khớp</div>
+          </div>
+        </div>
+
+        <label class="field-check">
+          <input type="checkbox" id="reg-terms">
+          Tôi đồng ý với <a href="#" onclick="return false">Điều khoản dịch vụ</a> và <a href="#" onclick="return false">Chính sách bảo mật</a>
+        </label>
+        <div class="field-error" id="err-reg-terms" style="margin-top:-10px; margin-bottom:14px;">Bạn cần đồng ý điều khoản</div>
+
+        <button class="btn-submit" id="btn-register" onclick="handleRegister()">
+          <span class="btn-text">Tạo tài khoản</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+        <p class="switch-msg">
+          Đã có tài khoản? <a onclick="switchTab('login')">Đăng nhập →</a>
+        </p>
+      </div>
+
+    </div><!-- /.auth-card -->
+  </div><!-- /.form-panel -->
+</div><!-- /.auth-wrapper -->
+
+<script>
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const API_BASE_URL = 'https://localhost:5107';
+
+const ENDPOINTS = {
+  login:        '/api/auth/login',
+  register:     '/api/auth/register',
+  refreshToken: '/api/auth/refresh-token',
+  logout:       '/api/auth/logout'
+};
+
+// ============================================================
+// TOKEN STORAGE
+// ============================================================
+const TokenStore = {
+  save(data) {
+    localStorage.setItem('token', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify({
+      userId: data.userId,
+      userName: data.userName,
+      email: data.email
+    }));
+  },
+  clear() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  },
+  get() {
+    let user = null;
+    try {
+      const raw = localStorage.getItem('user');
+      user = raw ? JSON.parse(raw) : null;
+    } catch {}
+
+    return {
+      accessToken: localStorage.getItem('token'),
+      refreshToken: localStorage.getItem('refreshToken'),
+      user
+    };
+  }
+};
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function apiFetch(endpoint, body, token = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  let res;
+  try {
+    res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body)
+    });
+  } catch (err) {
+    console.error('NETWORK ERROR:', err);
+    throw new Error('Không thể kết nối đến server');
+  }
+
+  let result = {};
+  try { result = await res.json(); } catch {}
+
+  if (!res.ok) {
+  if (result.errors) {
+    const msg = Object.values(result.errors).flat().join(', ');
+    throw new Error(msg);
+  }
+  throw new Error(result.message || `HTTP ${res.status}`);
+}
+
+// 🔥 NEW: handle logical failure
+if (result.success === false) {
+  throw new Error(result.message || 'Request failed');
+}
+
+  return result;
+}
+
+// ============================================================
+// REFRESH TOKEN
+// ============================================================
+async function refreshAccessToken() {
+  const stored = TokenStore.get();
+
+  if (!stored.accessToken || !stored.refreshToken)
+    throw new Error('No tokens');
+
+  const result = await apiFetch(
+    ENDPOINTS.refreshToken,
+    {
+      accessToken: stored.accessToken,
+      refreshToken: stored.refreshToken
+    },
+    stored.accessToken
+  );
+
+  if (result.success && result.data) {
+    TokenStore.save(result.data);
+    return result.data.accessToken;
+  }
+
+  throw new Error(result.message || 'Refresh failed');
+}
+
+// ============================================================
+// GLOBAL LOCK
+// ============================================================
+let isSubmitting = false;
+
+// ============================================================
+// LOGIN
+// ============================================================
+async function handleLogin() {
+  if (isSubmitting) return;
+  isSubmitting = true;
+
+  clearErrors();
+
+  const username = v('login-username').trim();
+  const password = v('login-password').trim();
+  const remember = document.getElementById('login-remember').checked;
+
+  let ok = true;
+  if (!username) { showFieldError('login-username', true); ok = false; }
+  if (!password) { showFieldError('login-password', true); ok = false; }
+
+  if (!ok) {
+    isSubmitting = false;
+    return;
+  }
+
+  setLoading('btn-login', true);
+
+  try {
+    const result = await apiFetch(ENDPOINTS.login, {
+      userNameOrEmail: username,
+      password,
+      rememberMe: remember
+    });
+
+    let data = null;
+
+    if (result?.data) data = result.data;
+    else if (result?.accessToken) data = result;
+
+    if (data && data.accessToken) {
+      TokenStore.save(data);
+
+      showSuccess(`Chào mừng, ${data.userName || 'user'}!`);
+
+      // 🔥 IMPORTANT: ensure redirect ALWAYS happens
+      setTimeout(() => {
+        window.location.href = '/Home';
+      }, 1200);
+
+    } else {
+      throw new Error(result.message || 'Đăng nhập thất bại');
+    }
+
+  } catch (err) {
+    console.error('LOGIN ERROR:', err);
+    showToast(err.message || 'Login failed', 'error');
+
+  } finally {
+    setLoading('btn-login', false);
+    isSubmitting = false;
+  }
+}
+
+// ============================================================
+// REGISTER
+// ============================================================
+async function handleRegister() {
+  if (isSubmitting) return;
+  isSubmitting = true;
+
+  clearErrors();
+
+  const userName = v('reg-username').trim();
+  const email = v('reg-email').trim();
+  const password = v('reg-password');
+  const confirmPassword = v('reg-confirm');
+  const phoneNumber = v('reg-phone').trim();
+  const terms = document.getElementById('reg-terms').checked;
+
+  let ok = true;
+
+  if (userName.length < 3) { showFieldError('reg-username', true); ok = false; }
+  if (!isValidEmail(email)) { showFieldError('reg-email', true); ok = false; }
+  if (password.length < 6) { showFieldError('reg-password', true); ok = false; }
+  if (password !== confirmPassword) { showFieldError('reg-confirm', true); ok = false; }
+  if (!terms) { showFieldError('reg-terms', true); ok = false; }
+
+  if (!ok) {
+    isSubmitting = false;
+    return;
+  }
+
+  setLoading('btn-register', true);
+
+  try {
+    const payload = {
+      userName,
+      email,
+      password,
+      confirmPassword,
+      phoneNumber: phoneNumber || ""
+    };
+
+    console.log('REGISTER PAYLOAD:', payload);
+
+    const result = await apiFetch(ENDPOINTS.register, payload);
+
+    if (result.success && result.data) {
+      TokenStore.save(result.data);
+      showSuccess(`Tài khoản đã tạo thành công!`);
+      scheduleRedirect('/Auth');
+    } else {
+      throw new Error(result.message || 'Đăng ký thất bại');
+    }
+
+  } catch (err) {
+    console.error('REGISTER ERROR:', err);
+    showToast(err.message, 'error');
+  } finally {
+    setLoading('btn-register', false);
+    isSubmitting = false;
+  }
+}
+
+// ============================================================
+// TAB SWITCHING (FIXED)
+// ============================================================
+function switchTab(tab) {
+  ['login', 'register'].forEach(t => {
+    const tabBtn = document.getElementById(`tab-${t}`);
+    const section = document.getElementById(`section-${t}`);
+
+    tabBtn?.classList.toggle('active', t === tab);
+    section?.classList.toggle('active', t === tab);
+  });
+
+  clearErrors();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function v(id) {
+  return document.getElementById(id)?.value ?? '';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+}
+
+function showFieldError(fieldId, show) {
+  const input = document.getElementById(fieldId);
+  const err = document.getElementById(`err-${fieldId}`);
+  input?.classList.toggle('error', show);
+  err?.classList.toggle('show', show);
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('input.error').forEach(i => i.classList.remove('error'));
+}
+
+function isValidEmail(email) {
+  return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+}
+
+// ============================================================
+// UI
+// ============================================================
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  container.appendChild(t);
+
+  setTimeout(() => t.remove(), 3000);
+}
+
+function showSuccess(msg) {
+  document.getElementById('success-msg').textContent = msg;
+  document.getElementById('success-overlay').classList.add('show');
+}
+
+function scheduleRedirect(url, delay = 1500) {
+  setTimeout(() => window.location.href = url, delay);
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function () {
+
+  // Bind tabs
+  document.getElementById('tab-login')
+    ?.addEventListener('click', () => switchTab('login'));
+
+  document.getElementById('tab-register')
+    ?.addEventListener('click', () => switchTab('register'));
+
+  // Razor-safe init
+  const tab = '@(initialTab ?? "login")';
+  switchTab(tab === 'register' ? 'register' : 'login');
+
+  // Auto-login check
+  const stored = TokenStore.get();
+
+  if (stored.accessToken && stored.user) {
+    refreshAccessToken()
+      .then(() => window.location.href = '/')
+      .catch(() => TokenStore.clear());
+  }
+
+  // Enter key submit
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || isSubmitting) return;
+
+    const loginActive =
+      document.getElementById('section-login').classList.contains('active');
+
+    if (loginActive) handleLogin();
+    else handleRegister();
+  });
+
+})();
+</script>
+</body>
+</html>
