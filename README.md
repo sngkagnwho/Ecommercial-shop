@@ -169,27 +169,295 @@ Access at `https://localhost:3001`
 
 ## 🏗️ Architecture Overview
 
-### Layered Architecture
+### Clean Architecture Pattern
 
-1. **Presentation Layer** (`mtkpm.UI`, `mtkpm.Admin`)
-   - Razor Pages
-   - User interfaces
-   - Request handling
+Dự án tuân theo **Clean Architecture** pattern với các layer độc lập và dependencies hướng vào core:
 
-2. **Application Layer** (`mtkpm.Application`)
-   - Business logic
-   - Use cases
-   - DTOs
+```
+┌─────────────────────────────────────────────────────────────┐
+│           Presentation Layer (mtkpm.UI, mtkpm.Admin)         │
+│              Razor Pages & Controllers                       │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│          Application Layer (mtkpm.Application)               │
+│    Features, Commands, Queries, DTOs, Validators            │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│           Domain Layer (mtkpm.Domain)                        │
+│      Entities, Enums, Events, Interfaces (Independent)      │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│      Infrastructure Layer (mtkpm.Infrastructure)             │
+│    DbContext, Repositories, Services, Migrations             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-3. **Domain Layer** (`mtkpm.Domain`)
-   - Core entities
-   - Business rules
-   - Interfaces
+### Layer Details
 
-4. **Infrastructure Layer** (`mtkpm.Infrastructure`)
-   - Database operations
-   - External service integrations
-   - Repository implementations
+#### 1️⃣ **Domain Layer** (`mtkpm.Domain`) - The Core
+**Độc lập hoàn toàn, không phụ thuộc vào layer khác**
+
+**Entities** - Các thực thể chính:
+- `User.cs` - Người dùng hệ thống
+- `Product.cs` - Sản phẩm
+- `Category.cs` - Danh mục sản phẩm
+- `Order.cs` / `OrderItem.cs` - Đơn hàng và chi tiết
+- `CartItem.cs` - Mục giỏ hàng
+- `Discount.cs` / `DiscountUsageHistory.cs` - Khuyến mãi
+- `PricingRule.cs` - Quy tắc giá
+- `PaymentMethodConfig.cs` - Cấu hình phương thức thanh toán
+- `UserAddress.cs` - Địa chỉ người dùng
+- `FavouriteProduct.cs` - Sản phẩm yêu thích
+- `RefreshToken.cs` - Token làm mới
+
+**Base Classes**:
+- `BaseEntity.cs` - Entity cơ bản (Id, CreatedAt, UpdatedAt)
+- `SoftDeleteEntity.cs` - Entity với soft delete
+
+**Enums**:
+- `OrderStatus.cs` - Trạng thái đơn hàng
+- `PaymentMethodType.cs` - Loại phương thức thanh toán
+
+**Domain Events**:
+- `DomainEvent.cs` - Base class cho domain events
+- `OrderEvents.cs` - Các sự kiện liên quan đến đơn hàng
+- `PaymentEvents.cs` - Các sự kiện thanh toán
+
+---
+
+#### 2️⃣ **Application Layer** (`mtkpm.Application`) - Use Cases & Business Logic
+
+**Features** - Tổ chức theo domain/chức năng:
+- **Auth/** - Xác thực
+  - Commands: `RegisterCommand`, `LoginCommand`, `ChangePasswordCommand`, `RefreshTokenCommand`
+  - Handlers: Xử lý logic đăng ký, đăng nhập, đổi mật khẩu
+  - Validators: Validate input
+
+- **Products/** - Quản lý sản phẩm
+  - Commands: `CreateProductCommand`, `UpdateProductCommand`, `DeleteProductCommand`, `UpdateStockCommand`, `CalculatePriceCommand`
+  - Queries: `GetAllProductsQuery`, `GetProductByIdQuery`, `GetProductsByCategoryQuery`, `SearchProductsQuery`, `GetProductsPaginatedQuery`
+
+- **Categories/** - Quản lý danh mục
+  - Commands: `CreateCategoryCommand`, `UpdateCategoryCommand`, `DeleteCategoryCommand`
+  - Queries: `GetAllCategoriesQuery`, `GetCategoryByIdQuery`
+
+- **Orders/** - Quản lý đơn hàng
+  - Commands: `CreateOrderCommand`, `UpdateOrderStatusCommand`, `CancelOrderCommand`, `ProcessPaymentCommand`, `MarkAsPaidCommand`
+  - Queries: `GetAllOrdersQuery`, `GetOrderByIdQuery`, `GetOrderByNumberQuery`, `GetUserOrdersQuery`
+
+- **Cart/** - Quản lý giỏ hàng
+  - Commands: `AddToCartCommand`, `RemoveFromCartCommand`, `UpdateCartItemCommand`, `ClearCartCommand`, `CalculateCartDiscountCommand`
+  - Queries: `GetUserCartQuery`, `GetCartItemCountQuery`
+
+- **Discounts/** - Quản lý khuyến mãi
+  - Commands: `CreateDiscountCommand`, `UpdateDiscountCommand`, `DeleteDiscountCommand`
+  - Queries: `GetDiscountByIdQuery`, `GetDiscountsQuery`
+
+- **Pricing/** - Quản lý giá và quy tắc giá
+  - Commands: `CreatePricingRuleCommand`, `UpdatePricingRuleCommand`, `DeletePricingRuleCommand`
+  - Queries: `GetPricingRulesQuery`, `GetPricingRuleByIdQuery`
+
+- **PaymentMethodConfigs/** - Cấu hình thanh toán
+  - Commands: `CreatePaymentMethodConfigCommand`, `UpdatePaymentMethodConfigCommand`, `DeletePaymentMethodConfigCommand`
+  - Queries: `GetPaymentMethodConfigsQuery`, `GetPaymentMethodConfigByCodeQuery`
+
+- **Users/** - Quản lý người dùng
+  - Commands: `UpdateUserCommand`, `AddFavouriteCommand`, `RemoveFavouriteCommand`, `CreateUserAddressCommand`, `UpdateUserAddressCommand`, `DeleteUserAddressCommand`
+  - Queries: `GetUserAddressesQuery`, `GetUserFavouritesQuery`, `GetUserAddressByIdQuery`
+
+- **NotificationMethods/** - Quản lý phương thức thông báo
+  - Commands: `SubscribeNotificationMethodCommand`, `UnsubscribeNotificationMethodCommand`
+  - Queries: `GetNotificationMethodsQuery`
+
+**Common/DTOs** - Data Transfer Objects:
+- Auth DTOs: `RegisterDto`, `LoginDto`, `AuthDto`, `ChangePasswordDto`, `RefreshTokenDto`
+- User DTOs: `UserDto`, `UserAddressDto`, `UpdateUserDto`, `UserWithRolesDto`, `AddFavouriteProductDto`, `FavouriteProductDto`
+- Product DTOs: `ProductDto`, `CreateProductDto`, `UpdateProductDto`
+- Order DTOs: `OrderDto`, `OrderItemDto`, `CreateOrderDto`, `UpdateOrderStatusDto`
+- Cart DTOs: `CartDto`, `CartItemDto`, `AddToCartDto`, `UpdateCartItemDto`
+- Category DTOs: `CategoryDto`, `CreateCategoryDto`, `UpdateCategoryDto`
+- Discount DTOs: `DiscountDto`
+- Pricing DTOs: `PricingRuleDto`
+- Payment DTOs: `PaymentMethodConfigDto`, `PaymentStatusInfoDto`
+- Common: `ApiResponse`, `PaginatedListDto`
+
+**Common/Interfaces** - Abstraction:
+- **Repositories**: `IRepository`, `IProductRepository`, `IOrderRepository`, `ICategoryRepository`, `ICartItemRepository`, `IDiscountRepository`, `IFavouriteProductRepository`, `IUserAddressRepository`, `IPaymentMethodConfigRepository`, `IPricingRuleRepository`, `IRefreshTokenRepository`, `IUnitOfWork`
+- **Services**: `IProductService`, `ICategoryService`, `ICartService`, `IOrderService`, `IPaymentService`, `IDiscountService`, `IPricingService`, `IUserService`, `IFavouriteProductService`, `INotificationMethodService`, `IPaymentMethod`, `IPaymentFactory`, `IPricingStrategy`, `INotificationObserver`
+- **Auth & Token**: `IAuthService`, `IJwtService`, `ITokenService`, `ILoggerService`, `IEventPublisher`
+
+**Mappers** - AutoMapper Profiles:
+- `UserMappingProfile`
+- `ProductMappingProfile`
+- `OrderMappingProfile`
+- `CategoryMappingProfile`
+- `CartMappingProfile`
+- `DiscountMappingProfile`
+- `PaymentMethodConfigMappingProfile`
+- `PricingRuleMappingProfile`
+- `UserAddressMappingProfile`
+- `MappingExtensions`
+
+**Validators** - FluentValidation:
+- Command validators cho tất cả commands
+- Discount validators
+
+**DependencyInjection.cs** - Đăng ký tất cả services
+
+---
+
+#### 3️⃣ **Infrastructure Layer** (`mtkpm.Infrastructure`) - Data & External Services
+
+**Data/Contexts**:
+- `ApplicationDbContext.cs` - EF Core DbContext chính
+
+**Data/Configurations** - EF Core Configurations:
+- `UserConfiguration`
+- `ProductConfiguration`
+- `CategoryConfiguration`
+- `OrderConfiguration`
+- `OrderItemConfiguration`
+- `CartItemConfiguration`
+- `FavouriteProductConfiguration`
+- `RefreshTokenConfiguration`
+- `PaymentMethodConfigConfiguration`
+- `DiscountConfiguration`
+- `DiscountUsageHistoryConfiguration`
+- `PricingRuleConfiguration`
+
+**Data/Repositories** - Repository Pattern Implementation:
+- `Repository.cs` - Generic repository base
+- `ProductRepository.cs` - Product repository
+- `OrderRepository.cs` - Order repository
+- `CategoryRepository.cs` - Category repository
+- `CartItemRepository.cs` - Cart item repository
+- `DiscountRepository.cs` - Discount repository
+- `FavouriteProductRepository.cs` - Favourite product repository
+- `UserAddressRepository.cs` - User address repository
+- `PaymentMethodConfigRepository.cs` - Payment config repository
+- `PricingRuleRepository.cs` - Pricing rule repository
+- `RefreshTokenRepository.cs` - Refresh token repository
+
+**Data/UnitOfWork**:
+- `UnitOfWork.cs` - Unit of Work pattern implementation
+
+**Data/Migrations** - EF Core Migrations:
+- Multiple migration files cho database versioning
+
+**Services/Payments** - Cổng thanh toán:
+- `PaymentService.cs` - Core payment service
+- `PaymentFactory.cs` - Factory pattern cho payment methods
+- `CreditCardPaymentService.cs` - Thanh toán bằng thẻ tín dụng
+- `PayPalPaymentService.cs` - Thanh toán PayPal
+- `BankTransferPaymentService.cs` - Chuyển khoản ngân hàng
+- `CODPaymentService.cs` - Thanh toán khi nhận hàng
+
+**Services/Pricing** - Chiến lược định giá:
+- `PricingService.cs` - Core pricing service
+- `RegularPricingStrategy.cs` - Giá thường
+- `BulkDiscountPricingStrategy.cs` - Giảm giá số lượng
+- `SeasonalPricingStrategy.cs` - Giá theo mùa
+- `VIPMemberPricingStrategy.cs` - Giá VIP
+
+**Services/Discounts** - Decorator pattern cho discount:
+- `DiscountService.cs` - Core discount service
+- `BaseDiscount.cs` - Base class
+- `DiscountDecorator.cs` - Decorator base
+- `PercentageDiscountDecorator.cs` - Giảm giá phần trăm
+- `FixedAmountDiscountDecorator.cs` - Giảm giá cố định
+- `FreeShippingDiscountDecorator.cs` - Miễn phí vận chuyển
+- `BundleDiscountDecorator.cs` - Giảm giá combo
+- `LoyaltyPointsDiscountDecorator.cs` - Giảm giá điểm tích lũy
+
+**Services/Notifications** - Hệ thống thông báo:
+- `EventPublisher.cs` - Publish domain events
+- `NotificationSubscriber.cs` - Subscribe to events
+- `NotificationMethodService.cs` - Core notification service
+- `EmailNotificationService.cs` - Email notifications
+- `SMSNotificationService.cs` - SMS notifications
+- `PushNotificationService.cs` - Push notifications
+
+**Services/QRCode**:
+- `QRCodeGeneratorService.cs` - QR code generation
+
+**Services/Auth**:
+- `AuthService.cs` - Authentication service
+- `JwtService.cs` - JWT token management
+- `CurrentUserService.cs` - Get current user info
+
+**Services/Logging**:
+- `LoggerService.cs` - Application logging
+
+**Services/SeedData**:
+- `DataSeeder.cs` - Database seeding
+
+**Configuration**:
+- `JwtSettings.cs` - JWT configuration
+- `PricingRuleConfiguration.cs`
+- `PaymentMethodConfigConfiguration.cs`
+- `DiscountConfiguration.cs`
+- `DiscountUsageHistoryConfiguration.cs`
+
+**DependencyInjection.cs** - Đăng ký tất cả infrastructure services
+
+---
+
+#### 4️⃣ **Presentation Layer** (`mtkpm.UI`, `mtkpm.Admin`) - User Interfaces
+
+**mtkpm.UI** - Customer-facing Razor Pages:
+- Controllers: `HomeController`, `AuthController`
+- Views: Razor pages (`.cshtml`)
+- Models: `ErrorViewModel`
+- Shared layouts: `_Layout.cshtml`, `_ValidationScriptsPartial.cshtml`
+
+**mtkpm.Admin** - Admin Dashboard (.NET 10):
+- Admin management interface
+- Dashboard & analytics
+
+### Design Patterns Used
+
+✅ **Clean Architecture** - Clear separation of concerns
+✅ **Repository Pattern** - Data access abstraction
+✅ **Unit of Work Pattern** - Transaction management
+✅ **Factory Pattern** - Payment methods creation
+✅ **Strategy Pattern** - Pricing strategies
+✅ **Decorator Pattern** - Discount composition
+✅ **Observer Pattern** - Event notifications
+✅ **CQRS** - Commands & Queries separation
+✅ **DTO Pattern** - Data transfer between layers
+✅ **Dependency Injection** - Loose coupling
+
+### Data Flow Example (Order Creation)
+
+```
+1. User Request (UI Layer)
+   ↓
+2. Controller receives CreateOrderCommand (Presentation)
+   ↓
+3. Command Handler processes (Application Layer)
+   ├─ Validates input with validators
+   ├─ Calculates pricing using PricingStrategy
+   ├─ Applies discounts using DiscountService
+   ├─ Creates Order entity
+   ↓
+4. Repository saves to database (Infrastructure)
+   ├─ Uses UnitOfWork for transactions
+   ├─ Executes EF Core migrations
+   ↓
+5. Domain Events published
+   ├─ OrderCreatedEvent
+   ├─ PaymentRequiredEvent
+   ↓
+6. Notifications sent
+   ├─ Email confirmation
+   ├─ SMS notification
+   └─ Push notification
+   ↓
+7. Response sent back to client (Presentation)
+```
 
 ## 🔒 Security Features
 
